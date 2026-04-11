@@ -1,40 +1,40 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Editor from "@monaco-editor/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import * as monaco from "monaco-editor";
-import { registerFileScriptLanguage } from "./FileScriptLanguage";
 import { trpcClient } from "../../services/api";
 
 export default function CodeEditor() {
   const [codeText, setCodeText] = useState<string>("");
-  function handleBeforeMount(monacoInstance: typeof monaco) {
-    registerFileScriptLanguage();
-  }
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<typeof monaco | null>(null);
 
   function handleEditorChange(value: string | undefined) {
     setCodeText(value || "");
   }
 
   function handleCompile() {
-    const tree = trpcClient.compileFScriptCode
+    trpcClient.compileFScriptCode
       .mutate({
         code: codeText,
       })
       .then((res) => {
-        console.log(res);
+        const model = editorRef.current.getModel();
+        const monaco = monacoRef.current;
+        const markers: monaco.editor.IMarkerData[] = res?.errors?.map(
+          (err: any) => ({
+            startLineNumber: err.line,
+            startColumn: err.column + 1,
+            endLineNumber: err.line,
+            endColumn: err.column + 2,
+            message: err.message,
+            severity: monaco.MarkerSeverity.Error,
+          }),
+        );
+
+        console.log(markers);
+        monaco.editor.setModelMarkers(model!, "test-owner", markers);
       });
-
-    // // converte erros → markers do Monaco
-    // const markers: monaco.editor.IMarkerData[] = errors.map((err) => ({
-    //   startLineNumber: err.line,
-    //   startColumn: err.column + 1,
-    //   endLineNumber: err.line,
-    //   endColumn: err.column + 2,
-    //   message: err.message,
-    //   severity: monaco.MarkerSeverity.Error,
-    // }));
-
-    // // aplica no editor
-    // monaco.editor.setModelMarkers(model, "antlr", markers);
   }
 
   return (
@@ -45,11 +45,15 @@ export default function CodeEditor() {
       <Editor
         height="500px"
         onChange={handleEditorChange}
+        language="filescript"
         defaultValue={`var x = 10;
         if x > 5 {
             return x;
             }`}
-        beforeMount={handleBeforeMount}
+        onMount={(editor, monaco) => {
+          editorRef.current = editor;
+          monacoRef.current = monaco;
+        }}
         theme="vs-dark"
       />
     </div>

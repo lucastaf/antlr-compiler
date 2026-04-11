@@ -12,7 +12,7 @@ export const router = t.router({
     const resTree = compile(input.code);
     console.log(resTree)
     return {
-      message: resTree
+      ...resTree
     };
   }),
 });
