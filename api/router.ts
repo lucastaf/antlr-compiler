@@ -1,5 +1,5 @@
 import { initTRPC } from "@trpc/server";
-import { CompileFileScriptCode } from "./FileScriptCompiler";
+import { compile } from "./compile";
 import { z } from 'zod';
 
 const t = initTRPC.create();
@@ -8,9 +8,11 @@ export const router = t.router({
   compileFScriptCode: t.procedure.input(z.object({
     code: z.string()
   })).mutation(async ({ input }) => {
-    const resTree = CompileFileScriptCode(input.code);
+    console.log(input.code);
+    const resTree = compile(input.code);
+    console.log(resTree)
     return {
-      message: resTree.getTokens
+      message: resTree
     };
   }),
 });

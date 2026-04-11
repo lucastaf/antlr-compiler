@@ -15,10 +15,13 @@ export default function CodeEditor() {
   }
 
   function handleCompile() {
-    const tree = trpcClient.compileFScriptCode.mutate({
-      code: "",
-    });
-    console.log(tree);
+    const tree = trpcClient.compileFScriptCode
+      .mutate({
+        code: codeText,
+      })
+      .then((res) => {
+        console.log(res);
+      });
 
     // // converte erros → markers do Monaco
     // const markers: monaco.editor.IMarkerData[] = errors.map((err) => ({
@@ -35,8 +38,10 @@ export default function CodeEditor() {
   }
 
   return (
-    <div>
-      <button onClick={handleCompile}>Compilar</button>
+    <div className="w-full">
+      <button className="bg-blue-950 p-2" onClick={handleCompile}>
+        Compilar
+      </button>
       <Editor
         height="500px"
         onChange={handleEditorChange}

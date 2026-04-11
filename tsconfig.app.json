@@ -22,5 +22,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "api/FileScriptCompiler.ts"]
+  "include": ["src", "api/compile.ts"]
 }
