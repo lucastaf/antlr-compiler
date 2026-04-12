@@ -6,6 +6,7 @@ import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 import { ProgramContext } from "./FileScriptParser";
 import { Lista_comandosContext } from "./FileScriptParser";
 import { ComandoContext } from "./FileScriptParser";
+import { Escopo_codigoContext } from "./FileScriptParser";
 import { Comando_atribuicaoContext } from "./FileScriptParser";
 import { Comando_declaracaoContext } from "./FileScriptParser";
 import { If_stmtContext } from "./FileScriptParser";
@@ -20,7 +21,6 @@ import { Function_declContext } from "./FileScriptParser";
 import { Lista_parametrosContext } from "./FileScriptParser";
 import { Return_stmtContext } from "./FileScriptParser";
 import { Function_callContext } from "./FileScriptParser";
-import { Escopo_codigoContext } from "./FileScriptParser";
 import { ExpressaoContext } from "./FileScriptParser";
 import { Calculo_prioridade_1Context } from "./FileScriptParser";
 import { Calculo_prioridade_2Context } from "./FileScriptParser";
@@ -73,6 +73,17 @@ export interface FileScriptParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitComando?: (ctx: ComandoContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `FileScriptParser.escopo_codigo`.
+	 * @param ctx the parse tree
+	 */
+	enterEscopo_codigo?: (ctx: Escopo_codigoContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.escopo_codigo`.
+	 * @param ctx the parse tree
+	 */
+	exitEscopo_codigo?: (ctx: Escopo_codigoContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `FileScriptParser.comando_atribuicao`.
@@ -227,17 +238,6 @@ export interface FileScriptParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitFunction_call?: (ctx: Function_callContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `FileScriptParser.escopo_codigo`.
-	 * @param ctx the parse tree
-	 */
-	enterEscopo_codigo?: (ctx: Escopo_codigoContext) => void;
-	/**
-	 * Exit a parse tree produced by `FileScriptParser.escopo_codigo`.
-	 * @param ctx the parse tree
-	 */
-	exitEscopo_codigo?: (ctx: Escopo_codigoContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `FileScriptParser.expressao`.
