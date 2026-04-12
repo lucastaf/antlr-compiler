@@ -1,6 +1,6 @@
-import * as monaco from "monaco-editor";
+import * as monacoEditor from "monaco-editor";
 
-export function registerFileScriptLanguage() {
+export function registerFileScriptLanguage(monaco: typeof monacoEditor) {
     monaco.languages.register({ id: "filescript" });
 
     monaco.languages.setMonarchTokensProvider("filescript", {
@@ -28,7 +28,7 @@ export function registerFileScriptLanguage() {
                 [/[a-zA-Z_][a-zA-Z0-9_]*/, "identifier"],
 
                 // delimitadores
-                [/[{}()\[\]]/, "@brackets"],
+                [/[{}()[\]]/, "@brackets"],
 
                 // comentários
                 [/\/\/.*/, "comment"],
@@ -36,9 +36,9 @@ export function registerFileScriptLanguage() {
             ],
 
             comment: [
-                [/[^\/*]+/, "comment"],
+                [/[^/*]+/, "comment"],
                 [/\*\//, "comment", "@pop"],
-                [/[\/*]/, "comment"],
+                [/[/*]/, "comment"],
             ],
         },
     });

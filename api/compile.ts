@@ -3,29 +3,11 @@ import { CharStreams, CommonTokenStream } from "antlr4ts";
 import { FileScriptLexer } from "./generated/fsCompiler/FileScriptLexer";
 import { FileScriptParser } from "./generated/fsCompiler/FileScriptParser";
 import {
-    RecognitionException,
     Recognizer,
 } from "antlr4ts";
+import type { CompileError, CompileResult, TokenInfo } from "../shared/types"
 
-interface CompileError {
-    line: number;
-    column: number;
-    message: string;
-    type: "LEXER" | "PARSER";
-}
 
-interface TokenInfo {
-    text: string;
-    type: number;
-    line: number;
-    column: number;
-}
-
-interface CompileResult {
-    tokens: TokenInfo[];
-    parseTree: string;
-    errors: CompileError[];
-}
 
 export function compile(code: string): CompileResult {
     const input = CharStreams.fromString(code);
@@ -44,7 +26,6 @@ export function compile(code: string): CompileResult {
             line: number,
             column: number,
             msg: string,
-            e: RecognitionException | undefined
         ) {
             const isLexer = recognizer.constructor.name.includes("Lexer");
 

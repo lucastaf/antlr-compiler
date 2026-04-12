@@ -1,23 +1,19 @@
 import { Toaster } from "react-hot-toast";
 import "./App.css";
 import CodeEditor from "./lib/editor/FileScriptEditor";
+import FSLOGO from "../public/favicon.svg";
 
 function App() {
   return (
     <>
       <Toaster position="top-right" />
       <section id="center">
-        <div>
+        <div className="flex gap-4">
+          <img width={48} src={FSLOGO}></img>
           <h1>FileScript editor</h1>
-          <p></p>
         </div>
         <CodeEditor />
       </section>
-
-      <div className="ticks"></div>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
     </>
   );
 }

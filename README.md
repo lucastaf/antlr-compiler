@@ -4,7 +4,7 @@ Lucas Bittencourt Rauch e Caio Rosa
 
 ## Instruções de como rodar o projetos:
 
-Pre requisitos: Ter java e node instalado no computador
+Pre requisitos: Ter node e npm instalado no computador
 
 - Rode 'npm install' para instalar as dependencias do código
 - Rode 'npm run altr' para gerar o compilador
