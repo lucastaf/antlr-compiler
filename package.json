@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "web_dev": "vite",
     "api_dev": "bun --watch api/index.ts",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -21,6 +21,7 @@
     "cors": "^2.8.6",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-hot-toast": "^2.6.0",
     "util": "^0.12.5"
   },
   "devDependencies": {

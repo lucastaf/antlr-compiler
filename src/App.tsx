@@ -1,9 +1,11 @@
+import { Toaster } from "react-hot-toast";
 import "./App.css";
 import CodeEditor from "./lib/editor/FileScriptEditor";
 
 function App() {
   return (
     <>
+      <Toaster position="top-right" />
       <section id="center">
         <div>
           <h1>FileScript editor</h1>
