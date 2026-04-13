@@ -22,5 +22,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "api/compile.ts"]
+  "include": ["web", "api/compile.ts"]
 }
