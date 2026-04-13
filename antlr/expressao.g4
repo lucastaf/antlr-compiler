@@ -48,4 +48,4 @@ valor_calculo: NUMERICO | VARIABLE | STRING | CHAR | array;
 // ===================== ARRAY =====================
 array: COLCHETES_OPEN lista_expressoes? COLCHETES_CLOSE;
 
-lista_expressoes: valor_calculo (COMMA valor_calculo)*;
+lista_expressoes: expressao (COMMA expressao)*;
