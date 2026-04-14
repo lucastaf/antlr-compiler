@@ -22,15 +22,23 @@ import { Lista_parametrosContext } from "./FileScriptParser";
 import { Return_stmtContext } from "./FileScriptParser";
 import { Function_callContext } from "./FileScriptParser";
 import { ExpressaoContext } from "./FileScriptParser";
+import { Calculo_logico_ouContext } from "./FileScriptParser";
+import { Calculo_logico_eContext } from "./FileScriptParser";
+import { Calculo_bitwise_ouContext } from "./FileScriptParser";
+import { Calculo_bitwise_xouContext } from "./FileScriptParser";
+import { Calculo_bitwise_eContext } from "./FileScriptParser";
+import { Calculo_igualdadeContext } from "./FileScriptParser";
+import { Calculo_relacionalContext } from "./FileScriptParser";
+import { Calculo_deslocamentoContext } from "./FileScriptParser";
 import { Calculo_prioridade_1Context } from "./FileScriptParser";
 import { Calculo_prioridade_2Context } from "./FileScriptParser";
-import { Calculo_operador_logicoContext } from "./FileScriptParser";
-import { Calculo_logico_compostoContext } from "./FileScriptParser";
+import { Calculo_unarioContext } from "./FileScriptParser";
 import { Calculo_parentesesContext } from "./FileScriptParser";
 import { Operador_prioridade_1Context } from "./FileScriptParser";
 import { Operador_prioridade_2Context } from "./FileScriptParser";
-import { Operador_logicoContext } from "./FileScriptParser";
-import { Composto_logicoContext } from "./FileScriptParser";
+import { Operador_igualdadeContext } from "./FileScriptParser";
+import { Operador_relacionalContext } from "./FileScriptParser";
+import { Operador_deslocamentoContext } from "./FileScriptParser";
 import { Valor_calculoContext } from "./FileScriptParser";
 import { ArrayContext } from "./FileScriptParser";
 import { Lista_expressoesContext } from "./FileScriptParser";
@@ -251,6 +259,94 @@ export interface FileScriptParserListener extends ParseTreeListener {
 	exitExpressao?: (ctx: ExpressaoContext) => void;
 
 	/**
+	 * Enter a parse tree produced by `FileScriptParser.calculo_logico_ou`.
+	 * @param ctx the parse tree
+	 */
+	enterCalculo_logico_ou?: (ctx: Calculo_logico_ouContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.calculo_logico_ou`.
+	 * @param ctx the parse tree
+	 */
+	exitCalculo_logico_ou?: (ctx: Calculo_logico_ouContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `FileScriptParser.calculo_logico_e`.
+	 * @param ctx the parse tree
+	 */
+	enterCalculo_logico_e?: (ctx: Calculo_logico_eContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.calculo_logico_e`.
+	 * @param ctx the parse tree
+	 */
+	exitCalculo_logico_e?: (ctx: Calculo_logico_eContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `FileScriptParser.calculo_bitwise_ou`.
+	 * @param ctx the parse tree
+	 */
+	enterCalculo_bitwise_ou?: (ctx: Calculo_bitwise_ouContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.calculo_bitwise_ou`.
+	 * @param ctx the parse tree
+	 */
+	exitCalculo_bitwise_ou?: (ctx: Calculo_bitwise_ouContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `FileScriptParser.calculo_bitwise_xou`.
+	 * @param ctx the parse tree
+	 */
+	enterCalculo_bitwise_xou?: (ctx: Calculo_bitwise_xouContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.calculo_bitwise_xou`.
+	 * @param ctx the parse tree
+	 */
+	exitCalculo_bitwise_xou?: (ctx: Calculo_bitwise_xouContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `FileScriptParser.calculo_bitwise_e`.
+	 * @param ctx the parse tree
+	 */
+	enterCalculo_bitwise_e?: (ctx: Calculo_bitwise_eContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.calculo_bitwise_e`.
+	 * @param ctx the parse tree
+	 */
+	exitCalculo_bitwise_e?: (ctx: Calculo_bitwise_eContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `FileScriptParser.calculo_igualdade`.
+	 * @param ctx the parse tree
+	 */
+	enterCalculo_igualdade?: (ctx: Calculo_igualdadeContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.calculo_igualdade`.
+	 * @param ctx the parse tree
+	 */
+	exitCalculo_igualdade?: (ctx: Calculo_igualdadeContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `FileScriptParser.calculo_relacional`.
+	 * @param ctx the parse tree
+	 */
+	enterCalculo_relacional?: (ctx: Calculo_relacionalContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.calculo_relacional`.
+	 * @param ctx the parse tree
+	 */
+	exitCalculo_relacional?: (ctx: Calculo_relacionalContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `FileScriptParser.calculo_deslocamento`.
+	 * @param ctx the parse tree
+	 */
+	enterCalculo_deslocamento?: (ctx: Calculo_deslocamentoContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.calculo_deslocamento`.
+	 * @param ctx the parse tree
+	 */
+	exitCalculo_deslocamento?: (ctx: Calculo_deslocamentoContext) => void;
+
+	/**
 	 * Enter a parse tree produced by `FileScriptParser.calculo_prioridade_1`.
 	 * @param ctx the parse tree
 	 */
@@ -273,26 +369,15 @@ export interface FileScriptParserListener extends ParseTreeListener {
 	exitCalculo_prioridade_2?: (ctx: Calculo_prioridade_2Context) => void;
 
 	/**
-	 * Enter a parse tree produced by `FileScriptParser.calculo_operador_logico`.
+	 * Enter a parse tree produced by `FileScriptParser.calculo_unario`.
 	 * @param ctx the parse tree
 	 */
-	enterCalculo_operador_logico?: (ctx: Calculo_operador_logicoContext) => void;
+	enterCalculo_unario?: (ctx: Calculo_unarioContext) => void;
 	/**
-	 * Exit a parse tree produced by `FileScriptParser.calculo_operador_logico`.
+	 * Exit a parse tree produced by `FileScriptParser.calculo_unario`.
 	 * @param ctx the parse tree
 	 */
-	exitCalculo_operador_logico?: (ctx: Calculo_operador_logicoContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `FileScriptParser.calculo_logico_composto`.
-	 * @param ctx the parse tree
-	 */
-	enterCalculo_logico_composto?: (ctx: Calculo_logico_compostoContext) => void;
-	/**
-	 * Exit a parse tree produced by `FileScriptParser.calculo_logico_composto`.
-	 * @param ctx the parse tree
-	 */
-	exitCalculo_logico_composto?: (ctx: Calculo_logico_compostoContext) => void;
+	exitCalculo_unario?: (ctx: Calculo_unarioContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `FileScriptParser.calculo_parenteses`.
@@ -328,26 +413,37 @@ export interface FileScriptParserListener extends ParseTreeListener {
 	exitOperador_prioridade_2?: (ctx: Operador_prioridade_2Context) => void;
 
 	/**
-	 * Enter a parse tree produced by `FileScriptParser.operador_logico`.
+	 * Enter a parse tree produced by `FileScriptParser.operador_igualdade`.
 	 * @param ctx the parse tree
 	 */
-	enterOperador_logico?: (ctx: Operador_logicoContext) => void;
+	enterOperador_igualdade?: (ctx: Operador_igualdadeContext) => void;
 	/**
-	 * Exit a parse tree produced by `FileScriptParser.operador_logico`.
+	 * Exit a parse tree produced by `FileScriptParser.operador_igualdade`.
 	 * @param ctx the parse tree
 	 */
-	exitOperador_logico?: (ctx: Operador_logicoContext) => void;
+	exitOperador_igualdade?: (ctx: Operador_igualdadeContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `FileScriptParser.composto_logico`.
+	 * Enter a parse tree produced by `FileScriptParser.operador_relacional`.
 	 * @param ctx the parse tree
 	 */
-	enterComposto_logico?: (ctx: Composto_logicoContext) => void;
+	enterOperador_relacional?: (ctx: Operador_relacionalContext) => void;
 	/**
-	 * Exit a parse tree produced by `FileScriptParser.composto_logico`.
+	 * Exit a parse tree produced by `FileScriptParser.operador_relacional`.
 	 * @param ctx the parse tree
 	 */
-	exitComposto_logico?: (ctx: Composto_logicoContext) => void;
+	exitOperador_relacional?: (ctx: Operador_relacionalContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `FileScriptParser.operador_deslocamento`.
+	 * @param ctx the parse tree
+	 */
+	enterOperador_deslocamento?: (ctx: Operador_deslocamentoContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.operador_deslocamento`.
+	 * @param ctx the parse tree
+	 */
+	exitOperador_deslocamento?: (ctx: Operador_deslocamentoContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `FileScriptParser.valor_calculo`.
