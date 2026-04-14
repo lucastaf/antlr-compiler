@@ -8,10 +8,7 @@ export const router = t.router({
   compileFScriptCode: t.procedure.input(z.object({
     code: z.string()
   })).mutation(async ({ input }) => {
-    const resTree = compile(input.code);
-    return {
-      ...resTree
-    };
+    return compile(input.code);
   }),
 });
 

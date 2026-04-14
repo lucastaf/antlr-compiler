@@ -5,7 +5,8 @@ import { FileScriptParser } from "./generated/fsCompiler/FileScriptParser";
 import {
     Recognizer,
 } from "antlr4ts";
-import type { CompileError, CompileResult, TokenInfo } from "../shared/types"
+import type { CompileError, CompileResult, TokenInfo } from "../shared/types";
+import { serializeProgramTree } from "./serializeProgramTree";
 
 
 
@@ -60,10 +61,12 @@ export function compile(code: string): CompileResult {
 
     // 🎯 árvore como string
     const parseTree = tree.toStringTree(parser.ruleNames);
+    const programTree = serializeProgramTree(tree, parser, lexer);
 
     return {
         tokens,
         parseTree,
+        programTree,
         errors,
     };
 }
