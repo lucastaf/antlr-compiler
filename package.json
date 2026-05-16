@@ -6,6 +6,7 @@
   "scripts": {
     "web_dev": "vite",
     "api_dev": "bun --watch api/index.ts",
+    "dev": "concurrently \"npm run web_dev\" \"npm run api_dev\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -38,6 +39,7 @@
     "antlr4ts-cli": "^0.5.0-alpha.4",
     "autoprefixer": "^10.4.27",
     "babel-plugin-react-compiler": "^1.0.0",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
