@@ -92,27 +92,37 @@ export class FileScriptParser extends Parser {
 	public static readonly RULE_return_stmt = 16;
 	public static readonly RULE_function_call = 17;
 	public static readonly RULE_expressao = 18;
-	public static readonly RULE_calculo_prioridade_1 = 19;
-	public static readonly RULE_calculo_prioridade_2 = 20;
-	public static readonly RULE_calculo_operador_logico = 21;
-	public static readonly RULE_calculo_logico_composto = 22;
-	public static readonly RULE_calculo_parenteses = 23;
-	public static readonly RULE_operador_prioridade_1 = 24;
-	public static readonly RULE_operador_prioridade_2 = 25;
-	public static readonly RULE_operador_logico = 26;
-	public static readonly RULE_composto_logico = 27;
-	public static readonly RULE_valor_calculo = 28;
-	public static readonly RULE_array = 29;
-	public static readonly RULE_lista_expressoes = 30;
+	public static readonly RULE_calculo_logico_ou = 19;
+	public static readonly RULE_calculo_logico_e = 20;
+	public static readonly RULE_calculo_bitwise_ou = 21;
+	public static readonly RULE_calculo_bitwise_xou = 22;
+	public static readonly RULE_calculo_bitwise_e = 23;
+	public static readonly RULE_calculo_igualdade = 24;
+	public static readonly RULE_calculo_relacional = 25;
+	public static readonly RULE_calculo_deslocamento = 26;
+	public static readonly RULE_calculo_prioridade_1 = 27;
+	public static readonly RULE_calculo_prioridade_2 = 28;
+	public static readonly RULE_calculo_unario = 29;
+	public static readonly RULE_calculo_parenteses = 30;
+	public static readonly RULE_operador_prioridade_1 = 31;
+	public static readonly RULE_operador_prioridade_2 = 32;
+	public static readonly RULE_operador_igualdade = 33;
+	public static readonly RULE_operador_relacional = 34;
+	public static readonly RULE_operador_deslocamento = 35;
+	public static readonly RULE_valor_calculo = 36;
+	public static readonly RULE_array = 37;
+	public static readonly RULE_lista_expressoes = 38;
 	// tslint:disable:no-trailing-whitespace
 	public static readonly ruleNames: string[] = [
 		"program", "lista_comandos", "comando", "escopo_codigo", "comando_atribuicao", 
 		"comando_declaracao", "if_stmt", "elseif", "else", "loop", "while_loop", 
 		"do_while_loop", "for_loop", "comandos_function", "function_decl", "lista_parametros", 
-		"return_stmt", "function_call", "expressao", "calculo_prioridade_1", "calculo_prioridade_2", 
-		"calculo_operador_logico", "calculo_logico_composto", "calculo_parenteses", 
-		"operador_prioridade_1", "operador_prioridade_2", "operador_logico", "composto_logico", 
-		"valor_calculo", "array", "lista_expressoes",
+		"return_stmt", "function_call", "expressao", "calculo_logico_ou", "calculo_logico_e", 
+		"calculo_bitwise_ou", "calculo_bitwise_xou", "calculo_bitwise_e", "calculo_igualdade", 
+		"calculo_relacional", "calculo_deslocamento", "calculo_prioridade_1", 
+		"calculo_prioridade_2", "calculo_unario", "calculo_parenteses", "operador_prioridade_1", 
+		"operador_prioridade_2", "operador_igualdade", "operador_relacional", 
+		"operador_deslocamento", "valor_calculo", "array", "lista_expressoes",
 	];
 
 	private static readonly _LITERAL_NAMES: Array<string | undefined> = [
@@ -165,9 +175,9 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 62;
+			this.state = 78;
 			this.lista_comandos();
-			this.state = 63;
+			this.state = 79;
 			this.match(FileScriptParser.EOF);
 			}
 		}
@@ -193,19 +203,19 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 70;
+			this.state = 86;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << FileScriptParser.PARENTESES_CLOSE) | (1 << FileScriptParser.CHAVES_OPEN) | (1 << FileScriptParser.LINE_END) | (1 << FileScriptParser.IF) | (1 << FileScriptParser.FOR) | (1 << FileScriptParser.WHILE) | (1 << FileScriptParser.DO) | (1 << FileScriptParser.FUNCTION) | (1 << FileScriptParser.RETURN) | (1 << FileScriptParser.VARIABLE_DECLARE))) !== 0) || _la === FileScriptParser.VARIABLE) {
 				{
 				{
-				this.state = 65;
+				this.state = 81;
 				this.comando();
-				this.state = 66;
+				this.state = 82;
 				this.match(FileScriptParser.LINE_END);
 				}
 				}
-				this.state = 72;
+				this.state = 88;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -230,13 +240,13 @@ export class FileScriptParser extends Parser {
 		let _localctx: ComandoContext = new ComandoContext(this._ctx, this.state);
 		this.enterRule(_localctx, 4, FileScriptParser.RULE_comando);
 		try {
-			this.state = 80;
+			this.state = 96;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 1, this._ctx) ) {
 			case 1:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 73;
+				this.state = 89;
 				this.comando_atribuicao();
 				}
 				break;
@@ -244,7 +254,7 @@ export class FileScriptParser extends Parser {
 			case 2:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 74;
+				this.state = 90;
 				this.escopo_codigo();
 				}
 				break;
@@ -252,7 +262,7 @@ export class FileScriptParser extends Parser {
 			case 3:
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 75;
+				this.state = 91;
 				this.if_stmt();
 				}
 				break;
@@ -260,7 +270,7 @@ export class FileScriptParser extends Parser {
 			case 4:
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 76;
+				this.state = 92;
 				this.loop();
 				}
 				break;
@@ -268,7 +278,7 @@ export class FileScriptParser extends Parser {
 			case 5:
 				this.enterOuterAlt(_localctx, 5);
 				{
-				this.state = 77;
+				this.state = 93;
 				this.comando_declaracao();
 				}
 				break;
@@ -276,7 +286,7 @@ export class FileScriptParser extends Parser {
 			case 6:
 				this.enterOuterAlt(_localctx, 6);
 				{
-				this.state = 78;
+				this.state = 94;
 				this.comandos_function();
 				}
 				break;
@@ -308,17 +318,17 @@ export class FileScriptParser extends Parser {
 		let _localctx: Escopo_codigoContext = new Escopo_codigoContext(this._ctx, this.state);
 		this.enterRule(_localctx, 6, FileScriptParser.RULE_escopo_codigo);
 		try {
-			this.state = 88;
+			this.state = 104;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 2, this._ctx) ) {
 			case 1:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 82;
+				this.state = 98;
 				this.match(FileScriptParser.CHAVES_OPEN);
-				this.state = 83;
+				this.state = 99;
 				this.lista_comandos();
-				this.state = 84;
+				this.state = 100;
 				this.match(FileScriptParser.CHAVES_CLOSE);
 				}
 				break;
@@ -326,9 +336,9 @@ export class FileScriptParser extends Parser {
 			case 2:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 86;
+				this.state = 102;
 				this.match(FileScriptParser.CHAVES_OPEN);
-				this.state = 87;
+				this.state = 103;
 				this.match(FileScriptParser.CHAVES_CLOSE);
 				}
 				break;
@@ -355,11 +365,11 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 90;
+			this.state = 106;
 			this.match(FileScriptParser.VARIABLE);
-			this.state = 91;
+			this.state = 107;
 			this.match(FileScriptParser.ATTR);
-			this.state = 92;
+			this.state = 108;
 			this.expressao();
 			}
 		}
@@ -384,9 +394,9 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 94;
+			this.state = 110;
 			this.match(FileScriptParser.VARIABLE_DECLARE);
-			this.state = 95;
+			this.state = 111;
 			this.comando_atribuicao();
 			}
 		}
@@ -412,32 +422,32 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 97;
+			this.state = 113;
 			this.match(FileScriptParser.IF);
-			this.state = 98;
+			this.state = 114;
 			this.expressao();
-			this.state = 99;
+			this.state = 115;
 			this.escopo_codigo();
-			this.state = 103;
+			this.state = 119;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la === FileScriptParser.ELIF) {
 				{
 				{
-				this.state = 100;
+				this.state = 116;
 				this.elseif();
 				}
 				}
-				this.state = 105;
+				this.state = 121;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
-			this.state = 107;
+			this.state = 123;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la === FileScriptParser.ELSE) {
 				{
-				this.state = 106;
+				this.state = 122;
 				this.else();
 				}
 			}
@@ -465,11 +475,11 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 109;
+			this.state = 125;
 			this.match(FileScriptParser.ELIF);
-			this.state = 110;
+			this.state = 126;
 			this.expressao();
-			this.state = 111;
+			this.state = 127;
 			this.escopo_codigo();
 			}
 		}
@@ -494,9 +504,9 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 113;
+			this.state = 129;
 			this.match(FileScriptParser.ELSE);
-			this.state = 114;
+			this.state = 130;
 			this.escopo_codigo();
 			}
 		}
@@ -519,27 +529,27 @@ export class FileScriptParser extends Parser {
 		let _localctx: LoopContext = new LoopContext(this._ctx, this.state);
 		this.enterRule(_localctx, 18, FileScriptParser.RULE_loop);
 		try {
-			this.state = 119;
+			this.state = 135;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case FileScriptParser.WHILE:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 116;
+				this.state = 132;
 				this.while_loop();
 				}
 				break;
 			case FileScriptParser.DO:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 117;
+				this.state = 133;
 				this.do_while_loop();
 				}
 				break;
 			case FileScriptParser.FOR:
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 118;
+				this.state = 134;
 				this.for_loop();
 				}
 				break;
@@ -568,11 +578,11 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 121;
+			this.state = 137;
 			this.match(FileScriptParser.WHILE);
-			this.state = 122;
+			this.state = 138;
 			this.expressao();
-			this.state = 123;
+			this.state = 139;
 			this.escopo_codigo();
 			}
 		}
@@ -597,13 +607,13 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 125;
+			this.state = 141;
 			this.match(FileScriptParser.DO);
-			this.state = 126;
+			this.state = 142;
 			this.escopo_codigo();
-			this.state = 127;
+			this.state = 143;
 			this.match(FileScriptParser.WHILE);
-			this.state = 128;
+			this.state = 144;
 			this.expressao();
 			}
 		}
@@ -629,31 +639,31 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 130;
+			this.state = 146;
 			this.match(FileScriptParser.FOR);
-			this.state = 131;
+			this.state = 147;
 			this.match(FileScriptParser.PARENTESES_OPEN);
-			this.state = 132;
+			this.state = 148;
 			this.comando();
-			this.state = 133;
+			this.state = 149;
 			this.match(FileScriptParser.LINE_END);
-			this.state = 135;
+			this.state = 151;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
-			if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << FileScriptParser.STRING) | (1 << FileScriptParser.CHAR) | (1 << FileScriptParser.PARENTESES_OPEN) | (1 << FileScriptParser.COLCHETES_OPEN))) !== 0) || _la === FileScriptParser.NUMERICO || _la === FileScriptParser.VARIABLE) {
+			if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << FileScriptParser.STRING) | (1 << FileScriptParser.CHAR) | (1 << FileScriptParser.PARENTESES_OPEN) | (1 << FileScriptParser.COLCHETES_OPEN))) !== 0) || ((((_la - 42)) & ~0x1F) === 0 && ((1 << (_la - 42)) & ((1 << (FileScriptParser.BITWISE_NOT - 42)) | (1 << (FileScriptParser.NUMERICO - 42)) | (1 << (FileScriptParser.VARIABLE - 42)))) !== 0)) {
 				{
-				this.state = 134;
+				this.state = 150;
 				this.expressao();
 				}
 			}
 
-			this.state = 137;
+			this.state = 153;
 			this.match(FileScriptParser.LINE_END);
-			this.state = 138;
+			this.state = 154;
 			this.comando();
-			this.state = 139;
+			this.state = 155;
 			this.match(FileScriptParser.PARENTESES_CLOSE);
-			this.state = 140;
+			this.state = 156;
 			this.escopo_codigo();
 			}
 		}
@@ -676,27 +686,27 @@ export class FileScriptParser extends Parser {
 		let _localctx: Comandos_functionContext = new Comandos_functionContext(this._ctx, this.state);
 		this.enterRule(_localctx, 26, FileScriptParser.RULE_comandos_function);
 		try {
-			this.state = 145;
+			this.state = 161;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case FileScriptParser.FUNCTION:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 142;
+				this.state = 158;
 				this.function_decl();
 				}
 				break;
 			case FileScriptParser.RETURN:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 143;
+				this.state = 159;
 				this.return_stmt();
 				}
 				break;
 			case FileScriptParser.VARIABLE:
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 144;
+				this.state = 160;
 				this.function_call();
 				}
 				break;
@@ -726,25 +736,25 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 147;
+			this.state = 163;
 			this.match(FileScriptParser.FUNCTION);
-			this.state = 148;
+			this.state = 164;
 			this.match(FileScriptParser.VARIABLE);
-			this.state = 149;
+			this.state = 165;
 			this.match(FileScriptParser.PARENTESES_OPEN);
-			this.state = 151;
+			this.state = 167;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la === FileScriptParser.VARIABLE) {
 				{
-				this.state = 150;
+				this.state = 166;
 				this.lista_parametros();
 				}
 			}
 
-			this.state = 153;
+			this.state = 169;
 			this.match(FileScriptParser.PARENTESES_CLOSE);
-			this.state = 154;
+			this.state = 170;
 			this.escopo_codigo();
 			}
 		}
@@ -770,21 +780,21 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 156;
+			this.state = 172;
 			this.match(FileScriptParser.VARIABLE);
-			this.state = 161;
+			this.state = 177;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la === FileScriptParser.COMMA) {
 				{
 				{
-				this.state = 157;
+				this.state = 173;
 				this.match(FileScriptParser.COMMA);
-				this.state = 158;
+				this.state = 174;
 				this.match(FileScriptParser.VARIABLE);
 				}
 				}
-				this.state = 163;
+				this.state = 179;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -811,9 +821,9 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 164;
+			this.state = 180;
 			this.match(FileScriptParser.RETURN);
-			this.state = 165;
+			this.state = 181;
 			this.expressao();
 			}
 		}
@@ -839,21 +849,21 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 167;
+			this.state = 183;
 			this.match(FileScriptParser.VARIABLE);
-			this.state = 168;
+			this.state = 184;
 			this.match(FileScriptParser.PARENTESES_OPEN);
-			this.state = 170;
+			this.state = 186;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
-			if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << FileScriptParser.STRING) | (1 << FileScriptParser.CHAR) | (1 << FileScriptParser.COLCHETES_OPEN))) !== 0) || _la === FileScriptParser.NUMERICO || _la === FileScriptParser.VARIABLE) {
+			if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << FileScriptParser.STRING) | (1 << FileScriptParser.CHAR) | (1 << FileScriptParser.PARENTESES_OPEN) | (1 << FileScriptParser.COLCHETES_OPEN))) !== 0) || ((((_la - 42)) & ~0x1F) === 0 && ((1 << (_la - 42)) & ((1 << (FileScriptParser.BITWISE_NOT - 42)) | (1 << (FileScriptParser.NUMERICO - 42)) | (1 << (FileScriptParser.VARIABLE - 42)))) !== 0)) {
 				{
-				this.state = 169;
+				this.state = 185;
 				this.lista_expressoes();
 				}
 			}
 
-			this.state = 172;
+			this.state = 188;
 			this.match(FileScriptParser.PARENTESES_CLOSE);
 			}
 		}
@@ -878,8 +888,344 @@ export class FileScriptParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 174;
+			this.state = 190;
+			this.calculo_logico_ou();
+			}
+		}
+		catch (re) {
+			if (re instanceof RecognitionException) {
+				_localctx.exception = re;
+				this._errHandler.reportError(this, re);
+				this._errHandler.recover(this, re);
+			} else {
+				throw re;
+			}
+		}
+		finally {
+			this.exitRule();
+		}
+		return _localctx;
+	}
+	// @RuleVersion(0)
+	public calculo_logico_ou(): Calculo_logico_ouContext {
+		let _localctx: Calculo_logico_ouContext = new Calculo_logico_ouContext(this._ctx, this.state);
+		this.enterRule(_localctx, 38, FileScriptParser.RULE_calculo_logico_ou);
+		let _la: number;
+		try {
+			this.enterOuterAlt(_localctx, 1);
+			{
+			this.state = 192;
+			this.calculo_logico_e();
+			this.state = 197;
+			this._errHandler.sync(this);
+			_la = this._input.LA(1);
+			while (_la === FileScriptParser.LOGIC_OR) {
+				{
+				{
+				this.state = 193;
+				this.match(FileScriptParser.LOGIC_OR);
+				this.state = 194;
+				this.calculo_logico_e();
+				}
+				}
+				this.state = 199;
+				this._errHandler.sync(this);
+				_la = this._input.LA(1);
+			}
+			}
+		}
+		catch (re) {
+			if (re instanceof RecognitionException) {
+				_localctx.exception = re;
+				this._errHandler.reportError(this, re);
+				this._errHandler.recover(this, re);
+			} else {
+				throw re;
+			}
+		}
+		finally {
+			this.exitRule();
+		}
+		return _localctx;
+	}
+	// @RuleVersion(0)
+	public calculo_logico_e(): Calculo_logico_eContext {
+		let _localctx: Calculo_logico_eContext = new Calculo_logico_eContext(this._ctx, this.state);
+		this.enterRule(_localctx, 40, FileScriptParser.RULE_calculo_logico_e);
+		let _la: number;
+		try {
+			this.enterOuterAlt(_localctx, 1);
+			{
+			this.state = 200;
+			this.calculo_bitwise_ou();
+			this.state = 205;
+			this._errHandler.sync(this);
+			_la = this._input.LA(1);
+			while (_la === FileScriptParser.LOGIC_AND) {
+				{
+				{
+				this.state = 201;
+				this.match(FileScriptParser.LOGIC_AND);
+				this.state = 202;
+				this.calculo_bitwise_ou();
+				}
+				}
+				this.state = 207;
+				this._errHandler.sync(this);
+				_la = this._input.LA(1);
+			}
+			}
+		}
+		catch (re) {
+			if (re instanceof RecognitionException) {
+				_localctx.exception = re;
+				this._errHandler.reportError(this, re);
+				this._errHandler.recover(this, re);
+			} else {
+				throw re;
+			}
+		}
+		finally {
+			this.exitRule();
+		}
+		return _localctx;
+	}
+	// @RuleVersion(0)
+	public calculo_bitwise_ou(): Calculo_bitwise_ouContext {
+		let _localctx: Calculo_bitwise_ouContext = new Calculo_bitwise_ouContext(this._ctx, this.state);
+		this.enterRule(_localctx, 42, FileScriptParser.RULE_calculo_bitwise_ou);
+		let _la: number;
+		try {
+			this.enterOuterAlt(_localctx, 1);
+			{
+			this.state = 208;
+			this.calculo_bitwise_xou();
+			this.state = 213;
+			this._errHandler.sync(this);
+			_la = this._input.LA(1);
+			while (_la === FileScriptParser.BITWISE_OR) {
+				{
+				{
+				this.state = 209;
+				this.match(FileScriptParser.BITWISE_OR);
+				this.state = 210;
+				this.calculo_bitwise_xou();
+				}
+				}
+				this.state = 215;
+				this._errHandler.sync(this);
+				_la = this._input.LA(1);
+			}
+			}
+		}
+		catch (re) {
+			if (re instanceof RecognitionException) {
+				_localctx.exception = re;
+				this._errHandler.reportError(this, re);
+				this._errHandler.recover(this, re);
+			} else {
+				throw re;
+			}
+		}
+		finally {
+			this.exitRule();
+		}
+		return _localctx;
+	}
+	// @RuleVersion(0)
+	public calculo_bitwise_xou(): Calculo_bitwise_xouContext {
+		let _localctx: Calculo_bitwise_xouContext = new Calculo_bitwise_xouContext(this._ctx, this.state);
+		this.enterRule(_localctx, 44, FileScriptParser.RULE_calculo_bitwise_xou);
+		let _la: number;
+		try {
+			this.enterOuterAlt(_localctx, 1);
+			{
+			this.state = 216;
+			this.calculo_bitwise_e();
+			this.state = 221;
+			this._errHandler.sync(this);
+			_la = this._input.LA(1);
+			while (_la === FileScriptParser.BITWISE_XOR) {
+				{
+				{
+				this.state = 217;
+				this.match(FileScriptParser.BITWISE_XOR);
+				this.state = 218;
+				this.calculo_bitwise_e();
+				}
+				}
+				this.state = 223;
+				this._errHandler.sync(this);
+				_la = this._input.LA(1);
+			}
+			}
+		}
+		catch (re) {
+			if (re instanceof RecognitionException) {
+				_localctx.exception = re;
+				this._errHandler.reportError(this, re);
+				this._errHandler.recover(this, re);
+			} else {
+				throw re;
+			}
+		}
+		finally {
+			this.exitRule();
+		}
+		return _localctx;
+	}
+	// @RuleVersion(0)
+	public calculo_bitwise_e(): Calculo_bitwise_eContext {
+		let _localctx: Calculo_bitwise_eContext = new Calculo_bitwise_eContext(this._ctx, this.state);
+		this.enterRule(_localctx, 46, FileScriptParser.RULE_calculo_bitwise_e);
+		let _la: number;
+		try {
+			this.enterOuterAlt(_localctx, 1);
+			{
+			this.state = 224;
+			this.calculo_igualdade();
+			this.state = 229;
+			this._errHandler.sync(this);
+			_la = this._input.LA(1);
+			while (_la === FileScriptParser.BITWISE_AND) {
+				{
+				{
+				this.state = 225;
+				this.match(FileScriptParser.BITWISE_AND);
+				this.state = 226;
+				this.calculo_igualdade();
+				}
+				}
+				this.state = 231;
+				this._errHandler.sync(this);
+				_la = this._input.LA(1);
+			}
+			}
+		}
+		catch (re) {
+			if (re instanceof RecognitionException) {
+				_localctx.exception = re;
+				this._errHandler.reportError(this, re);
+				this._errHandler.recover(this, re);
+			} else {
+				throw re;
+			}
+		}
+		finally {
+			this.exitRule();
+		}
+		return _localctx;
+	}
+	// @RuleVersion(0)
+	public calculo_igualdade(): Calculo_igualdadeContext {
+		let _localctx: Calculo_igualdadeContext = new Calculo_igualdadeContext(this._ctx, this.state);
+		this.enterRule(_localctx, 48, FileScriptParser.RULE_calculo_igualdade);
+		let _la: number;
+		try {
+			this.enterOuterAlt(_localctx, 1);
+			{
+			this.state = 232;
+			this.calculo_relacional();
+			this.state = 238;
+			this._errHandler.sync(this);
+			_la = this._input.LA(1);
+			while (_la === FileScriptParser.EQUALS || _la === FileScriptParser.NOT_EQUALS) {
+				{
+				{
+				this.state = 233;
+				this.operador_igualdade();
+				this.state = 234;
+				this.calculo_relacional();
+				}
+				}
+				this.state = 240;
+				this._errHandler.sync(this);
+				_la = this._input.LA(1);
+			}
+			}
+		}
+		catch (re) {
+			if (re instanceof RecognitionException) {
+				_localctx.exception = re;
+				this._errHandler.reportError(this, re);
+				this._errHandler.recover(this, re);
+			} else {
+				throw re;
+			}
+		}
+		finally {
+			this.exitRule();
+		}
+		return _localctx;
+	}
+	// @RuleVersion(0)
+	public calculo_relacional(): Calculo_relacionalContext {
+		let _localctx: Calculo_relacionalContext = new Calculo_relacionalContext(this._ctx, this.state);
+		this.enterRule(_localctx, 50, FileScriptParser.RULE_calculo_relacional);
+		let _la: number;
+		try {
+			this.enterOuterAlt(_localctx, 1);
+			{
+			this.state = 241;
+			this.calculo_deslocamento();
+			this.state = 247;
+			this._errHandler.sync(this);
+			_la = this._input.LA(1);
+			while (((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & ((1 << (FileScriptParser.GREATER - 32)) | (1 << (FileScriptParser.GREATER_EQUALS - 32)) | (1 << (FileScriptParser.LESS - 32)) | (1 << (FileScriptParser.LESS_EQUALS - 32)))) !== 0)) {
+				{
+				{
+				this.state = 242;
+				this.operador_relacional();
+				this.state = 243;
+				this.calculo_deslocamento();
+				}
+				}
+				this.state = 249;
+				this._errHandler.sync(this);
+				_la = this._input.LA(1);
+			}
+			}
+		}
+		catch (re) {
+			if (re instanceof RecognitionException) {
+				_localctx.exception = re;
+				this._errHandler.reportError(this, re);
+				this._errHandler.recover(this, re);
+			} else {
+				throw re;
+			}
+		}
+		finally {
+			this.exitRule();
+		}
+		return _localctx;
+	}
+	// @RuleVersion(0)
+	public calculo_deslocamento(): Calculo_deslocamentoContext {
+		let _localctx: Calculo_deslocamentoContext = new Calculo_deslocamentoContext(this._ctx, this.state);
+		this.enterRule(_localctx, 52, FileScriptParser.RULE_calculo_deslocamento);
+		let _la: number;
+		try {
+			this.enterOuterAlt(_localctx, 1);
+			{
+			this.state = 250;
 			this.calculo_prioridade_1();
+			this.state = 256;
+			this._errHandler.sync(this);
+			_la = this._input.LA(1);
+			while (_la === FileScriptParser.RIGHT_SHIFT || _la === FileScriptParser.LEFT_SHIFT) {
+				{
+				{
+				this.state = 251;
+				this.operador_deslocamento();
+				this.state = 252;
+				this.calculo_prioridade_1();
+				}
+				}
+				this.state = 258;
+				this._errHandler.sync(this);
+				_la = this._input.LA(1);
+			}
 			}
 		}
 		catch (re) {
@@ -899,26 +1245,26 @@ export class FileScriptParser extends Parser {
 	// @RuleVersion(0)
 	public calculo_prioridade_1(): Calculo_prioridade_1Context {
 		let _localctx: Calculo_prioridade_1Context = new Calculo_prioridade_1Context(this._ctx, this.state);
-		this.enterRule(_localctx, 38, FileScriptParser.RULE_calculo_prioridade_1);
+		this.enterRule(_localctx, 54, FileScriptParser.RULE_calculo_prioridade_1);
 		let _la: number;
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 176;
+			this.state = 259;
 			this.calculo_prioridade_2();
-			this.state = 182;
+			this.state = 265;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la === FileScriptParser.SUM || _la === FileScriptParser.SUB) {
 				{
 				{
-				this.state = 177;
+				this.state = 260;
 				this.operador_prioridade_1();
-				this.state = 178;
+				this.state = 261;
 				this.calculo_prioridade_2();
 				}
 				}
-				this.state = 184;
+				this.state = 267;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -941,26 +1287,26 @@ export class FileScriptParser extends Parser {
 	// @RuleVersion(0)
 	public calculo_prioridade_2(): Calculo_prioridade_2Context {
 		let _localctx: Calculo_prioridade_2Context = new Calculo_prioridade_2Context(this._ctx, this.state);
-		this.enterRule(_localctx, 40, FileScriptParser.RULE_calculo_prioridade_2);
+		this.enterRule(_localctx, 56, FileScriptParser.RULE_calculo_prioridade_2);
 		let _la: number;
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 185;
-			this.calculo_operador_logico();
-			this.state = 191;
+			this.state = 268;
+			this.calculo_unario();
+			this.state = 274;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << FileScriptParser.MULT) | (1 << FileScriptParser.DIV) | (1 << FileScriptParser.MOD))) !== 0)) {
 				{
 				{
-				this.state = 186;
+				this.state = 269;
 				this.operador_prioridade_2();
-				this.state = 187;
-				this.calculo_operador_logico();
+				this.state = 270;
+				this.calculo_unario();
 				}
 				}
-				this.state = 193;
+				this.state = 276;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -981,73 +1327,36 @@ export class FileScriptParser extends Parser {
 		return _localctx;
 	}
 	// @RuleVersion(0)
-	public calculo_operador_logico(): Calculo_operador_logicoContext {
-		let _localctx: Calculo_operador_logicoContext = new Calculo_operador_logicoContext(this._ctx, this.state);
-		this.enterRule(_localctx, 42, FileScriptParser.RULE_calculo_operador_logico);
-		let _la: number;
+	public calculo_unario(): Calculo_unarioContext {
+		let _localctx: Calculo_unarioContext = new Calculo_unarioContext(this._ctx, this.state);
+		this.enterRule(_localctx, 58, FileScriptParser.RULE_calculo_unario);
 		try {
-			this.enterOuterAlt(_localctx, 1);
-			{
-			this.state = 194;
-			this.calculo_logico_composto();
-			this.state = 200;
+			this.state = 280;
 			this._errHandler.sync(this);
-			_la = this._input.LA(1);
-			while (((((_la - 30)) & ~0x1F) === 0 && ((1 << (_la - 30)) & ((1 << (FileScriptParser.EQUALS - 30)) | (1 << (FileScriptParser.NOT_EQUALS - 30)) | (1 << (FileScriptParser.GREATER - 30)) | (1 << (FileScriptParser.GREATER_EQUALS - 30)) | (1 << (FileScriptParser.LESS - 30)) | (1 << (FileScriptParser.LESS_EQUALS - 30)))) !== 0)) {
+			switch (this._input.LA(1)) {
+			case FileScriptParser.BITWISE_NOT:
+				this.enterOuterAlt(_localctx, 1);
 				{
-				{
-				this.state = 195;
-				this.operador_logico();
-				this.state = 196;
-				this.calculo_logico_composto();
+				this.state = 277;
+				this.match(FileScriptParser.BITWISE_NOT);
+				this.state = 278;
+				this.calculo_unario();
 				}
-				}
-				this.state = 202;
-				this._errHandler.sync(this);
-				_la = this._input.LA(1);
-			}
-			}
-		}
-		catch (re) {
-			if (re instanceof RecognitionException) {
-				_localctx.exception = re;
-				this._errHandler.reportError(this, re);
-				this._errHandler.recover(this, re);
-			} else {
-				throw re;
-			}
-		}
-		finally {
-			this.exitRule();
-		}
-		return _localctx;
-	}
-	// @RuleVersion(0)
-	public calculo_logico_composto(): Calculo_logico_compostoContext {
-		let _localctx: Calculo_logico_compostoContext = new Calculo_logico_compostoContext(this._ctx, this.state);
-		this.enterRule(_localctx, 44, FileScriptParser.RULE_calculo_logico_composto);
-		let _la: number;
-		try {
-			this.enterOuterAlt(_localctx, 1);
-			{
-			this.state = 203;
-			this.calculo_parenteses();
-			this.state = 209;
-			this._errHandler.sync(this);
-			_la = this._input.LA(1);
-			while (_la === FileScriptParser.LOGIC_AND || _la === FileScriptParser.LOGIC_OR) {
+				break;
+			case FileScriptParser.STRING:
+			case FileScriptParser.CHAR:
+			case FileScriptParser.PARENTESES_OPEN:
+			case FileScriptParser.COLCHETES_OPEN:
+			case FileScriptParser.NUMERICO:
+			case FileScriptParser.VARIABLE:
+				this.enterOuterAlt(_localctx, 2);
 				{
-				{
-				this.state = 204;
-				this.composto_logico();
-				this.state = 205;
+				this.state = 279;
 				this.calculo_parenteses();
 				}
-				}
-				this.state = 211;
-				this._errHandler.sync(this);
-				_la = this._input.LA(1);
-			}
+				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 		}
 		catch (re) {
@@ -1067,19 +1376,19 @@ export class FileScriptParser extends Parser {
 	// @RuleVersion(0)
 	public calculo_parenteses(): Calculo_parentesesContext {
 		let _localctx: Calculo_parentesesContext = new Calculo_parentesesContext(this._ctx, this.state);
-		this.enterRule(_localctx, 46, FileScriptParser.RULE_calculo_parenteses);
+		this.enterRule(_localctx, 60, FileScriptParser.RULE_calculo_parenteses);
 		try {
-			this.state = 217;
+			this.state = 287;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case FileScriptParser.PARENTESES_OPEN:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 212;
+				this.state = 282;
 				this.match(FileScriptParser.PARENTESES_OPEN);
-				this.state = 213;
-				this.calculo_prioridade_1();
-				this.state = 214;
+				this.state = 283;
+				this.expressao();
+				this.state = 284;
 				this.match(FileScriptParser.PARENTESES_CLOSE);
 				}
 				break;
@@ -1090,7 +1399,7 @@ export class FileScriptParser extends Parser {
 			case FileScriptParser.VARIABLE:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 216;
+				this.state = 286;
 				this.valor_calculo();
 				}
 				break;
@@ -1115,12 +1424,12 @@ export class FileScriptParser extends Parser {
 	// @RuleVersion(0)
 	public operador_prioridade_1(): Operador_prioridade_1Context {
 		let _localctx: Operador_prioridade_1Context = new Operador_prioridade_1Context(this._ctx, this.state);
-		this.enterRule(_localctx, 48, FileScriptParser.RULE_operador_prioridade_1);
+		this.enterRule(_localctx, 62, FileScriptParser.RULE_operador_prioridade_1);
 		let _la: number;
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 219;
+			this.state = 289;
 			_la = this._input.LA(1);
 			if (!(_la === FileScriptParser.SUM || _la === FileScriptParser.SUB)) {
 			this._errHandler.recoverInline(this);
@@ -1151,12 +1460,12 @@ export class FileScriptParser extends Parser {
 	// @RuleVersion(0)
 	public operador_prioridade_2(): Operador_prioridade_2Context {
 		let _localctx: Operador_prioridade_2Context = new Operador_prioridade_2Context(this._ctx, this.state);
-		this.enterRule(_localctx, 50, FileScriptParser.RULE_operador_prioridade_2);
+		this.enterRule(_localctx, 64, FileScriptParser.RULE_operador_prioridade_2);
 		let _la: number;
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 221;
+			this.state = 291;
 			_la = this._input.LA(1);
 			if (!((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << FileScriptParser.MULT) | (1 << FileScriptParser.DIV) | (1 << FileScriptParser.MOD))) !== 0))) {
 			this._errHandler.recoverInline(this);
@@ -1185,16 +1494,16 @@ export class FileScriptParser extends Parser {
 		return _localctx;
 	}
 	// @RuleVersion(0)
-	public operador_logico(): Operador_logicoContext {
-		let _localctx: Operador_logicoContext = new Operador_logicoContext(this._ctx, this.state);
-		this.enterRule(_localctx, 52, FileScriptParser.RULE_operador_logico);
+	public operador_igualdade(): Operador_igualdadeContext {
+		let _localctx: Operador_igualdadeContext = new Operador_igualdadeContext(this._ctx, this.state);
+		this.enterRule(_localctx, 66, FileScriptParser.RULE_operador_igualdade);
 		let _la: number;
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 223;
+			this.state = 293;
 			_la = this._input.LA(1);
-			if (!(((((_la - 30)) & ~0x1F) === 0 && ((1 << (_la - 30)) & ((1 << (FileScriptParser.EQUALS - 30)) | (1 << (FileScriptParser.NOT_EQUALS - 30)) | (1 << (FileScriptParser.GREATER - 30)) | (1 << (FileScriptParser.GREATER_EQUALS - 30)) | (1 << (FileScriptParser.LESS - 30)) | (1 << (FileScriptParser.LESS_EQUALS - 30)))) !== 0))) {
+			if (!(_la === FileScriptParser.EQUALS || _la === FileScriptParser.NOT_EQUALS)) {
 			this._errHandler.recoverInline(this);
 			} else {
 				if (this._input.LA(1) === Token.EOF) {
@@ -1221,16 +1530,52 @@ export class FileScriptParser extends Parser {
 		return _localctx;
 	}
 	// @RuleVersion(0)
-	public composto_logico(): Composto_logicoContext {
-		let _localctx: Composto_logicoContext = new Composto_logicoContext(this._ctx, this.state);
-		this.enterRule(_localctx, 54, FileScriptParser.RULE_composto_logico);
+	public operador_relacional(): Operador_relacionalContext {
+		let _localctx: Operador_relacionalContext = new Operador_relacionalContext(this._ctx, this.state);
+		this.enterRule(_localctx, 68, FileScriptParser.RULE_operador_relacional);
 		let _la: number;
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 225;
+			this.state = 295;
 			_la = this._input.LA(1);
-			if (!(_la === FileScriptParser.LOGIC_AND || _la === FileScriptParser.LOGIC_OR)) {
+			if (!(((((_la - 32)) & ~0x1F) === 0 && ((1 << (_la - 32)) & ((1 << (FileScriptParser.GREATER - 32)) | (1 << (FileScriptParser.GREATER_EQUALS - 32)) | (1 << (FileScriptParser.LESS - 32)) | (1 << (FileScriptParser.LESS_EQUALS - 32)))) !== 0))) {
+			this._errHandler.recoverInline(this);
+			} else {
+				if (this._input.LA(1) === Token.EOF) {
+					this.matchedEOF = true;
+				}
+
+				this._errHandler.reportMatch(this);
+				this.consume();
+			}
+			}
+		}
+		catch (re) {
+			if (re instanceof RecognitionException) {
+				_localctx.exception = re;
+				this._errHandler.reportError(this, re);
+				this._errHandler.recover(this, re);
+			} else {
+				throw re;
+			}
+		}
+		finally {
+			this.exitRule();
+		}
+		return _localctx;
+	}
+	// @RuleVersion(0)
+	public operador_deslocamento(): Operador_deslocamentoContext {
+		let _localctx: Operador_deslocamentoContext = new Operador_deslocamentoContext(this._ctx, this.state);
+		this.enterRule(_localctx, 70, FileScriptParser.RULE_operador_deslocamento);
+		let _la: number;
+		try {
+			this.enterOuterAlt(_localctx, 1);
+			{
+			this.state = 297;
+			_la = this._input.LA(1);
+			if (!(_la === FileScriptParser.RIGHT_SHIFT || _la === FileScriptParser.LEFT_SHIFT)) {
 			this._errHandler.recoverInline(this);
 			} else {
 				if (this._input.LA(1) === Token.EOF) {
@@ -1259,43 +1604,43 @@ export class FileScriptParser extends Parser {
 	// @RuleVersion(0)
 	public valor_calculo(): Valor_calculoContext {
 		let _localctx: Valor_calculoContext = new Valor_calculoContext(this._ctx, this.state);
-		this.enterRule(_localctx, 56, FileScriptParser.RULE_valor_calculo);
+		this.enterRule(_localctx, 72, FileScriptParser.RULE_valor_calculo);
 		try {
-			this.state = 232;
+			this.state = 304;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case FileScriptParser.NUMERICO:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 227;
+				this.state = 299;
 				this.match(FileScriptParser.NUMERICO);
 				}
 				break;
 			case FileScriptParser.VARIABLE:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 228;
+				this.state = 300;
 				this.match(FileScriptParser.VARIABLE);
 				}
 				break;
 			case FileScriptParser.STRING:
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 229;
+				this.state = 301;
 				this.match(FileScriptParser.STRING);
 				}
 				break;
 			case FileScriptParser.CHAR:
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 230;
+				this.state = 302;
 				this.match(FileScriptParser.CHAR);
 				}
 				break;
 			case FileScriptParser.COLCHETES_OPEN:
 				this.enterOuterAlt(_localctx, 5);
 				{
-				this.state = 231;
+				this.state = 303;
 				this.array();
 				}
 				break;
@@ -1320,24 +1665,24 @@ export class FileScriptParser extends Parser {
 	// @RuleVersion(0)
 	public array(): ArrayContext {
 		let _localctx: ArrayContext = new ArrayContext(this._ctx, this.state);
-		this.enterRule(_localctx, 58, FileScriptParser.RULE_array);
+		this.enterRule(_localctx, 74, FileScriptParser.RULE_array);
 		let _la: number;
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 234;
+			this.state = 306;
 			this.match(FileScriptParser.COLCHETES_OPEN);
-			this.state = 236;
+			this.state = 308;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
-			if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << FileScriptParser.STRING) | (1 << FileScriptParser.CHAR) | (1 << FileScriptParser.COLCHETES_OPEN))) !== 0) || _la === FileScriptParser.NUMERICO || _la === FileScriptParser.VARIABLE) {
+			if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << FileScriptParser.STRING) | (1 << FileScriptParser.CHAR) | (1 << FileScriptParser.PARENTESES_OPEN) | (1 << FileScriptParser.COLCHETES_OPEN))) !== 0) || ((((_la - 42)) & ~0x1F) === 0 && ((1 << (_la - 42)) & ((1 << (FileScriptParser.BITWISE_NOT - 42)) | (1 << (FileScriptParser.NUMERICO - 42)) | (1 << (FileScriptParser.VARIABLE - 42)))) !== 0)) {
 				{
-				this.state = 235;
+				this.state = 307;
 				this.lista_expressoes();
 				}
 			}
 
-			this.state = 238;
+			this.state = 310;
 			this.match(FileScriptParser.COLCHETES_CLOSE);
 			}
 		}
@@ -1358,26 +1703,26 @@ export class FileScriptParser extends Parser {
 	// @RuleVersion(0)
 	public lista_expressoes(): Lista_expressoesContext {
 		let _localctx: Lista_expressoesContext = new Lista_expressoesContext(this._ctx, this.state);
-		this.enterRule(_localctx, 60, FileScriptParser.RULE_lista_expressoes);
+		this.enterRule(_localctx, 76, FileScriptParser.RULE_lista_expressoes);
 		let _la: number;
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 240;
-			this.valor_calculo();
-			this.state = 245;
+			this.state = 312;
+			this.expressao();
+			this.state = 317;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la === FileScriptParser.COMMA) {
 				{
 				{
-				this.state = 241;
+				this.state = 313;
 				this.match(FileScriptParser.COMMA);
-				this.state = 242;
-				this.valor_calculo();
+				this.state = 314;
+				this.expressao();
 				}
 				}
-				this.state = 247;
+				this.state = 319;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1399,111 +1744,148 @@ export class FileScriptParser extends Parser {
 	}
 
 	public static readonly _serializedATN: string =
-		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03/\xFB\x04\x02" +
+		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03/\u0143\x04\x02" +
 		"\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07" +
 		"\t\x07\x04\b\t\b\x04\t\t\t\x04\n\t\n\x04\v\t\v\x04\f\t\f\x04\r\t\r\x04" +
 		"\x0E\t\x0E\x04\x0F\t\x0F\x04\x10\t\x10\x04\x11\t\x11\x04\x12\t\x12\x04" +
 		"\x13\t\x13\x04\x14\t\x14\x04\x15\t\x15\x04\x16\t\x16\x04\x17\t\x17\x04" +
 		"\x18\t\x18\x04\x19\t\x19\x04\x1A\t\x1A\x04\x1B\t\x1B\x04\x1C\t\x1C\x04" +
-		"\x1D\t\x1D\x04\x1E\t\x1E\x04\x1F\t\x1F\x04 \t \x03\x02\x03\x02\x03\x02" +
-		"\x03\x03\x03\x03\x03\x03\x07\x03G\n\x03\f\x03\x0E\x03J\v\x03\x03\x04\x03" +
-		"\x04\x03\x04\x03\x04\x03\x04\x03\x04\x03\x04\x05\x04S\n\x04\x03\x05\x03" +
-		"\x05\x03\x05\x03\x05\x03\x05\x03\x05\x05\x05[\n\x05\x03\x06\x03\x06\x03" +
-		"\x06\x03\x06\x03\x07\x03\x07\x03\x07\x03\b\x03\b\x03\b\x03\b\x07\bh\n" +
-		"\b\f\b\x0E\bk\v\b\x03\b\x05\bn\n\b\x03\t\x03\t\x03\t\x03\t\x03\n\x03\n" +
-		"\x03\n\x03\v\x03\v\x03\v\x05\vz\n\v\x03\f\x03\f\x03\f\x03\f\x03\r\x03" +
-		"\r\x03\r\x03\r\x03\r\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x05\x0E\x8A" +
+		"\x1D\t\x1D\x04\x1E\t\x1E\x04\x1F\t\x1F\x04 \t \x04!\t!\x04\"\t\"\x04#" +
+		"\t#\x04$\t$\x04%\t%\x04&\t&\x04\'\t\'\x04(\t(\x03\x02\x03\x02\x03\x02" +
+		"\x03\x03\x03\x03\x03\x03\x07\x03W\n\x03\f\x03\x0E\x03Z\v\x03\x03\x04\x03" +
+		"\x04\x03\x04\x03\x04\x03\x04\x03\x04\x03\x04\x05\x04c\n\x04\x03\x05\x03" +
+		"\x05\x03\x05\x03\x05\x03\x05\x03\x05\x05\x05k\n\x05\x03\x06\x03\x06\x03" +
+		"\x06\x03\x06\x03\x07\x03\x07\x03\x07\x03\b\x03\b\x03\b\x03\b\x07\bx\n" +
+		"\b\f\b\x0E\b{\v\b\x03\b\x05\b~\n\b\x03\t\x03\t\x03\t\x03\t\x03\n\x03\n" +
+		"\x03\n\x03\v\x03\v\x03\v\x05\v\x8A\n\v\x03\f\x03\f\x03\f\x03\f\x03\r\x03" +
+		"\r\x03\r\x03\r\x03\r\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x05\x0E\x9A" +
 		"\n\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0F\x03\x0F\x03\x0F" +
-		"\x05\x0F\x94\n\x0F\x03\x10\x03\x10\x03\x10\x03\x10\x05\x10\x9A\n\x10\x03" +
-		"\x10\x03\x10\x03\x10\x03\x11\x03\x11\x03\x11\x07\x11\xA2\n\x11\f\x11\x0E" +
-		"\x11\xA5\v\x11\x03\x12\x03\x12\x03\x12\x03\x13\x03\x13\x03\x13\x05\x13" +
-		"\xAD\n\x13\x03\x13\x03\x13\x03\x14\x03\x14\x03\x15\x03\x15\x03\x15\x03" +
-		"\x15\x07\x15\xB7\n\x15\f\x15\x0E\x15\xBA\v\x15\x03\x16\x03\x16\x03\x16" +
-		"\x03\x16\x07\x16\xC0\n\x16\f\x16\x0E\x16\xC3\v\x16\x03\x17\x03\x17\x03" +
-		"\x17\x03\x17\x07\x17\xC9\n\x17\f\x17\x0E\x17\xCC\v\x17\x03\x18\x03\x18" +
-		"\x03\x18\x03\x18\x07\x18\xD2\n\x18\f\x18\x0E\x18\xD5\v\x18\x03\x19\x03" +
-		"\x19\x03\x19\x03\x19\x03\x19\x05\x19\xDC\n\x19\x03\x1A\x03\x1A\x03\x1B" +
-		"\x03\x1B\x03\x1C\x03\x1C\x03\x1D\x03\x1D\x03\x1E\x03\x1E\x03\x1E\x03\x1E" +
-		"\x03\x1E\x05\x1E\xEB\n\x1E\x03\x1F\x03\x1F\x05\x1F\xEF\n\x1F\x03\x1F\x03" +
-		"\x1F\x03 \x03 \x03 \x07 \xF6\n \f \x0E \xF9\v \x03 \x02\x02\x02!\x02\x02" +
-		"\x04\x02\x06\x02\b\x02\n\x02\f\x02\x0E\x02\x10\x02\x12\x02\x14\x02\x16" +
-		"\x02\x18\x02\x1A\x02\x1C\x02\x1E\x02 \x02\"\x02$\x02&\x02(\x02*\x02,\x02" +
-		".\x020\x022\x024\x026\x028\x02:\x02<\x02>\x02\x02\x06\x03\x02\x1B\x1C" +
-		"\x03\x02\x1D\x1F\x03\x02 %\x03\x02&\'\x02\xF8\x02@\x03\x02\x02\x02\x04" +
-		"H\x03\x02\x02\x02\x06R\x03\x02\x02\x02\bZ\x03\x02\x02\x02\n\\\x03\x02" +
-		"\x02\x02\f`\x03\x02\x02\x02\x0Ec\x03\x02\x02\x02\x10o\x03\x02\x02\x02" +
-		"\x12s\x03\x02\x02\x02\x14y\x03\x02\x02\x02\x16{\x03\x02\x02\x02\x18\x7F" +
-		"\x03\x02\x02\x02\x1A\x84\x03\x02\x02\x02\x1C\x93\x03\x02\x02\x02\x1E\x95" +
-		"\x03\x02\x02\x02 \x9E\x03\x02\x02\x02\"\xA6\x03\x02\x02\x02$\xA9\x03\x02" +
-		"\x02\x02&\xB0\x03\x02\x02\x02(\xB2\x03\x02\x02\x02*\xBB\x03\x02\x02\x02" +
-		",\xC4\x03\x02\x02\x02.\xCD\x03\x02\x02\x020\xDB\x03\x02\x02\x022\xDD\x03" +
-		"\x02\x02\x024\xDF\x03\x02\x02\x026\xE1\x03\x02\x02\x028\xE3\x03\x02\x02" +
-		"\x02:\xEA\x03\x02\x02\x02<\xEC\x03\x02\x02\x02>\xF2\x03\x02\x02\x02@A" +
-		"\x05\x04\x03\x02AB\x07\x02\x02\x03B\x03\x03\x02\x02\x02CD\x05\x06\x04" +
-		"\x02DE\x07\x0E\x02\x02EG\x03\x02\x02\x02FC\x03\x02\x02\x02GJ\x03\x02\x02" +
-		"\x02HF\x03\x02\x02\x02HI\x03\x02\x02\x02I\x05\x03\x02\x02\x02JH\x03\x02" +
-		"\x02\x02KS\x05\n\x06\x02LS\x05\b\x05\x02MS\x05\x0E\b\x02NS\x05\x14\v\x02" +
-		"OS\x05\f\x07\x02PS\x05\x1C\x0F\x02QS\x03\x02\x02\x02RK\x03\x02\x02\x02" +
-		"RL\x03\x02\x02\x02RM\x03\x02\x02\x02RN\x03\x02\x02\x02RO\x03\x02\x02\x02" +
-		"RP\x03\x02\x02\x02RQ\x03\x02\x02\x02S\x07\x03\x02\x02\x02TU\x07\n\x02" +
-		"\x02UV\x05\x04\x03\x02VW\x07\v\x02\x02W[\x03\x02\x02\x02XY\x07\n\x02\x02" +
-		"Y[\x07\v\x02\x02ZT\x03\x02\x02\x02ZX\x03\x02\x02\x02[\t\x03\x02\x02\x02" +
-		"\\]\x07/\x02\x02]^\x07\x1A\x02\x02^_\x05&\x14\x02_\v\x03\x02\x02\x02`" +
-		"a\x07\x19\x02\x02ab\x05\n\x06\x02b\r\x03\x02\x02\x02cd\x07\x11\x02\x02" +
-		"de\x05&\x14\x02ei\x05\b\x05\x02fh\x05\x10\t\x02gf\x03\x02\x02\x02hk\x03" +
-		"\x02\x02\x02ig\x03\x02\x02\x02ij\x03\x02\x02\x02jm\x03\x02\x02\x02ki\x03" +
-		"\x02\x02\x02ln\x05\x12\n\x02ml\x03\x02\x02\x02mn\x03\x02\x02\x02n\x0F" +
-		"\x03\x02\x02\x02op\x07\x13\x02\x02pq\x05&\x14\x02qr\x05\b\x05\x02r\x11" +
-		"\x03\x02\x02\x02st\x07\x12\x02\x02tu\x05\b\x05\x02u\x13\x03\x02\x02\x02" +
-		"vz\x05\x16\f\x02wz\x05\x18\r\x02xz\x05\x1A\x0E\x02yv\x03\x02\x02\x02y" +
-		"w\x03\x02\x02\x02yx\x03\x02\x02\x02z\x15\x03\x02\x02\x02{|\x07\x15\x02" +
-		"\x02|}\x05&\x14\x02}~\x05\b\x05\x02~\x17\x03\x02\x02\x02\x7F\x80\x07\x16" +
-		"\x02\x02\x80\x81\x05\b\x05\x02\x81\x82\x07\x15\x02\x02\x82\x83\x05&\x14" +
-		"\x02\x83\x19\x03\x02\x02\x02\x84\x85\x07\x14\x02\x02\x85\x86\x07\b\x02" +
-		"\x02\x86\x87\x05\x06\x04\x02\x87\x89\x07\x0E\x02\x02\x88\x8A\x05&\x14" +
-		"\x02\x89\x88\x03\x02\x02\x02\x89\x8A\x03\x02\x02\x02\x8A\x8B\x03\x02\x02" +
-		"\x02\x8B\x8C\x07\x0E\x02\x02\x8C\x8D\x05\x06\x04\x02\x8D\x8E\x07\t\x02" +
-		"\x02\x8E\x8F\x05\b\x05\x02\x8F\x1B\x03\x02\x02\x02\x90\x94\x05\x1E\x10" +
-		"\x02\x91\x94\x05\"\x12\x02\x92\x94\x05$\x13\x02\x93\x90\x03\x02\x02\x02" +
-		"\x93\x91\x03\x02\x02\x02\x93\x92\x03\x02\x02\x02\x94\x1D\x03\x02\x02\x02" +
-		"\x95\x96\x07\x17\x02\x02\x96\x97\x07/\x02\x02\x97\x99\x07\b\x02\x02\x98" +
-		"\x9A\x05 \x11\x02\x99\x98\x03\x02\x02\x02\x99\x9A\x03\x02\x02\x02\x9A" +
-		"\x9B\x03\x02\x02\x02\x9B\x9C\x07\t\x02\x02\x9C\x9D\x05\b\x05\x02\x9D\x1F" +
-		"\x03\x02\x02\x02\x9E\xA3\x07/\x02\x02\x9F\xA0\x07\x10\x02\x02\xA0\xA2" +
-		"\x07/\x02\x02\xA1\x9F\x03\x02\x02\x02\xA2\xA5\x03\x02\x02\x02\xA3\xA1" +
-		"\x03\x02\x02\x02\xA3\xA4\x03\x02\x02\x02\xA4!\x03\x02\x02\x02\xA5\xA3" +
-		"\x03\x02\x02\x02\xA6\xA7\x07\x18\x02\x02\xA7\xA8\x05&\x14\x02\xA8#\x03" +
-		"\x02\x02\x02\xA9\xAA\x07/\x02\x02\xAA\xAC\x07\b\x02\x02\xAB\xAD\x05> " +
-		"\x02\xAC\xAB\x03\x02\x02\x02\xAC\xAD\x03\x02\x02\x02\xAD\xAE\x03\x02\x02" +
-		"\x02\xAE\xAF\x07\t\x02\x02\xAF%\x03\x02\x02\x02\xB0\xB1\x05(\x15\x02\xB1" +
-		"\'\x03\x02\x02\x02\xB2\xB8\x05*\x16\x02\xB3\xB4\x052\x1A\x02\xB4\xB5\x05" +
-		"*\x16\x02\xB5\xB7\x03\x02\x02\x02\xB6\xB3\x03\x02\x02\x02\xB7\xBA\x03" +
-		"\x02\x02\x02\xB8\xB6\x03\x02\x02\x02\xB8\xB9\x03\x02\x02\x02\xB9)\x03" +
-		"\x02\x02\x02\xBA\xB8\x03\x02\x02\x02\xBB\xC1\x05,\x17\x02\xBC\xBD\x05" +
-		"4\x1B\x02\xBD\xBE\x05,\x17\x02\xBE\xC0\x03\x02\x02\x02\xBF\xBC\x03\x02" +
-		"\x02\x02\xC0\xC3\x03\x02\x02\x02\xC1\xBF\x03\x02\x02\x02\xC1\xC2\x03\x02" +
-		"\x02\x02\xC2+\x03\x02\x02\x02\xC3\xC1\x03\x02\x02\x02\xC4\xCA\x05.\x18" +
-		"\x02\xC5\xC6\x056\x1C\x02\xC6\xC7\x05.\x18\x02\xC7\xC9\x03\x02\x02\x02" +
-		"\xC8\xC5\x03\x02\x02\x02\xC9\xCC\x03\x02\x02\x02\xCA\xC8\x03\x02\x02\x02" +
-		"\xCA\xCB\x03\x02\x02\x02\xCB-\x03\x02\x02\x02\xCC\xCA\x03\x02\x02\x02" +
-		"\xCD\xD3\x050\x19\x02\xCE\xCF\x058\x1D\x02\xCF\xD0\x050\x19\x02\xD0\xD2" +
-		"\x03\x02\x02\x02\xD1\xCE\x03\x02\x02\x02\xD2\xD5\x03\x02\x02\x02\xD3\xD1" +
-		"\x03\x02\x02\x02\xD3\xD4\x03\x02\x02\x02\xD4/\x03\x02\x02\x02\xD5\xD3" +
-		"\x03\x02\x02\x02\xD6\xD7\x07\b\x02\x02\xD7\xD8\x05(\x15\x02\xD8\xD9\x07" +
-		"\t\x02\x02\xD9\xDC\x03\x02\x02\x02\xDA\xDC\x05:\x1E\x02\xDB\xD6\x03\x02" +
-		"\x02\x02\xDB\xDA\x03\x02\x02\x02\xDC1\x03\x02\x02\x02\xDD\xDE\t\x02\x02" +
-		"\x02\xDE3\x03\x02\x02\x02\xDF\xE0\t\x03\x02\x02\xE05\x03\x02\x02\x02\xE1" +
-		"\xE2\t\x04\x02\x02\xE27\x03\x02\x02\x02\xE3\xE4\t\x05\x02\x02\xE49\x03" +
-		"\x02\x02\x02\xE5\xEB\x07.\x02\x02\xE6\xEB\x07/\x02\x02\xE7\xEB\x07\x06" +
-		"\x02\x02\xE8\xEB\x07\x07\x02\x02\xE9\xEB\x05<\x1F\x02\xEA\xE5\x03\x02" +
-		"\x02\x02\xEA\xE6\x03\x02\x02\x02\xEA\xE7\x03\x02\x02\x02\xEA\xE8\x03\x02" +
-		"\x02\x02\xEA\xE9\x03\x02\x02\x02\xEB;\x03\x02\x02\x02\xEC\xEE\x07\f\x02" +
-		"\x02\xED\xEF\x05> \x02\xEE\xED\x03\x02\x02\x02\xEE\xEF\x03\x02\x02\x02" +
-		"\xEF\xF0\x03\x02\x02\x02\xF0\xF1\x07\r\x02\x02\xF1=\x03\x02\x02\x02\xF2" +
-		"\xF7\x05:\x1E\x02\xF3\xF4\x07\x10\x02\x02\xF4\xF6\x05:\x1E\x02\xF5\xF3" +
-		"\x03\x02\x02\x02\xF6\xF9\x03\x02\x02\x02\xF7\xF5\x03\x02\x02\x02\xF7\xF8" +
-		"\x03\x02\x02\x02\xF8?\x03\x02\x02\x02\xF9\xF7\x03\x02\x02\x02\x15HRZi" +
-		"my\x89\x93\x99\xA3\xAC\xB8\xC1\xCA\xD3\xDB\xEA\xEE\xF7";
+		"\x05\x0F\xA4\n\x0F\x03\x10\x03\x10\x03\x10\x03\x10\x05\x10\xAA\n\x10\x03" +
+		"\x10\x03\x10\x03\x10\x03\x11\x03\x11\x03\x11\x07\x11\xB2\n\x11\f\x11\x0E" +
+		"\x11\xB5\v\x11\x03\x12\x03\x12\x03\x12\x03\x13\x03\x13\x03\x13\x05\x13" +
+		"\xBD\n\x13\x03\x13\x03\x13\x03\x14\x03\x14\x03\x15\x03\x15\x03\x15\x07" +
+		"\x15\xC6\n\x15\f\x15\x0E\x15\xC9\v\x15\x03\x16\x03\x16\x03\x16\x07\x16" +
+		"\xCE\n\x16\f\x16\x0E\x16\xD1\v\x16\x03\x17\x03\x17\x03\x17\x07\x17\xD6" +
+		"\n\x17\f\x17\x0E\x17\xD9\v\x17\x03\x18\x03\x18\x03\x18\x07\x18\xDE\n\x18" +
+		"\f\x18\x0E\x18\xE1\v\x18\x03\x19\x03\x19\x03\x19\x07\x19\xE6\n\x19\f\x19" +
+		"\x0E\x19\xE9\v\x19\x03\x1A\x03\x1A\x03\x1A\x03\x1A\x07\x1A\xEF\n\x1A\f" +
+		"\x1A\x0E\x1A\xF2\v\x1A\x03\x1B\x03\x1B\x03\x1B\x03\x1B\x07\x1B\xF8\n\x1B" +
+		"\f\x1B\x0E\x1B\xFB\v\x1B\x03\x1C\x03\x1C\x03\x1C\x03\x1C\x07\x1C\u0101" +
+		"\n\x1C\f\x1C\x0E\x1C\u0104\v\x1C\x03\x1D\x03\x1D\x03\x1D\x03\x1D\x07\x1D" +
+		"\u010A\n\x1D\f\x1D\x0E\x1D\u010D\v\x1D\x03\x1E\x03\x1E\x03\x1E\x03\x1E" +
+		"\x07\x1E\u0113\n\x1E\f\x1E\x0E\x1E\u0116\v\x1E\x03\x1F\x03\x1F\x03\x1F" +
+		"\x05\x1F\u011B\n\x1F\x03 \x03 \x03 \x03 \x03 \x05 \u0122\n \x03!\x03!" +
+		"\x03\"\x03\"\x03#\x03#\x03$\x03$\x03%\x03%\x03&\x03&\x03&\x03&\x03&\x05" +
+		"&\u0133\n&\x03\'\x03\'\x05\'\u0137\n\'\x03\'\x03\'\x03(\x03(\x03(\x07" +
+		"(\u013E\n(\f(\x0E(\u0141\v(\x03(\x02\x02\x02)\x02\x02\x04\x02\x06\x02" +
+		"\b\x02\n\x02\f\x02\x0E\x02\x10\x02\x12\x02\x14\x02\x16\x02\x18\x02\x1A" +
+		"\x02\x1C\x02\x1E\x02 \x02\"\x02$\x02&\x02(\x02*\x02,\x02.\x020\x022\x02" +
+		"4\x026\x028\x02:\x02<\x02>\x02@\x02B\x02D\x02F\x02H\x02J\x02L\x02N\x02" +
+		"\x02\x07\x03\x02\x1B\x1C\x03\x02\x1D\x1F\x03\x02 !\x03\x02\"%\x03\x02" +
+		"()\x02\u013F\x02P\x03\x02\x02\x02\x04X\x03\x02\x02\x02\x06b\x03\x02\x02" +
+		"\x02\bj\x03\x02\x02\x02\nl\x03\x02\x02\x02\fp\x03\x02\x02\x02\x0Es\x03" +
+		"\x02\x02\x02\x10\x7F\x03\x02\x02\x02\x12\x83\x03\x02\x02\x02\x14\x89\x03" +
+		"\x02\x02\x02\x16\x8B\x03\x02\x02\x02\x18\x8F\x03\x02\x02\x02\x1A\x94\x03" +
+		"\x02\x02\x02\x1C\xA3\x03\x02\x02\x02\x1E\xA5\x03\x02\x02\x02 \xAE\x03" +
+		"\x02\x02\x02\"\xB6\x03\x02\x02\x02$\xB9\x03\x02\x02\x02&\xC0\x03\x02\x02" +
+		"\x02(\xC2\x03\x02\x02\x02*\xCA\x03\x02\x02\x02,\xD2\x03\x02\x02\x02.\xDA" +
+		"\x03\x02\x02\x020\xE2\x03\x02\x02\x022\xEA\x03\x02\x02\x024\xF3\x03\x02" +
+		"\x02\x026\xFC\x03\x02\x02\x028\u0105\x03\x02\x02\x02:\u010E\x03\x02\x02" +
+		"\x02<\u011A\x03\x02\x02\x02>\u0121\x03\x02\x02\x02@\u0123\x03\x02\x02" +
+		"\x02B\u0125\x03\x02\x02\x02D\u0127\x03\x02\x02\x02F\u0129\x03\x02\x02" +
+		"\x02H\u012B\x03\x02\x02\x02J\u0132\x03\x02\x02\x02L\u0134\x03\x02\x02" +
+		"\x02N\u013A\x03\x02\x02\x02PQ\x05\x04\x03\x02QR\x07\x02\x02\x03R\x03\x03" +
+		"\x02\x02\x02ST\x05\x06\x04\x02TU\x07\x0E\x02\x02UW\x03\x02\x02\x02VS\x03" +
+		"\x02\x02\x02WZ\x03\x02\x02\x02XV\x03\x02\x02\x02XY\x03\x02\x02\x02Y\x05" +
+		"\x03\x02\x02\x02ZX\x03\x02\x02\x02[c\x05\n\x06\x02\\c\x05\b\x05\x02]c" +
+		"\x05\x0E\b\x02^c\x05\x14\v\x02_c\x05\f\x07\x02`c\x05\x1C\x0F\x02ac\x03" +
+		"\x02\x02\x02b[\x03\x02\x02\x02b\\\x03\x02\x02\x02b]\x03\x02\x02\x02b^" +
+		"\x03\x02\x02\x02b_\x03\x02\x02\x02b`\x03\x02\x02\x02ba\x03\x02\x02\x02" +
+		"c\x07\x03\x02\x02\x02de\x07\n\x02\x02ef\x05\x04\x03\x02fg\x07\v\x02\x02" +
+		"gk\x03\x02\x02\x02hi\x07\n\x02\x02ik\x07\v\x02\x02jd\x03\x02\x02\x02j" +
+		"h\x03\x02\x02\x02k\t\x03\x02\x02\x02lm\x07/\x02\x02mn\x07\x1A\x02\x02" +
+		"no\x05&\x14\x02o\v\x03\x02\x02\x02pq\x07\x19\x02\x02qr\x05\n\x06\x02r" +
+		"\r\x03\x02\x02\x02st\x07\x11\x02\x02tu\x05&\x14\x02uy\x05\b\x05\x02vx" +
+		"\x05\x10\t\x02wv\x03\x02\x02\x02x{\x03\x02\x02\x02yw\x03\x02\x02\x02y" +
+		"z\x03\x02\x02\x02z}\x03\x02\x02\x02{y\x03\x02\x02\x02|~\x05\x12\n\x02" +
+		"}|\x03\x02\x02\x02}~\x03\x02\x02\x02~\x0F\x03\x02\x02\x02\x7F\x80\x07" +
+		"\x13\x02\x02\x80\x81\x05&\x14\x02\x81\x82\x05\b\x05\x02\x82\x11\x03\x02" +
+		"\x02\x02\x83\x84\x07\x12\x02\x02\x84\x85\x05\b\x05\x02\x85\x13\x03\x02" +
+		"\x02\x02\x86\x8A\x05\x16\f\x02\x87\x8A\x05\x18\r\x02\x88\x8A\x05\x1A\x0E" +
+		"\x02\x89\x86\x03\x02\x02\x02\x89\x87\x03\x02\x02\x02\x89\x88\x03\x02\x02" +
+		"\x02\x8A\x15\x03\x02\x02\x02\x8B\x8C\x07\x15\x02\x02\x8C\x8D\x05&\x14" +
+		"\x02\x8D\x8E\x05\b\x05\x02\x8E\x17\x03\x02\x02\x02\x8F\x90\x07\x16\x02" +
+		"\x02\x90\x91\x05\b\x05\x02\x91\x92\x07\x15\x02\x02\x92\x93\x05&\x14\x02" +
+		"\x93\x19\x03\x02\x02\x02\x94\x95\x07\x14\x02\x02\x95\x96\x07\b\x02\x02" +
+		"\x96\x97\x05\x06\x04\x02\x97\x99\x07\x0E\x02\x02\x98\x9A\x05&\x14\x02" +
+		"\x99\x98\x03\x02\x02\x02\x99\x9A\x03\x02\x02\x02\x9A\x9B\x03\x02\x02\x02" +
+		"\x9B\x9C\x07\x0E\x02\x02\x9C\x9D\x05\x06\x04\x02\x9D\x9E\x07\t\x02\x02" +
+		"\x9E\x9F\x05\b\x05\x02\x9F\x1B\x03\x02\x02\x02\xA0\xA4\x05\x1E\x10\x02" +
+		"\xA1\xA4\x05\"\x12\x02\xA2\xA4\x05$\x13\x02\xA3\xA0\x03\x02\x02\x02\xA3" +
+		"\xA1\x03\x02\x02\x02\xA3\xA2\x03\x02\x02\x02\xA4\x1D\x03\x02\x02\x02\xA5" +
+		"\xA6\x07\x17\x02\x02\xA6\xA7\x07/\x02\x02\xA7\xA9\x07\b\x02\x02\xA8\xAA" +
+		"\x05 \x11\x02\xA9\xA8\x03\x02\x02\x02\xA9\xAA\x03\x02\x02\x02\xAA\xAB" +
+		"\x03\x02\x02\x02\xAB\xAC\x07\t\x02\x02\xAC\xAD\x05\b\x05\x02\xAD\x1F\x03" +
+		"\x02\x02\x02\xAE\xB3\x07/\x02\x02\xAF\xB0\x07\x10\x02\x02\xB0\xB2\x07" +
+		"/\x02\x02\xB1\xAF\x03\x02\x02\x02\xB2\xB5\x03\x02\x02\x02\xB3\xB1\x03" +
+		"\x02\x02\x02\xB3\xB4\x03\x02\x02\x02\xB4!\x03\x02\x02\x02\xB5\xB3\x03" +
+		"\x02\x02\x02\xB6\xB7\x07\x18\x02\x02\xB7\xB8\x05&\x14\x02\xB8#\x03\x02" +
+		"\x02\x02\xB9\xBA\x07/\x02\x02\xBA\xBC\x07\b\x02\x02\xBB\xBD\x05N(\x02" +
+		"\xBC\xBB\x03\x02\x02\x02\xBC\xBD\x03\x02\x02\x02\xBD\xBE\x03\x02\x02\x02" +
+		"\xBE\xBF\x07\t\x02\x02\xBF%\x03\x02\x02\x02\xC0\xC1\x05(\x15\x02\xC1\'" +
+		"\x03\x02\x02\x02\xC2\xC7\x05*\x16\x02\xC3\xC4\x07\'\x02\x02\xC4\xC6\x05" +
+		"*\x16\x02\xC5\xC3\x03\x02\x02\x02\xC6\xC9\x03\x02\x02\x02\xC7\xC5\x03" +
+		"\x02\x02\x02\xC7\xC8\x03\x02\x02\x02\xC8)\x03\x02\x02\x02\xC9\xC7\x03" +
+		"\x02\x02\x02\xCA\xCF\x05,\x17\x02\xCB\xCC\x07&\x02\x02\xCC\xCE\x05,\x17" +
+		"\x02\xCD\xCB\x03\x02\x02\x02\xCE\xD1\x03\x02\x02\x02\xCF\xCD\x03\x02\x02" +
+		"\x02\xCF\xD0\x03\x02\x02\x02\xD0+\x03\x02\x02\x02\xD1\xCF\x03\x02\x02" +
+		"\x02\xD2\xD7\x05.\x18\x02\xD3\xD4\x07+\x02\x02\xD4\xD6\x05.\x18\x02\xD5" +
+		"\xD3\x03\x02\x02\x02\xD6\xD9\x03\x02\x02\x02\xD7\xD5\x03\x02\x02\x02\xD7" +
+		"\xD8\x03\x02\x02\x02\xD8-\x03\x02\x02\x02\xD9\xD7\x03\x02\x02\x02\xDA" +
+		"\xDF\x050\x19\x02\xDB\xDC\x07-\x02\x02\xDC\xDE\x050\x19\x02\xDD\xDB\x03" +
+		"\x02\x02\x02\xDE\xE1\x03\x02\x02\x02\xDF\xDD\x03\x02\x02\x02\xDF\xE0\x03" +
+		"\x02\x02\x02\xE0/\x03\x02\x02\x02\xE1\xDF\x03\x02\x02\x02\xE2\xE7\x05" +
+		"2\x1A\x02\xE3\xE4\x07*\x02\x02\xE4\xE6\x052\x1A\x02\xE5\xE3\x03\x02\x02" +
+		"\x02\xE6\xE9\x03\x02\x02\x02\xE7\xE5\x03\x02\x02\x02\xE7\xE8\x03\x02\x02" +
+		"\x02\xE81\x03\x02\x02\x02\xE9\xE7\x03\x02\x02\x02\xEA\xF0\x054\x1B\x02" +
+		"\xEB\xEC\x05D#\x02\xEC\xED\x054\x1B\x02\xED\xEF\x03\x02\x02\x02\xEE\xEB" +
+		"\x03\x02\x02\x02\xEF\xF2\x03\x02\x02\x02\xF0\xEE\x03\x02\x02\x02\xF0\xF1" +
+		"\x03\x02\x02\x02\xF13\x03\x02\x02\x02\xF2\xF0\x03\x02\x02\x02\xF3\xF9" +
+		"\x056\x1C\x02\xF4\xF5\x05F$\x02\xF5\xF6\x056\x1C\x02\xF6\xF8\x03\x02\x02" +
+		"\x02\xF7\xF4\x03\x02\x02\x02\xF8\xFB\x03\x02\x02\x02\xF9\xF7\x03\x02\x02" +
+		"\x02\xF9\xFA\x03\x02\x02\x02\xFA5\x03\x02\x02\x02\xFB\xF9\x03\x02\x02" +
+		"\x02\xFC\u0102\x058\x1D\x02\xFD\xFE\x05H%\x02\xFE\xFF\x058\x1D\x02\xFF" +
+		"\u0101\x03\x02\x02\x02\u0100\xFD\x03\x02\x02\x02\u0101\u0104\x03\x02\x02" +
+		"\x02\u0102\u0100\x03\x02\x02\x02\u0102\u0103\x03\x02\x02\x02\u01037\x03" +
+		"\x02\x02\x02\u0104\u0102\x03\x02\x02\x02\u0105\u010B\x05:\x1E\x02\u0106" +
+		"\u0107\x05@!\x02\u0107\u0108\x05:\x1E\x02\u0108\u010A\x03\x02\x02\x02" +
+		"\u0109\u0106\x03\x02\x02\x02\u010A\u010D\x03\x02\x02\x02\u010B\u0109\x03" +
+		"\x02\x02\x02\u010B\u010C\x03\x02\x02\x02\u010C9\x03\x02\x02\x02\u010D" +
+		"\u010B\x03\x02\x02\x02\u010E\u0114\x05<\x1F\x02\u010F\u0110\x05B\"\x02" +
+		"\u0110\u0111\x05<\x1F\x02\u0111\u0113\x03\x02\x02\x02\u0112\u010F\x03" +
+		"\x02\x02\x02\u0113\u0116\x03\x02\x02\x02\u0114\u0112\x03\x02\x02\x02\u0114" +
+		"\u0115\x03\x02\x02\x02\u0115;\x03\x02\x02\x02\u0116\u0114\x03\x02\x02" +
+		"\x02\u0117\u0118\x07,\x02\x02\u0118\u011B\x05<\x1F\x02\u0119\u011B\x05" +
+		"> \x02\u011A\u0117\x03\x02\x02\x02\u011A\u0119\x03\x02\x02\x02\u011B=" +
+		"\x03\x02\x02\x02\u011C\u011D\x07\b\x02\x02\u011D\u011E\x05&\x14\x02\u011E" +
+		"\u011F\x07\t\x02\x02\u011F\u0122\x03\x02\x02\x02\u0120\u0122\x05J&\x02" +
+		"\u0121\u011C\x03\x02\x02\x02\u0121\u0120\x03\x02\x02\x02\u0122?\x03\x02" +
+		"\x02\x02\u0123\u0124\t\x02\x02\x02\u0124A\x03\x02\x02\x02\u0125\u0126" +
+		"\t\x03\x02\x02\u0126C\x03\x02\x02\x02\u0127\u0128\t\x04\x02\x02\u0128" +
+		"E\x03\x02\x02\x02\u0129\u012A\t\x05\x02\x02\u012AG\x03\x02\x02\x02\u012B" +
+		"\u012C\t\x06\x02\x02\u012CI\x03\x02\x02\x02\u012D\u0133\x07.\x02\x02\u012E" +
+		"\u0133\x07/\x02\x02\u012F\u0133\x07\x06\x02\x02\u0130\u0133\x07\x07\x02" +
+		"\x02\u0131\u0133\x05L\'\x02\u0132\u012D\x03\x02\x02\x02\u0132\u012E\x03" +
+		"\x02\x02\x02\u0132\u012F\x03\x02\x02\x02\u0132\u0130\x03\x02\x02\x02\u0132" +
+		"\u0131\x03\x02\x02\x02\u0133K\x03\x02\x02\x02\u0134\u0136\x07\f\x02\x02" +
+		"\u0135\u0137\x05N(\x02\u0136\u0135\x03\x02\x02\x02\u0136\u0137\x03\x02" +
+		"\x02\x02\u0137\u0138\x03\x02\x02\x02\u0138\u0139\x07\r\x02\x02\u0139M" +
+		"\x03\x02\x02\x02\u013A\u013F\x05&\x14\x02\u013B\u013C\x07\x10\x02\x02" +
+		"\u013C\u013E\x05&\x14\x02\u013D\u013B\x03\x02\x02\x02\u013E\u0141\x03" +
+		"\x02\x02\x02\u013F\u013D\x03\x02\x02\x02\u013F\u0140\x03\x02\x02\x02\u0140" +
+		"O\x03\x02\x02\x02\u0141\u013F\x03\x02\x02\x02\x1CXbjy}\x89\x99\xA3\xA9" +
+		"\xB3\xBC\xC7\xCF\xD7\xDF\xE7\xF0\xF9\u0102\u010B\u0114\u011A\u0121\u0132" +
+		"\u0136\u013F";
 	public static __ATN: ATN;
 	public static get _ATN(): ATN {
 		if (!FileScriptParser.__ATN) {
@@ -2220,8 +2602,8 @@ export class Function_callContext extends ParserRuleContext {
 
 
 export class ExpressaoContext extends ParserRuleContext {
-	public calculo_prioridade_1(): Calculo_prioridade_1Context {
-		return this.getRuleContext(0, Calculo_prioridade_1Context);
+	public calculo_logico_ou(): Calculo_logico_ouContext {
+		return this.getRuleContext(0, Calculo_logico_ouContext);
 	}
 	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
 		super(parent, invokingState);
@@ -2244,6 +2626,382 @@ export class ExpressaoContext extends ParserRuleContext {
 	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
 		if (visitor.visitExpressao) {
 			return visitor.visitExpressao(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+
+
+export class Calculo_logico_ouContext extends ParserRuleContext {
+	public calculo_logico_e(): Calculo_logico_eContext[];
+	public calculo_logico_e(i: number): Calculo_logico_eContext;
+	public calculo_logico_e(i?: number): Calculo_logico_eContext | Calculo_logico_eContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(Calculo_logico_eContext);
+		} else {
+			return this.getRuleContext(i, Calculo_logico_eContext);
+		}
+	}
+	public LOGIC_OR(): TerminalNode[];
+	public LOGIC_OR(i: number): TerminalNode;
+	public LOGIC_OR(i?: number): TerminalNode | TerminalNode[] {
+		if (i === undefined) {
+			return this.getTokens(FileScriptParser.LOGIC_OR);
+		} else {
+			return this.getToken(FileScriptParser.LOGIC_OR, i);
+		}
+	}
+	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+		super(parent, invokingState);
+	}
+	// @Override
+	public get ruleIndex(): number { return FileScriptParser.RULE_calculo_logico_ou; }
+	// @Override
+	public enterRule(listener: FileScriptParserListener): void {
+		if (listener.enterCalculo_logico_ou) {
+			listener.enterCalculo_logico_ou(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: FileScriptParserListener): void {
+		if (listener.exitCalculo_logico_ou) {
+			listener.exitCalculo_logico_ou(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
+		if (visitor.visitCalculo_logico_ou) {
+			return visitor.visitCalculo_logico_ou(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+
+
+export class Calculo_logico_eContext extends ParserRuleContext {
+	public calculo_bitwise_ou(): Calculo_bitwise_ouContext[];
+	public calculo_bitwise_ou(i: number): Calculo_bitwise_ouContext;
+	public calculo_bitwise_ou(i?: number): Calculo_bitwise_ouContext | Calculo_bitwise_ouContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(Calculo_bitwise_ouContext);
+		} else {
+			return this.getRuleContext(i, Calculo_bitwise_ouContext);
+		}
+	}
+	public LOGIC_AND(): TerminalNode[];
+	public LOGIC_AND(i: number): TerminalNode;
+	public LOGIC_AND(i?: number): TerminalNode | TerminalNode[] {
+		if (i === undefined) {
+			return this.getTokens(FileScriptParser.LOGIC_AND);
+		} else {
+			return this.getToken(FileScriptParser.LOGIC_AND, i);
+		}
+	}
+	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+		super(parent, invokingState);
+	}
+	// @Override
+	public get ruleIndex(): number { return FileScriptParser.RULE_calculo_logico_e; }
+	// @Override
+	public enterRule(listener: FileScriptParserListener): void {
+		if (listener.enterCalculo_logico_e) {
+			listener.enterCalculo_logico_e(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: FileScriptParserListener): void {
+		if (listener.exitCalculo_logico_e) {
+			listener.exitCalculo_logico_e(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
+		if (visitor.visitCalculo_logico_e) {
+			return visitor.visitCalculo_logico_e(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+
+
+export class Calculo_bitwise_ouContext extends ParserRuleContext {
+	public calculo_bitwise_xou(): Calculo_bitwise_xouContext[];
+	public calculo_bitwise_xou(i: number): Calculo_bitwise_xouContext;
+	public calculo_bitwise_xou(i?: number): Calculo_bitwise_xouContext | Calculo_bitwise_xouContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(Calculo_bitwise_xouContext);
+		} else {
+			return this.getRuleContext(i, Calculo_bitwise_xouContext);
+		}
+	}
+	public BITWISE_OR(): TerminalNode[];
+	public BITWISE_OR(i: number): TerminalNode;
+	public BITWISE_OR(i?: number): TerminalNode | TerminalNode[] {
+		if (i === undefined) {
+			return this.getTokens(FileScriptParser.BITWISE_OR);
+		} else {
+			return this.getToken(FileScriptParser.BITWISE_OR, i);
+		}
+	}
+	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+		super(parent, invokingState);
+	}
+	// @Override
+	public get ruleIndex(): number { return FileScriptParser.RULE_calculo_bitwise_ou; }
+	// @Override
+	public enterRule(listener: FileScriptParserListener): void {
+		if (listener.enterCalculo_bitwise_ou) {
+			listener.enterCalculo_bitwise_ou(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: FileScriptParserListener): void {
+		if (listener.exitCalculo_bitwise_ou) {
+			listener.exitCalculo_bitwise_ou(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
+		if (visitor.visitCalculo_bitwise_ou) {
+			return visitor.visitCalculo_bitwise_ou(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+
+
+export class Calculo_bitwise_xouContext extends ParserRuleContext {
+	public calculo_bitwise_e(): Calculo_bitwise_eContext[];
+	public calculo_bitwise_e(i: number): Calculo_bitwise_eContext;
+	public calculo_bitwise_e(i?: number): Calculo_bitwise_eContext | Calculo_bitwise_eContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(Calculo_bitwise_eContext);
+		} else {
+			return this.getRuleContext(i, Calculo_bitwise_eContext);
+		}
+	}
+	public BITWISE_XOR(): TerminalNode[];
+	public BITWISE_XOR(i: number): TerminalNode;
+	public BITWISE_XOR(i?: number): TerminalNode | TerminalNode[] {
+		if (i === undefined) {
+			return this.getTokens(FileScriptParser.BITWISE_XOR);
+		} else {
+			return this.getToken(FileScriptParser.BITWISE_XOR, i);
+		}
+	}
+	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+		super(parent, invokingState);
+	}
+	// @Override
+	public get ruleIndex(): number { return FileScriptParser.RULE_calculo_bitwise_xou; }
+	// @Override
+	public enterRule(listener: FileScriptParserListener): void {
+		if (listener.enterCalculo_bitwise_xou) {
+			listener.enterCalculo_bitwise_xou(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: FileScriptParserListener): void {
+		if (listener.exitCalculo_bitwise_xou) {
+			listener.exitCalculo_bitwise_xou(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
+		if (visitor.visitCalculo_bitwise_xou) {
+			return visitor.visitCalculo_bitwise_xou(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+
+
+export class Calculo_bitwise_eContext extends ParserRuleContext {
+	public calculo_igualdade(): Calculo_igualdadeContext[];
+	public calculo_igualdade(i: number): Calculo_igualdadeContext;
+	public calculo_igualdade(i?: number): Calculo_igualdadeContext | Calculo_igualdadeContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(Calculo_igualdadeContext);
+		} else {
+			return this.getRuleContext(i, Calculo_igualdadeContext);
+		}
+	}
+	public BITWISE_AND(): TerminalNode[];
+	public BITWISE_AND(i: number): TerminalNode;
+	public BITWISE_AND(i?: number): TerminalNode | TerminalNode[] {
+		if (i === undefined) {
+			return this.getTokens(FileScriptParser.BITWISE_AND);
+		} else {
+			return this.getToken(FileScriptParser.BITWISE_AND, i);
+		}
+	}
+	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+		super(parent, invokingState);
+	}
+	// @Override
+	public get ruleIndex(): number { return FileScriptParser.RULE_calculo_bitwise_e; }
+	// @Override
+	public enterRule(listener: FileScriptParserListener): void {
+		if (listener.enterCalculo_bitwise_e) {
+			listener.enterCalculo_bitwise_e(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: FileScriptParserListener): void {
+		if (listener.exitCalculo_bitwise_e) {
+			listener.exitCalculo_bitwise_e(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
+		if (visitor.visitCalculo_bitwise_e) {
+			return visitor.visitCalculo_bitwise_e(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+
+
+export class Calculo_igualdadeContext extends ParserRuleContext {
+	public calculo_relacional(): Calculo_relacionalContext[];
+	public calculo_relacional(i: number): Calculo_relacionalContext;
+	public calculo_relacional(i?: number): Calculo_relacionalContext | Calculo_relacionalContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(Calculo_relacionalContext);
+		} else {
+			return this.getRuleContext(i, Calculo_relacionalContext);
+		}
+	}
+	public operador_igualdade(): Operador_igualdadeContext[];
+	public operador_igualdade(i: number): Operador_igualdadeContext;
+	public operador_igualdade(i?: number): Operador_igualdadeContext | Operador_igualdadeContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(Operador_igualdadeContext);
+		} else {
+			return this.getRuleContext(i, Operador_igualdadeContext);
+		}
+	}
+	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+		super(parent, invokingState);
+	}
+	// @Override
+	public get ruleIndex(): number { return FileScriptParser.RULE_calculo_igualdade; }
+	// @Override
+	public enterRule(listener: FileScriptParserListener): void {
+		if (listener.enterCalculo_igualdade) {
+			listener.enterCalculo_igualdade(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: FileScriptParserListener): void {
+		if (listener.exitCalculo_igualdade) {
+			listener.exitCalculo_igualdade(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
+		if (visitor.visitCalculo_igualdade) {
+			return visitor.visitCalculo_igualdade(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+
+
+export class Calculo_relacionalContext extends ParserRuleContext {
+	public calculo_deslocamento(): Calculo_deslocamentoContext[];
+	public calculo_deslocamento(i: number): Calculo_deslocamentoContext;
+	public calculo_deslocamento(i?: number): Calculo_deslocamentoContext | Calculo_deslocamentoContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(Calculo_deslocamentoContext);
+		} else {
+			return this.getRuleContext(i, Calculo_deslocamentoContext);
+		}
+	}
+	public operador_relacional(): Operador_relacionalContext[];
+	public operador_relacional(i: number): Operador_relacionalContext;
+	public operador_relacional(i?: number): Operador_relacionalContext | Operador_relacionalContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(Operador_relacionalContext);
+		} else {
+			return this.getRuleContext(i, Operador_relacionalContext);
+		}
+	}
+	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+		super(parent, invokingState);
+	}
+	// @Override
+	public get ruleIndex(): number { return FileScriptParser.RULE_calculo_relacional; }
+	// @Override
+	public enterRule(listener: FileScriptParserListener): void {
+		if (listener.enterCalculo_relacional) {
+			listener.enterCalculo_relacional(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: FileScriptParserListener): void {
+		if (listener.exitCalculo_relacional) {
+			listener.exitCalculo_relacional(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
+		if (visitor.visitCalculo_relacional) {
+			return visitor.visitCalculo_relacional(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+
+
+export class Calculo_deslocamentoContext extends ParserRuleContext {
+	public calculo_prioridade_1(): Calculo_prioridade_1Context[];
+	public calculo_prioridade_1(i: number): Calculo_prioridade_1Context;
+	public calculo_prioridade_1(i?: number): Calculo_prioridade_1Context | Calculo_prioridade_1Context[] {
+		if (i === undefined) {
+			return this.getRuleContexts(Calculo_prioridade_1Context);
+		} else {
+			return this.getRuleContext(i, Calculo_prioridade_1Context);
+		}
+	}
+	public operador_deslocamento(): Operador_deslocamentoContext[];
+	public operador_deslocamento(i: number): Operador_deslocamentoContext;
+	public operador_deslocamento(i?: number): Operador_deslocamentoContext | Operador_deslocamentoContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(Operador_deslocamentoContext);
+		} else {
+			return this.getRuleContext(i, Operador_deslocamentoContext);
+		}
+	}
+	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+		super(parent, invokingState);
+	}
+	// @Override
+	public get ruleIndex(): number { return FileScriptParser.RULE_calculo_deslocamento; }
+	// @Override
+	public enterRule(listener: FileScriptParserListener): void {
+		if (listener.enterCalculo_deslocamento) {
+			listener.enterCalculo_deslocamento(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: FileScriptParserListener): void {
+		if (listener.exitCalculo_deslocamento) {
+			listener.exitCalculo_deslocamento(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
+		if (visitor.visitCalculo_deslocamento) {
+			return visitor.visitCalculo_deslocamento(this);
 		} else {
 			return visitor.visitChildren(this);
 		}
@@ -2299,13 +3057,13 @@ export class Calculo_prioridade_1Context extends ParserRuleContext {
 
 
 export class Calculo_prioridade_2Context extends ParserRuleContext {
-	public calculo_operador_logico(): Calculo_operador_logicoContext[];
-	public calculo_operador_logico(i: number): Calculo_operador_logicoContext;
-	public calculo_operador_logico(i?: number): Calculo_operador_logicoContext | Calculo_operador_logicoContext[] {
+	public calculo_unario(): Calculo_unarioContext[];
+	public calculo_unario(i: number): Calculo_unarioContext;
+	public calculo_unario(i?: number): Calculo_unarioContext | Calculo_unarioContext[] {
 		if (i === undefined) {
-			return this.getRuleContexts(Calculo_operador_logicoContext);
+			return this.getRuleContexts(Calculo_unarioContext);
 		} else {
-			return this.getRuleContext(i, Calculo_operador_logicoContext);
+			return this.getRuleContext(i, Calculo_unarioContext);
 		}
 	}
 	public operador_prioridade_2(): Operador_prioridade_2Context[];
@@ -2345,93 +3103,35 @@ export class Calculo_prioridade_2Context extends ParserRuleContext {
 }
 
 
-export class Calculo_operador_logicoContext extends ParserRuleContext {
-	public calculo_logico_composto(): Calculo_logico_compostoContext[];
-	public calculo_logico_composto(i: number): Calculo_logico_compostoContext;
-	public calculo_logico_composto(i?: number): Calculo_logico_compostoContext | Calculo_logico_compostoContext[] {
-		if (i === undefined) {
-			return this.getRuleContexts(Calculo_logico_compostoContext);
-		} else {
-			return this.getRuleContext(i, Calculo_logico_compostoContext);
-		}
+export class Calculo_unarioContext extends ParserRuleContext {
+	public BITWISE_NOT(): TerminalNode | undefined { return this.tryGetToken(FileScriptParser.BITWISE_NOT, 0); }
+	public calculo_unario(): Calculo_unarioContext | undefined {
+		return this.tryGetRuleContext(0, Calculo_unarioContext);
 	}
-	public operador_logico(): Operador_logicoContext[];
-	public operador_logico(i: number): Operador_logicoContext;
-	public operador_logico(i?: number): Operador_logicoContext | Operador_logicoContext[] {
-		if (i === undefined) {
-			return this.getRuleContexts(Operador_logicoContext);
-		} else {
-			return this.getRuleContext(i, Operador_logicoContext);
-		}
+	public calculo_parenteses(): Calculo_parentesesContext | undefined {
+		return this.tryGetRuleContext(0, Calculo_parentesesContext);
 	}
 	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
 		super(parent, invokingState);
 	}
 	// @Override
-	public get ruleIndex(): number { return FileScriptParser.RULE_calculo_operador_logico; }
+	public get ruleIndex(): number { return FileScriptParser.RULE_calculo_unario; }
 	// @Override
 	public enterRule(listener: FileScriptParserListener): void {
-		if (listener.enterCalculo_operador_logico) {
-			listener.enterCalculo_operador_logico(this);
+		if (listener.enterCalculo_unario) {
+			listener.enterCalculo_unario(this);
 		}
 	}
 	// @Override
 	public exitRule(listener: FileScriptParserListener): void {
-		if (listener.exitCalculo_operador_logico) {
-			listener.exitCalculo_operador_logico(this);
+		if (listener.exitCalculo_unario) {
+			listener.exitCalculo_unario(this);
 		}
 	}
 	// @Override
 	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
-		if (visitor.visitCalculo_operador_logico) {
-			return visitor.visitCalculo_operador_logico(this);
-		} else {
-			return visitor.visitChildren(this);
-		}
-	}
-}
-
-
-export class Calculo_logico_compostoContext extends ParserRuleContext {
-	public calculo_parenteses(): Calculo_parentesesContext[];
-	public calculo_parenteses(i: number): Calculo_parentesesContext;
-	public calculo_parenteses(i?: number): Calculo_parentesesContext | Calculo_parentesesContext[] {
-		if (i === undefined) {
-			return this.getRuleContexts(Calculo_parentesesContext);
-		} else {
-			return this.getRuleContext(i, Calculo_parentesesContext);
-		}
-	}
-	public composto_logico(): Composto_logicoContext[];
-	public composto_logico(i: number): Composto_logicoContext;
-	public composto_logico(i?: number): Composto_logicoContext | Composto_logicoContext[] {
-		if (i === undefined) {
-			return this.getRuleContexts(Composto_logicoContext);
-		} else {
-			return this.getRuleContext(i, Composto_logicoContext);
-		}
-	}
-	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-		super(parent, invokingState);
-	}
-	// @Override
-	public get ruleIndex(): number { return FileScriptParser.RULE_calculo_logico_composto; }
-	// @Override
-	public enterRule(listener: FileScriptParserListener): void {
-		if (listener.enterCalculo_logico_composto) {
-			listener.enterCalculo_logico_composto(this);
-		}
-	}
-	// @Override
-	public exitRule(listener: FileScriptParserListener): void {
-		if (listener.exitCalculo_logico_composto) {
-			listener.exitCalculo_logico_composto(this);
-		}
-	}
-	// @Override
-	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
-		if (visitor.visitCalculo_logico_composto) {
-			return visitor.visitCalculo_logico_composto(this);
+		if (visitor.visitCalculo_unario) {
+			return visitor.visitCalculo_unario(this);
 		} else {
 			return visitor.visitChildren(this);
 		}
@@ -2441,8 +3141,8 @@ export class Calculo_logico_compostoContext extends ParserRuleContext {
 
 export class Calculo_parentesesContext extends ParserRuleContext {
 	public PARENTESES_OPEN(): TerminalNode | undefined { return this.tryGetToken(FileScriptParser.PARENTESES_OPEN, 0); }
-	public calculo_prioridade_1(): Calculo_prioridade_1Context | undefined {
-		return this.tryGetRuleContext(0, Calculo_prioridade_1Context);
+	public expressao(): ExpressaoContext | undefined {
+		return this.tryGetRuleContext(0, ExpressaoContext);
 	}
 	public PARENTESES_CLOSE(): TerminalNode | undefined { return this.tryGetToken(FileScriptParser.PARENTESES_CLOSE, 0); }
 	public valor_calculo(): Valor_calculoContext | undefined {
@@ -2539,9 +3239,38 @@ export class Operador_prioridade_2Context extends ParserRuleContext {
 }
 
 
-export class Operador_logicoContext extends ParserRuleContext {
+export class Operador_igualdadeContext extends ParserRuleContext {
 	public EQUALS(): TerminalNode | undefined { return this.tryGetToken(FileScriptParser.EQUALS, 0); }
 	public NOT_EQUALS(): TerminalNode | undefined { return this.tryGetToken(FileScriptParser.NOT_EQUALS, 0); }
+	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+		super(parent, invokingState);
+	}
+	// @Override
+	public get ruleIndex(): number { return FileScriptParser.RULE_operador_igualdade; }
+	// @Override
+	public enterRule(listener: FileScriptParserListener): void {
+		if (listener.enterOperador_igualdade) {
+			listener.enterOperador_igualdade(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: FileScriptParserListener): void {
+		if (listener.exitOperador_igualdade) {
+			listener.exitOperador_igualdade(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
+		if (visitor.visitOperador_igualdade) {
+			return visitor.visitOperador_igualdade(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+
+
+export class Operador_relacionalContext extends ParserRuleContext {
 	public GREATER(): TerminalNode | undefined { return this.tryGetToken(FileScriptParser.GREATER, 0); }
 	public GREATER_EQUALS(): TerminalNode | undefined { return this.tryGetToken(FileScriptParser.GREATER_EQUALS, 0); }
 	public LESS(): TerminalNode | undefined { return this.tryGetToken(FileScriptParser.LESS, 0); }
@@ -2550,23 +3279,23 @@ export class Operador_logicoContext extends ParserRuleContext {
 		super(parent, invokingState);
 	}
 	// @Override
-	public get ruleIndex(): number { return FileScriptParser.RULE_operador_logico; }
+	public get ruleIndex(): number { return FileScriptParser.RULE_operador_relacional; }
 	// @Override
 	public enterRule(listener: FileScriptParserListener): void {
-		if (listener.enterOperador_logico) {
-			listener.enterOperador_logico(this);
+		if (listener.enterOperador_relacional) {
+			listener.enterOperador_relacional(this);
 		}
 	}
 	// @Override
 	public exitRule(listener: FileScriptParserListener): void {
-		if (listener.exitOperador_logico) {
-			listener.exitOperador_logico(this);
+		if (listener.exitOperador_relacional) {
+			listener.exitOperador_relacional(this);
 		}
 	}
 	// @Override
 	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
-		if (visitor.visitOperador_logico) {
-			return visitor.visitOperador_logico(this);
+		if (visitor.visitOperador_relacional) {
+			return visitor.visitOperador_relacional(this);
 		} else {
 			return visitor.visitChildren(this);
 		}
@@ -2574,30 +3303,30 @@ export class Operador_logicoContext extends ParserRuleContext {
 }
 
 
-export class Composto_logicoContext extends ParserRuleContext {
-	public LOGIC_AND(): TerminalNode | undefined { return this.tryGetToken(FileScriptParser.LOGIC_AND, 0); }
-	public LOGIC_OR(): TerminalNode | undefined { return this.tryGetToken(FileScriptParser.LOGIC_OR, 0); }
+export class Operador_deslocamentoContext extends ParserRuleContext {
+	public RIGHT_SHIFT(): TerminalNode | undefined { return this.tryGetToken(FileScriptParser.RIGHT_SHIFT, 0); }
+	public LEFT_SHIFT(): TerminalNode | undefined { return this.tryGetToken(FileScriptParser.LEFT_SHIFT, 0); }
 	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
 		super(parent, invokingState);
 	}
 	// @Override
-	public get ruleIndex(): number { return FileScriptParser.RULE_composto_logico; }
+	public get ruleIndex(): number { return FileScriptParser.RULE_operador_deslocamento; }
 	// @Override
 	public enterRule(listener: FileScriptParserListener): void {
-		if (listener.enterComposto_logico) {
-			listener.enterComposto_logico(this);
+		if (listener.enterOperador_deslocamento) {
+			listener.enterOperador_deslocamento(this);
 		}
 	}
 	// @Override
 	public exitRule(listener: FileScriptParserListener): void {
-		if (listener.exitComposto_logico) {
-			listener.exitComposto_logico(this);
+		if (listener.exitOperador_deslocamento) {
+			listener.exitOperador_deslocamento(this);
 		}
 	}
 	// @Override
 	public accept<Result>(visitor: FileScriptParserVisitor<Result>): Result {
-		if (visitor.visitComposto_logico) {
-			return visitor.visitComposto_logico(this);
+		if (visitor.visitOperador_deslocamento) {
+			return visitor.visitOperador_deslocamento(this);
 		} else {
 			return visitor.visitChildren(this);
 		}
@@ -2676,13 +3405,13 @@ export class ArrayContext extends ParserRuleContext {
 
 
 export class Lista_expressoesContext extends ParserRuleContext {
-	public valor_calculo(): Valor_calculoContext[];
-	public valor_calculo(i: number): Valor_calculoContext;
-	public valor_calculo(i?: number): Valor_calculoContext | Valor_calculoContext[] {
+	public expressao(): ExpressaoContext[];
+	public expressao(i: number): ExpressaoContext;
+	public expressao(i?: number): ExpressaoContext | ExpressaoContext[] {
 		if (i === undefined) {
-			return this.getRuleContexts(Valor_calculoContext);
+			return this.getRuleContexts(ExpressaoContext);
 		} else {
-			return this.getRuleContext(i, Valor_calculoContext);
+			return this.getRuleContext(i, ExpressaoContext);
 		}
 	}
 	public COMMA(): TerminalNode[];

@@ -22,15 +22,23 @@ import { Lista_parametrosContext } from "./FileScriptParser";
 import { Return_stmtContext } from "./FileScriptParser";
 import { Function_callContext } from "./FileScriptParser";
 import { ExpressaoContext } from "./FileScriptParser";
+import { Calculo_logico_ouContext } from "./FileScriptParser";
+import { Calculo_logico_eContext } from "./FileScriptParser";
+import { Calculo_bitwise_ouContext } from "./FileScriptParser";
+import { Calculo_bitwise_xouContext } from "./FileScriptParser";
+import { Calculo_bitwise_eContext } from "./FileScriptParser";
+import { Calculo_igualdadeContext } from "./FileScriptParser";
+import { Calculo_relacionalContext } from "./FileScriptParser";
+import { Calculo_deslocamentoContext } from "./FileScriptParser";
 import { Calculo_prioridade_1Context } from "./FileScriptParser";
 import { Calculo_prioridade_2Context } from "./FileScriptParser";
-import { Calculo_operador_logicoContext } from "./FileScriptParser";
-import { Calculo_logico_compostoContext } from "./FileScriptParser";
+import { Calculo_unarioContext } from "./FileScriptParser";
 import { Calculo_parentesesContext } from "./FileScriptParser";
 import { Operador_prioridade_1Context } from "./FileScriptParser";
 import { Operador_prioridade_2Context } from "./FileScriptParser";
-import { Operador_logicoContext } from "./FileScriptParser";
-import { Composto_logicoContext } from "./FileScriptParser";
+import { Operador_igualdadeContext } from "./FileScriptParser";
+import { Operador_relacionalContext } from "./FileScriptParser";
+import { Operador_deslocamentoContext } from "./FileScriptParser";
 import { Valor_calculoContext } from "./FileScriptParser";
 import { ArrayContext } from "./FileScriptParser";
 import { Lista_expressoesContext } from "./FileScriptParser";
@@ -178,6 +186,62 @@ export interface FileScriptParserVisitor<Result> extends ParseTreeVisitor<Result
 	visitExpressao?: (ctx: ExpressaoContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by `FileScriptParser.calculo_logico_ou`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCalculo_logico_ou?: (ctx: Calculo_logico_ouContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `FileScriptParser.calculo_logico_e`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCalculo_logico_e?: (ctx: Calculo_logico_eContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `FileScriptParser.calculo_bitwise_ou`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCalculo_bitwise_ou?: (ctx: Calculo_bitwise_ouContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `FileScriptParser.calculo_bitwise_xou`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCalculo_bitwise_xou?: (ctx: Calculo_bitwise_xouContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `FileScriptParser.calculo_bitwise_e`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCalculo_bitwise_e?: (ctx: Calculo_bitwise_eContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `FileScriptParser.calculo_igualdade`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCalculo_igualdade?: (ctx: Calculo_igualdadeContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `FileScriptParser.calculo_relacional`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCalculo_relacional?: (ctx: Calculo_relacionalContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `FileScriptParser.calculo_deslocamento`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCalculo_deslocamento?: (ctx: Calculo_deslocamentoContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by `FileScriptParser.calculo_prioridade_1`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -192,18 +256,11 @@ export interface FileScriptParserVisitor<Result> extends ParseTreeVisitor<Result
 	visitCalculo_prioridade_2?: (ctx: Calculo_prioridade_2Context) => Result;
 
 	/**
-	 * Visit a parse tree produced by `FileScriptParser.calculo_operador_logico`.
+	 * Visit a parse tree produced by `FileScriptParser.calculo_unario`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitCalculo_operador_logico?: (ctx: Calculo_operador_logicoContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `FileScriptParser.calculo_logico_composto`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitCalculo_logico_composto?: (ctx: Calculo_logico_compostoContext) => Result;
+	visitCalculo_unario?: (ctx: Calculo_unarioContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `FileScriptParser.calculo_parenteses`.
@@ -227,18 +284,25 @@ export interface FileScriptParserVisitor<Result> extends ParseTreeVisitor<Result
 	visitOperador_prioridade_2?: (ctx: Operador_prioridade_2Context) => Result;
 
 	/**
-	 * Visit a parse tree produced by `FileScriptParser.operador_logico`.
+	 * Visit a parse tree produced by `FileScriptParser.operador_igualdade`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitOperador_logico?: (ctx: Operador_logicoContext) => Result;
+	visitOperador_igualdade?: (ctx: Operador_igualdadeContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `FileScriptParser.composto_logico`.
+	 * Visit a parse tree produced by `FileScriptParser.operador_relacional`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitComposto_logico?: (ctx: Composto_logicoContext) => Result;
+	visitOperador_relacional?: (ctx: Operador_relacionalContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `FileScriptParser.operador_deslocamento`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitOperador_deslocamento?: (ctx: Operador_deslocamentoContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `FileScriptParser.valor_calculo`.
