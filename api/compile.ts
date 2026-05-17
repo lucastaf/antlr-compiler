@@ -6,7 +6,7 @@ import {
     Recognizer,
 } from "antlr4ts";
 import type { CompileError, CompileResult, TokenInfo } from "../shared/types"
-
+import { SemanticAnalyser } from "./lib/SemanticAnalysis"
 
 
 export function compile(code: string): CompileResult {
@@ -57,6 +57,9 @@ export function compile(code: string): CompileResult {
 
     // 🎯 parse
     const tree = parser.program();
+
+    const semantic = new SemanticAnalyser();
+    semantic.visit(tree);
 
     // 🎯 árvore como string
     const parseTree = tree.toStringTree(parser.ruleNames);
