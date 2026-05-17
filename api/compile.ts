@@ -34,6 +34,7 @@ export function compile(code: string): CompileResult {
                 column,
                 message: msg,
                 type: isLexer ? "LEXER" : "PARSER",
+                severity: "Error"
             });
         },
     };
@@ -58,8 +59,13 @@ export function compile(code: string): CompileResult {
     // 🎯 parse
     const tree = parser.program();
 
+    console.log("INICIANDO ANALISE SEMANTICA")
     const semantic = new SemanticAnalyser();
     semantic.visit(tree);
+
+    console.log("ERRORS: ")
+    console.log(semantic.errors);
+    errors.push(...semantic.errors);
 
     // 🎯 árvore como string
     const parseTree = tree.toStringTree(parser.ruleNames);

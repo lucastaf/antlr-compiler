@@ -1,8 +1,11 @@
+export type ErrorSeverity = "Error" | "Warning"
+
 export interface CompileError {
     line: number;
     column: number;
     message: string;
-    type: "LEXER" | "PARSER";
+    severity: ErrorSeverity
+    type: "LEXER" | "PARSER" | "SEMANTIC";
 }
 
 export interface TokenInfo {

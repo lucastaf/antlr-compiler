@@ -7,9 +7,14 @@ import toast from "react-hot-toast";
 import { registerFileScriptLanguage } from "./FileScriptLanguage";
 import type { CompileError } from "../../../shared/types";
 
+const errorsSeverity: Record<CompileError["severity"], monaco.MarkerSeverity> =
+  {
+    Error: monaco.MarkerSeverity.Error,
+    Warning: monaco.MarkerSeverity.Warning,
+  };
 export default function CodeEditor() {
   const [codeText, setCodeText] = useState<string>("");
-  const [errors, setErrors] = useState<CompileError[]>();
+  const [errors, setErrors] = useState<CompileError[] | null>();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof monaco | null>(null);
 
@@ -23,7 +28,7 @@ export default function CodeEditor() {
         code: codeText,
       })
       .then((res) => {
-        const model = editorRef.current.getModel();
+        const model = editorRef?.current?.getModel();
         const monaco = monacoRef.current;
         const markers: monaco.editor.IMarkerData[] = res?.errors?.map(
           (err: any) => ({
@@ -32,7 +37,7 @@ export default function CodeEditor() {
             endLineNumber: err.line,
             endColumn: err.column + 2,
             message: err.message,
-            severity: monaco.MarkerSeverity.Error,
+            severity: errorsSeverity[err.severity],
           }),
         );
 
@@ -44,7 +49,7 @@ export default function CodeEditor() {
           setErrors(res.errors as CompileError[]);
         }
         console.log(markers);
-        monaco.editor.setModelMarkers(model!, "test-owner", markers);
+        monaco?.editor.setModelMarkers(model!, "test-owner", markers);
       });
   }
 

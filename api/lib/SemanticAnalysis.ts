@@ -3,11 +3,31 @@ import type { Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codig
 import type { FileScriptParserVisitor } from "../generated/fsCompiler/FileScriptParserVisitor";
 import { ExpressionTypeVisitor } from "./ExpressionHandler";
 import { ScopeManager } from "./ScopeManager";
+import type { ParserRuleContext } from "antlr4ts";
+import type { CompileError, ErrorSeverity } from "../../shared/types";
 
 export class SemanticAnalyser extends AbstractParseTreeVisitor<any> implements FileScriptParserVisitor<any> {
-    private scopeManager = new ScopeManager();
+    private scopeManager;
 
-    public errors: string[] = [];
+    public errors: CompileError[] = [];
+
+    public constructor() {
+        super();
+
+        this.scopeManager = new ScopeManager(this.addError);
+        this.scopeManager.beginScope();
+    }
+
+    private addError(ctx: ParserRuleContext, message: string, severity: ErrorSeverity) {
+        console.log("ADICIONADO ERROR", message)
+        this.errors.push({
+            line: ctx.start.line,
+            column: ctx.start.charPositionInLine,
+            message: message,
+            severity: severity,
+            type: "SEMANTIC"
+        })
+    }
 
     protected defaultResult() {
         return null;
@@ -15,7 +35,6 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<any> implements F
 
     private parseVariableAttr(ctx: Comando_atribuicaoContext) {
         const varName = ctx.VARIABLE().text;
-        //@ts-expect-error Typescript enchendo o saco com tipagem
         const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager);
 
         const type = expressionVisitor.visit(ctx.expressao());
