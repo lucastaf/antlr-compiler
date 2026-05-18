@@ -1,7 +1,7 @@
 import type { ParserRuleContext } from "antlr4ts";
 import { AbstractParseTreeVisitor } from "antlr4ts/tree";
 import type { CompileError, ErrorSeverity } from "../../shared/types";
-import type { Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codigoContext, Function_callContext, Function_declContext, ProgramContext, Return_stmtContext } from "../generated/fsCompiler/FileScriptParser";
+import type { Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codigoContext, For_loopContext, Function_callContext, Function_declContext, ProgramContext, Return_stmtContext } from "../generated/fsCompiler/FileScriptParser";
 import type { FileScriptParserVisitor } from "../generated/fsCompiler/FileScriptParserVisitor";
 import { ExpressionTypeVisitor } from "./ExpressionHandler";
 import { ScopeManager } from "./ScopeManager";
@@ -45,7 +45,7 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<any> implements F
 
     private parseVariableAttr(ctx: Comando_atribuicaoContext) {
         const varName = ctx.VARIABLE().text;
-        const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager);
+        const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager, this.addError);
 
         const type = expressionVisitor.visit(ctx.expressao());
 
@@ -88,6 +88,16 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<any> implements F
         return null;
     };
 
+    //#region loops
+
+    visitFor_loop(ctx: For_loopContext) {
+        this.scopeManager.beginScope();
+        this.visitChildren(ctx);
+        this.scopeManager.endScope(ctx);
+    };
+
+    //#endregion
+
     //#region Funções
     visitFunction_decl(ctx: Function_declContext) {
         const funcName = ctx.VARIABLE().text;
@@ -104,15 +114,16 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<any> implements F
 
     visitFunction_call(ctx: Function_callContext) {
         const funcName = ctx.VARIABLE().text;
-        this.scopeManager.resolve(funcName, ctx);
-        const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager);
+        const symbol = this.scopeManager.resolve(funcName, ctx);
+        if (symbol?.type != "function") this.addError(ctx, `${funcName} não é uma função`, "Warning")
+        const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager, this.addError);
         ctx.lista_expressoes()?.expressao()?.map(ex => {
             expressionVisitor.visit(ex);
         })
     };
 
     visitReturn_stmt(ctx: Return_stmtContext) {
-        const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager);
+        const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager, this.addError);
         expressionVisitor.visit(ctx.expressao());
     };
 

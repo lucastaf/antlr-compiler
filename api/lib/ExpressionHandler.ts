@@ -3,6 +3,8 @@ import { AbstractParseTreeVisitor } from "antlr4ts/tree";
 import type { expressaoVisitor } from "../generated/fsCompiler/expressaoVisitor";
 import type { ScopeManager } from "./ScopeManager";
 
+import type { ParserRuleContext } from "antlr4ts";
+import type { ErrorSeverity } from "../../shared/types";
 import {
     Calculo_bitwise_eContext,
     Calculo_bitwise_ouContext,
@@ -39,12 +41,12 @@ export class ExpressionTypeVisitor
     extends AbstractParseTreeVisitor<VarType>
     implements expressaoVisitor<VarType> {
 
-    public errors: string[] = [];
 
     private scopes: ScopeManager
 
     constructor(
-        scopes: ScopeManager
+        scopes: ScopeManager,
+        private readonly addError: (ctx: ParserRuleContext, message: string, severity: ErrorSeverity) => void
     ) {
         super();
         this.scopes = scopes;
@@ -66,22 +68,6 @@ export class ExpressionTypeVisitor
     private isBoolean(type: VarType) {
 
         return type === "boolean";
-    }
-
-    private error(
-        ctx: any,
-        message: string
-    ) {
-
-        const line =
-            ctx.start.line;
-
-        const column =
-            ctx.start.charPositionInLine;
-
-        this.errors.push(
-            `[${line}:${column}] ${message}`
-        );
     }
 
     // =====================
@@ -120,10 +106,11 @@ export class ExpressionTypeVisitor
 
             if (!symbol) {
 
-                this.error(
-                    ctx,
-                    `Variável '${name}' não declarada`
-                );
+                // this.addError(
+                //     ctx,
+                //     `Variável '${name}' não declarada`,
+                //     "Error"
+                // );
 
                 return "unknown";
             }
@@ -175,9 +162,10 @@ export class ExpressionTypeVisitor
                 !this.isNumeric(type)
             ) {
 
-                this.error(
+                this.addError(
                     ctx,
-                    "Operador unário inválido"
+                    "Operador unário inválido",
+                    "Error"
                 );
 
                 return "unknown";
@@ -230,10 +218,10 @@ export class ExpressionTypeVisitor
                 !this.isNumeric(currentType) ||
                 !this.isNumeric(rightType)
             ) {
-
-                this.error(
+                this.addError(
                     ctx,
-                    "Operação aritmética inválida"
+                    "Operação aritmética inválida",
+                    "Error"
                 );
 
                 return "unknown";
@@ -283,9 +271,10 @@ export class ExpressionTypeVisitor
                 !this.isNumeric(rightType)
             ) {
 
-                this.error(
+                this.addError(
                     ctx,
-                    "Operação aritmética inválida"
+                    "Operação aritmética inválida",
+                    "Error"
                 );
 
                 return "unknown";
@@ -335,9 +324,10 @@ export class ExpressionTypeVisitor
                 !this.isNumeric(rightType)
             ) {
 
-                this.error(
+                this.addError(
                     ctx,
-                    "Shift exige números"
+                    "Shift exige números",
+                    "Error"
                 );
 
                 return "unknown";
@@ -387,9 +377,10 @@ export class ExpressionTypeVisitor
                 !this.isNumeric(rightType)
             ) {
 
-                this.error(
+                this.addError(
                     ctx,
-                    "Operador relacional exige números"
+                    "Operador relacional exige números",
+                    "Error"
                 );
 
                 return "unknown";
@@ -438,9 +429,10 @@ export class ExpressionTypeVisitor
                 currentType !== rightType
             ) {
 
-                this.error(
+                this.addError(
                     ctx,
-                    "Comparação entre tipos incompatíveis"
+                    "Comparação entre tipos incompatíveis",
+                    "Error"
                 );
 
                 return "unknown";
@@ -488,9 +480,10 @@ export class ExpressionTypeVisitor
                 !this.isNumeric(rightType)
             ) {
 
-                this.error(
+                this.addError(
                     ctx,
-                    "Operador bitwise exige números"
+                    "Operador bitwise exige números",
+                    "Error"
                 );
 
                 return "unknown";
@@ -538,9 +531,10 @@ export class ExpressionTypeVisitor
                 !this.isNumeric(rightType)
             ) {
 
-                this.error(
+                this.addError(
                     ctx,
-                    "Operador bitwise exige números"
+                    "Operador bitwise exige números",
+                    "Error"
                 );
 
                 return "unknown";
@@ -588,9 +582,10 @@ export class ExpressionTypeVisitor
                 !this.isNumeric(rightType)
             ) {
 
-                this.error(
+                this.addError(
                     ctx,
-                    "Operador bitwise exige números"
+                    "Operador bitwise exige números",
+                    "Error"
                 );
 
                 return "unknown";
@@ -640,9 +635,10 @@ export class ExpressionTypeVisitor
                 !this.isBoolean(rightType)
             ) {
 
-                this.error(
+                this.addError(
                     ctx,
-                    "Operador lógico exige boolean"
+                    "Operador lógico exige boolean",
+                    "Error"
                 );
 
                 return "unknown";
@@ -692,9 +688,10 @@ export class ExpressionTypeVisitor
                 !this.isBoolean(rightType)
             ) {
 
-                this.error(
+                this.addError(
                     ctx,
-                    "Operador lógico exige boolean"
+                    "Operador lógico exige boolean",
+                    "Error"
                 );
 
                 return "unknown";

@@ -15,7 +15,7 @@ const errorsSeverity: Record<
   Error: { monaco: monaco.MarkerSeverity.Error, className: "bg-red-500" },
   Warning: {
     monaco: monaco.MarkerSeverity.Warning,
-    className: "bg-yellow-500",
+    className: "bg-yellow-600",
   },
 };
 export default function CodeEditor() {
