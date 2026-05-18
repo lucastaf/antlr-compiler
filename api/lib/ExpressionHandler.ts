@@ -1,7 +1,7 @@
 import { AbstractParseTreeVisitor } from "antlr4ts/tree";
 
 import type { expressaoVisitor } from "../generated/fsCompiler/expressaoVisitor";
-import type { SymbolInfo } from "./ScopeManager"
+import type { ScopeManager } from "./ScopeManager";
 
 import {
     Calculo_bitwise_eContext,
@@ -28,61 +28,9 @@ export type VarType =
     | "char"
     | "boolean"
     | "array"
-    | "unknown";
-
-
-// ===================== SCOPE =====================
-
-export class ScopeManager {
-
-    private scopes:
-        Map<string, SymbolInfo>[] = [];
-
-    constructor() {
-        this.beginScope();
-    }
-
-    beginScope() {
-        this.scopes.push(new Map());
-    }
-
-    endScope() {
-        this.scopes.pop();
-    }
-
-    define(symbol: SymbolInfo) {
-
-        const current =
-            this.scopes[
-            this.scopes.length - 1
-            ];
-
-        current.set(symbol.name, symbol);
-    }
-
-    resolve(name: string)
-        : SymbolInfo | undefined {
-
-        for (
-            let i = this.scopes.length - 1;
-            i >= 0;
-            i--
-        ) {
-
-            const scope =
-                this.scopes[i];
-
-            const symbol =
-                scope.get(name);
-
-            if (symbol) {
-                return symbol;
-            }
-        }
-
-        return undefined;
-    }
-}
+    | "function"
+    | "unknown"
+    | "any";
 
 
 // ===================== VISITOR =====================
@@ -168,7 +116,7 @@ export class ExpressionTypeVisitor
                 ctx.VARIABLE()!.text;
 
             const symbol =
-                this.scopes.resolve(name);
+                this.scopes.resolve(name, ctx);
 
             if (!symbol) {
 

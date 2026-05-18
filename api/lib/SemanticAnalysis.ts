@@ -1,24 +1,34 @@
+import type { ParserRuleContext } from "antlr4ts";
 import { AbstractParseTreeVisitor } from "antlr4ts/tree";
-import type { Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codigoContext } from "../generated/fsCompiler/FileScriptParser";
+import type { CompileError, ErrorSeverity } from "../../shared/types";
+import type { Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codigoContext, Function_callContext, Function_declContext, ProgramContext, Return_stmtContext } from "../generated/fsCompiler/FileScriptParser";
 import type { FileScriptParserVisitor } from "../generated/fsCompiler/FileScriptParserVisitor";
 import { ExpressionTypeVisitor } from "./ExpressionHandler";
 import { ScopeManager } from "./ScopeManager";
-import type { ParserRuleContext } from "antlr4ts";
-import type { CompileError, ErrorSeverity } from "../../shared/types";
 
 export class SemanticAnalyser extends AbstractParseTreeVisitor<any> implements FileScriptParserVisitor<any> {
-    private scopeManager;
+    private scopeManager: ScopeManager;
 
     public errors: CompileError[] = [];
+
 
     public constructor() {
         super();
 
         this.scopeManager = new ScopeManager(this.addError);
-        this.scopeManager.beginScope();
     }
 
-    private addError(ctx: ParserRuleContext, message: string, severity: ErrorSeverity) {
+    public GetVariablesList() {
+        return this.scopeManager.GetVariablesList();
+    }
+
+    visitProgram(ctx: ProgramContext) {
+        this.scopeManager.beginScope();
+        this.visitChildren(ctx);
+        this.scopeManager.endScope(ctx);
+    };
+
+    private addError = (ctx: ParserRuleContext, message: string, severity: ErrorSeverity) => {
         console.log("ADICIONADO ERROR", message)
         this.errors.push({
             line: ctx.start.line,
@@ -45,19 +55,27 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<any> implements F
         }
     }
 
+    //#region Declaração de atribuição de variaveis
+
     visitComando_declaracao(ctx: Comando_declaracaoContext) {
         const isConst = ctx.VARIABLE_DECLARE().text == "const";
 
         const { name, type } = this.parseVariableAttr(ctx.comando_atribuicao());
 
-        this.scopeManager.define(name, type, isConst);
+        this.scopeManager.define(name, type, isConst, ctx);
+
+        return null;
     }
 
     visitComando_atribuicao(ctx: Comando_atribuicaoContext) {
         const { name, type } = this.parseVariableAttr(ctx);
 
-        this.scopeManager.assign(name, type);
+        this.scopeManager.assign(name, type, ctx);
+
+        return null;
     };
+
+    //#endregion
 
     visitEscopo_codigo(ctx: Escopo_codigoContext) {
 
@@ -65,6 +83,38 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<any> implements F
 
         this.visitChildren(ctx)
 
-        this.scopeManager.endScope();
+        this.scopeManager.endScope(ctx);
+
+        return null;
     };
+
+    //#region Funções
+    visitFunction_decl(ctx: Function_declContext) {
+        const funcName = ctx.VARIABLE().text;
+        this.scopeManager.define(funcName, "function", true, ctx);
+        this.scopeManager.beginScope();
+        ctx.lista_parametros()?.VARIABLE()?.map(exp => {
+            this.scopeManager.define(exp.text, "any", false, ctx);
+        })
+
+        this.visitChildren(ctx);
+
+        this.scopeManager.endScope(ctx);
+    };
+
+    visitFunction_call(ctx: Function_callContext) {
+        const funcName = ctx.VARIABLE().text;
+        this.scopeManager.resolve(funcName, ctx);
+        const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager);
+        ctx.lista_expressoes()?.expressao()?.map(ex => {
+            expressionVisitor.visit(ex);
+        })
+    };
+
+    visitReturn_stmt(ctx: Return_stmtContext) {
+        const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager);
+        expressionVisitor.visit(ctx.expressao());
+    };
+
+    //#endregion
 }

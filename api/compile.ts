@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CharStreams, CommonTokenStream } from "antlr4ts";
 import { FileScriptLexer } from "./generated/fsCompiler/FileScriptLexer";
 import { FileScriptParser } from "./generated/fsCompiler/FileScriptParser";
@@ -61,7 +60,20 @@ export function compile(code: string): CompileResult {
 
     console.log("INICIANDO ANALISE SEMANTICA")
     const semantic = new SemanticAnalyser();
-    semantic.visit(tree);
+
+    try {
+        semantic.visit(tree);
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "Falha inesperada na análise semântica";
+
+        errors.push({
+            line: 1,
+            column: 0,
+            message,
+            type: "SEMANTIC",
+            severity: "Error"
+        });
+    }
 
     console.log("ERRORS: ")
     console.log(semantic.errors);
@@ -74,5 +86,12 @@ export function compile(code: string): CompileResult {
         tokens,
         parseTree,
         errors,
+        variables: semantic.GetVariablesList().map(item => ({
+            end: item.end,
+            isConst: item.isConst,
+            name: item.name,
+            start: item.start,
+            type: item.type
+        }))
     };
 }

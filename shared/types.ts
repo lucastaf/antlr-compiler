@@ -15,8 +15,17 @@ export interface TokenInfo {
     column: number;
 }
 
+export interface VariableDeclare {
+    name: string,
+    type: string,
+    isConst: boolean,
+    start: number,
+    end: number
+};
+
 export interface CompileResult {
     tokens: TokenInfo[];
     parseTree: string;
     errors: CompileError[];
+    variables: VariableDeclare[]
 }
