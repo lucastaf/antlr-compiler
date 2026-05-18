@@ -1,20 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Editor from "@monaco-editor/react";
-import { useRef, useState } from "react";
 import * as monaco from "monaco-editor";
-import { trpcClient } from "../../services/api";
+import { useRef, useState } from "react";
 import toast from "react-hot-toast";
+import type { VariableDeclare, CompileError } from "../../../shared/types";
+import { trpcClient } from "../../services/api";
+import SymbolTable from "../symbolsTable/symbolsTable";
 import { registerFileScriptLanguage } from "./FileScriptLanguage";
-import type { CompileError } from "../../../shared/types";
 
-const errorsSeverity: Record<CompileError["severity"], monaco.MarkerSeverity> =
-  {
-    Error: monaco.MarkerSeverity.Error,
-    Warning: monaco.MarkerSeverity.Warning,
-  };
+const errorsSeverity: Record<
+  CompileError["severity"],
+  { monaco: monaco.MarkerSeverity; className: string }
+> = {
+  Error: { monaco: monaco.MarkerSeverity.Error, className: "bg-red-500" },
+  Warning: {
+    monaco: monaco.MarkerSeverity.Warning,
+    className: "bg-yellow-500",
+  },
+};
 export default function CodeEditor() {
   const [codeText, setCodeText] = useState<string>("");
   const [errors, setErrors] = useState<CompileError[] | null>();
+  const [symbols, setSymbols] = useState<VariableDeclare[] | null>();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof monaco | null>(null);
 
@@ -37,10 +44,11 @@ export default function CodeEditor() {
             endLineNumber: err.line,
             endColumn: err.column + 2,
             message: err.message,
-            severity: errorsSeverity[err.severity],
+            severity: errorsSeverity[err.severity].monaco,
           }),
         );
 
+        setSymbols(res.variables);
         if (!res?.errors?.length) {
           toast.success("Código compilado sem erros");
           setErrors(null);
@@ -84,14 +92,18 @@ export default function CodeEditor() {
         theme="vs-dark"
       />
       {errors && (
-        <div className="bg-red-500 ">
+        <div>
           {errors.map((error, index) => (
-            <div className="text-white text-left my-1" key={index}>
-              {error.message}, Error in {error.line}:{error.column}
+            <div
+              className={`text-white text-left my-1 ${errorsSeverity[error.severity].className}`}
+              key={index}
+            >
+              {error.message}, {error.severity} in {error.line}:{error.column}
             </div>
           ))}
         </div>
       )}
+      {symbols && <SymbolTable variables={symbols} />}
     </div>
   );
 }
