@@ -56,7 +56,7 @@ export default function SymbolTable(props: {
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-[11px] text-[#4ec9b0] font-mono">{v.type}</span>
                 <span className="text-[11px] text-[#4e4e4e]">·</span>
-                <span className="text-[11px] text-[#858585]">linha {v.start}</span>
+                <span className="text-[11px] text-[#858585]">linha {v.start}–{v.end}</span>
               </div>
             </div>
           ))}
