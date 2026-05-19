@@ -8,6 +8,7 @@ import FileSidebar from "./lib/sidebar/FileSidebar";
 import SymbolTable from "./lib/symbolsTable/symbolsTable";
 import { trpcClient } from "./services/api";
 import { useFileStorage } from "./hooks/useFileStorage";
+import WorkspaceMenu from "./lib/workspace/WorkspaceMenu";
 import FSLOGO from "../public/favicon.svg";
 import "./App.css";
 
@@ -23,6 +24,7 @@ export default function App() {
     renameFile,
     updateContent,
     setActiveFileId,
+    importFiles,
   } = useFileStorage();
 
   const [errors, setErrors] = useState<CompileError[] | null>(null);
@@ -115,8 +117,7 @@ export default function App() {
             icon: "⚠️",
             style: {
               background: "#2d2d2d",
-              color: "#cca700",
-              border: "1px solid #cca700",
+              color: "#cca710",
               fontSize: "13px",
             },
           });
@@ -167,6 +168,9 @@ export default function App() {
       <header className="shrink-0 h-9 bg-[#323233] border-b border-[#3c3c3c] flex items-center px-3 gap-2 select-none">
         <img src={FSLOGO} width={18} height={18} alt="FileScript logo" />
         <span className="text-sm text-[#cccccc] font-medium">FileScript</span>
+        <div className="ml-auto">
+          <WorkspaceMenu files={files} onImport={importFiles} />
+        </div>
       </header>
 
       {/* Three-column body */}

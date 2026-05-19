@@ -107,6 +107,20 @@ export function useFileStorage() {
     persistFiles(updated);
   }
 
+  function importFiles(incoming: Array<{ name: string; content: string }>) {
+    const toAdd: FileScriptFile[] = incoming.map((f) => ({
+      id: generateId(),
+      name: f.name,
+      content: f.content,
+    }));
+    const updated = [...files, ...toAdd];
+    setFiles(updated);
+    persistFiles(updated);
+    if (toAdd.length > 0) {
+      setActiveFileId(toAdd[0].id);
+    }
+  }
+
   return {
     files,
     activeId,
@@ -116,5 +130,6 @@ export function useFileStorage() {
     renameFile,
     updateContent,
     setActiveFileId,
+    importFiles,
   };
 }
