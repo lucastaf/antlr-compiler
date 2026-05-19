@@ -1,7 +1,7 @@
 import type { ParserRuleContext } from "antlr4ts";
 import { AbstractParseTreeVisitor } from "antlr4ts/tree";
 import type { CompileError, ErrorSeverity } from "../../shared/types";
-import type { Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codigoContext, For_loopContext, Function_callContext, Function_declContext, ProgramContext, Return_stmtContext } from "../generated/fsCompiler/FileScriptParser";
+import type { Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codigoContext, ExpressaoContext, For_loopContext, Function_callContext, Function_declContext, ProgramContext, Return_stmtContext } from "../generated/fsCompiler/FileScriptParser";
 import type { FileScriptParserVisitor } from "../generated/fsCompiler/FileScriptParserVisitor";
 import { ExpressionTypeVisitor } from "./ExpressionHandler";
 import { ScopeManager } from "./ScopeManager";
@@ -21,6 +21,11 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<any> implements F
     public GetVariablesList() {
         return this.scopeManager.GetVariablesList();
     }
+
+    visitExpressao(ctx: ExpressaoContext) {
+        const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager, this.addError);
+        expressionVisitor.visit(ctx);
+    };
 
     visitProgram(ctx: ProgramContext) {
         this.scopeManager.beginScope();
