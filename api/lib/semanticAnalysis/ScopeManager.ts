@@ -35,7 +35,7 @@ export class ScopeManager {
         if (lastScope) {
             const variables = Array.from(lastScope.values());
             variables.forEach(variable => {
-                if (variable.useCount == 0) {
+                if (variable.useCount == 1) {
                     this.addError(variable.declareCtx, "Variavel declarada, mas nunca usada - " + variable.name, "Warning")
                 };
 
@@ -90,7 +90,7 @@ export class ScopeManager {
                 this.addError(ctx, msg, "Error")
             }
 
-            if (symbol?.isConst) {
+            if (symbol?.isConst && symbol.assignCount > 0) {
                 console.log("VARIAVEL NAO PODE SER REDECLARADA POIS É CONST", symbol.name)
                 this.addError(ctx, "Variavel não pode ser reatribuida pois é const - " + symbol.name, "Error");
             }

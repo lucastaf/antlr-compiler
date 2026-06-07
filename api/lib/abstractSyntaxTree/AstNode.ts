@@ -30,8 +30,3 @@ export class AssignmentNode extends ASTNode {
         super(ctx);
     }
 }
-export class PrintNode extends ASTNode {
-    constructor(public parameter: ASTExpressionNode, ctx: ParserRuleContext) {
-        super(ctx)
-    }
-}

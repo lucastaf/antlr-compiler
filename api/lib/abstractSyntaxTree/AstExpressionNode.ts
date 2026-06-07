@@ -68,6 +68,13 @@ export class ReadNode extends ASTExpressionNode {
         this.type = "number"
     }
 }
+
+export class PrintNode extends ASTExpressionNode {
+    constructor(public parameter: ASTExpressionNode, ctx: ParserRuleContext) {
+        super(ctx)
+        this.type = "unknown";
+    }
+}
 //#endregion
 
 type unaryOperators = "~"

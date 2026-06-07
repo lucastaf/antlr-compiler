@@ -1,5 +1,5 @@
 import * as monaco from "monaco-editor";
-import { AlertCircle, AlertTriangle, Play } from "lucide-react";
+import { AlertCircle, AlertTriangle, Copy, Play } from "lucide-react";
 import { useRef, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import type { CompileError, VariableDeclare } from "../shared/types";
@@ -31,6 +31,7 @@ export default function App() {
   const [symbols, setSymbols] = useState<VariableDeclare[] | null>(null);
   const [isCompiling, setIsCompiling] = useState(false);
 
+  const asmCode = useRef<string>("");
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof monaco | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -43,7 +44,11 @@ export default function App() {
     const editor = editorRef.current;
     const monacoInstance = monacoRef.current;
     if (editor && monacoInstance) {
-      monacoInstance.editor.setModelMarkers(editor.getModel()!, "filescript", []);
+      monacoInstance.editor.setModelMarkers(
+        editor.getModel()!,
+        "filescript",
+        [],
+      );
     }
   }
 
@@ -86,22 +91,29 @@ export default function App() {
     trpcClient.compileFScriptCode
       .mutate({ code: activeFile.content })
       .then((res) => {
+        asmCode.current = res.ASMcode;
         const editor = editorRef.current;
         const monacoInstance = monacoRef.current;
 
         if (editor && monacoInstance) {
-          const markers: monaco.editor.IMarkerData[] = res.errors.map((err) => ({
-            startLineNumber: err.line,
-            startColumn: err.column + 1,
-            endLineNumber: err.line,
-            endColumn: err.column + 2,
-            message: err.message,
-            severity:
-              err.severity === "Error"
-                ? monacoInstance.MarkerSeverity.Error
-                : monacoInstance.MarkerSeverity.Warning,
-          }));
-          monacoInstance.editor.setModelMarkers(editor.getModel()!, "filescript", markers);
+          const markers: monaco.editor.IMarkerData[] = res.errors.map(
+            (err) => ({
+              startLineNumber: err.line,
+              startColumn: err.column + 1,
+              endLineNumber: err.line,
+              endColumn: err.column + 2,
+              message: err.message,
+              severity:
+                err.severity === "Error"
+                  ? monacoInstance.MarkerSeverity.Error
+                  : monacoInstance.MarkerSeverity.Warning,
+            }),
+          );
+          monacoInstance.editor.setModelMarkers(
+            editor.getModel()!,
+            "filescript",
+            markers,
+          );
         }
 
         setSymbols(res.variables);
@@ -192,18 +204,38 @@ export default function App() {
             <span className="text-xs text-[#858585] select-none font-mono">
               {activeFile?.name ?? ""}
             </span>
-            <button
-              onClick={() => { cancelDebounce(); handleCompile(); }}
-              disabled={isCompiling}
-              title="Executar (Ctrl+Enter)"
-              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded
-                         bg-[#0e639c] hover:bg-[#1177bb] disabled:opacity-50
-                         text-white cursor-pointer disabled:cursor-not-allowed transition-colors"
-            >
-              <Play size={12} />
-              {isCompiling ? "Executando…" : "Executar"}
-              <kbd className="ml-1 text-[10px] opacity-60 font-sans">Ctrl+↵</kbd>
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  cancelDebounce();
+                  handleCompile();
+                }}
+                disabled={isCompiling}
+                title="Executar (Ctrl+Enter)"
+                className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded
+              bg-[#0e639c] hover:bg-[#1177bb] disabled:opacity-50
+              text-white cursor-pointer disabled:cursor-not-allowed transition-colors"
+              >
+                <Play size={12} />
+                {isCompiling ? "Executando…" : "Executar"}
+                <kbd className="ml-1 text-[10px] opacity-60 font-sans">
+                  Ctrl+↵
+                </kbd>
+              </button>
+              <button
+                onClick={(()=> {
+                  navigator.clipboard.writeText(asmCode.current);
+                })}
+                disabled={isCompiling}
+                title="Copiar código gerado"
+                className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded
+              bg-[#0e639c] hover:bg-[#1177bb] disabled:opacity-50
+              text-white cursor-pointer disabled:cursor-not-allowed transition-colors"
+              >
+                <Copy size={12} />
+                {isCompiling ? "Executando…" : "Copiar código gerado"}
+              </button>
+            </div>
           </div>
 
           {/* Monaco editor — fills all remaining vertical space */}
@@ -222,7 +254,9 @@ export default function App() {
                 <span className="text-[10px] font-semibold uppercase tracking-widest text-[#858585] select-none">
                   Problemas
                 </span>
-                <span className="text-[10px] text-[#858585]">({errorCount})</span>
+                <span className="text-[10px] text-[#858585]">
+                  ({errorCount})
+                </span>
               </div>
               <div className="overflow-y-auto max-h-36">
                 {errors.map((err, i) => (
@@ -231,9 +265,15 @@ export default function App() {
                     className="flex items-start gap-2 px-3 py-1.5 hover:bg-[#2a2d2e] transition-colors"
                   >
                     {err.severity === "Error" ? (
-                      <AlertCircle size={13} className="text-[#f14c4c] mt-0.5 shrink-0" />
+                      <AlertCircle
+                        size={13}
+                        className="text-[#f14c4c] mt-0.5 shrink-0"
+                      />
                     ) : (
-                      <AlertTriangle size={13} className="text-[#cca700] mt-0.5 shrink-0" />
+                      <AlertTriangle
+                        size={13}
+                        className="text-[#cca700] mt-0.5 shrink-0"
+                      />
                     )}
                     <span className="text-xs text-[#d4d4d4] flex-1 min-w-0">
                       {err.message}

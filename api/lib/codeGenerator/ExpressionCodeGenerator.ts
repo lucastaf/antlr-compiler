@@ -1,21 +1,21 @@
-import { ArrayLiteral, ASTExpressionNode, CharLiteral, LogicExpression, MathOperator, NumberLiteral, ReadNode, StringLiteral, SymbolNode, UnaryOperator } from "../abstractSyntaxTree/AstExpressionNode";
+import { ArrayLiteral, ASTExpressionNode, CharLiteral, LogicExpression, MathOperator, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator } from "../abstractSyntaxTree/AstExpressionNode";
 import type { CodeGeneratorAddErrorType, CodeGeneratorEmit } from "./CodeGenerator";
 
 export class ExpressionCodeGenerator {
-    private code : string[] = [];
+    private code: string[] = [];
     public constructor(private readonly RootNode: ASTExpressionNode,
         private readonly addError: CodeGeneratorAddErrorType,
         private stackPointer: number
     ) { }
-    
+
     private readonly emit: CodeGeneratorEmit = (instruction) => {
-        if(Array.isArray(instruction)){
+        if (Array.isArray(instruction)) {
             this.code.push(...instruction)
-        }else{
+        } else {
             this.code.push(instruction);
         }
     }
-    public generate(){
+    public generate() {
         this.visit(this.RootNode);
         return this.code;
     }
@@ -38,24 +38,32 @@ export class ExpressionCodeGenerator {
             //
         } else if (node instanceof LogicExpression) {
             //
-        } else if (node instanceof ReadNode){
+        } else if (node instanceof ReadNode) {
             this.visitReadNode(node);
+        } else if (node instanceof PrintNode) {
+            this.visitPrintNode(node);
         }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private visitReadNode(_node : ReadNode){
+    private visitReadNode(_node: ReadNode) {
         this.emit("ld $in_port")
+    }
+
+
+    private visitPrintNode(node: PrintNode) {
+        this.visit(node.parameter);
+        this.emit(`sto $out_port`)
     }
 
     private visitSymbolNode(node: SymbolNode) {
         this.emit(`ld ${node.symbol.assemblyName}`);
     }
-    
+
     private visitNumberLiteral(node: NumberLiteral) {
         this.emit(`ldi ${node.value}`);
     }
-    
+
     private visitMathOperator(node: MathOperator) {
         this.visit(node.left);
         this.emit(`sto ${this.stackPointer}`);

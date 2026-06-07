@@ -1,13 +1,13 @@
 import type { ParserRuleContext } from "antlr4ts";
+import { Interval } from "antlr4ts/misc/Interval";
 import { AbstractParseTreeVisitor } from "antlr4ts/tree";
 import type { CompileError, ErrorSeverity } from "../../../shared/types";
-import type { Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codigoContext, ExpressaoContext, For_loopContext, Function_callContext, Function_declContext, ProgramContext, Return_stmtContext } from "../../generated/fsCompiler/FileScriptParser";
+import type { Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codigoContext, ExpressaoContext, For_loopContext, Function_declContext, ProgramContext, Return_stmtContext } from "../../generated/fsCompiler/FileScriptParser";
 import type { FileScriptParserVisitor } from "../../generated/fsCompiler/FileScriptParserVisitor";
+import { UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
+import { AssignmentNode, InvalidNode, ProgramNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
 import { ExpressionTypeVisitor } from "./ExpressionHandler";
 import { ScopeManager, type SymbolInfo } from "./ScopeManager";
-import { AssignmentNode, InvalidNode, PrintNode, ProgramNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
-import { ReadNode, UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
-import { Interval } from "antlr4ts/misc/Interval";
 export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implements FileScriptParserVisitor<ASTNode> {
     private scopeManager: ScopeManager;
 
@@ -35,8 +35,9 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
             const start = ctx.start.startIndex;
             const stop = ctx!.stop!.stopIndex;
             const originalText = ctx.start.inputStream!.getText(new Interval(start, stop));
+            const node = this.visitChildren(ctx);
             return {
-                node: this.visitChildren(ctx),
+                node,
                 originalLine: originalText
             }
         });
@@ -58,6 +59,7 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
     protected defaultResult() {
         return new InvalidNode(undefined);
     }
+    
 
     private parseVariableAttr(ctx: Comando_atribuicaoContext, isDeclaration: boolean = false) {
         const varName = ctx.VARIABLE().text;
@@ -105,6 +107,7 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
         return new AssignmentNode(varSymbol, expressionNode, ctx);
     };
 
+
     //#endregion
 
     visitEscopo_codigo(ctx: Escopo_codigoContext) {
@@ -134,6 +137,7 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
     visitFunction_decl(ctx: Function_declContext) {
         const funcName = ctx.VARIABLE().text;
         this.scopeManager.define(funcName, "function", true, ctx);
+        this.scopeManager.resolve(funcName, ctx);
         this.scopeManager.beginScope();
         ctx.lista_parametros()?.VARIABLE()?.map(exp => {
             this.scopeManager.define(exp.text, "any", false, ctx);
@@ -142,29 +146,6 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
         this.visitChildren(ctx);
 
         this.scopeManager.endScope(ctx);
-
-        return new InvalidNode(ctx);
-    };
-
-    visitFunction_call(ctx: Function_callContext) {
-        const funcName = ctx.VARIABLE().text;
-        const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager, this.addError);
-        const firstParameter = ctx.lista_expressoes?.()?.expressao()?.at(0);
-        if (!firstParameter) {
-            return new InvalidNode(ctx);
-        }
-
-        if (funcName == "read") {
-            return new ReadNode(ctx);
-        }
-        if (funcName == "print") {
-            return new PrintNode(expressionVisitor.visit(firstParameter), ctx);
-        }
-        const symbol = this.scopeManager.resolve(funcName, ctx);
-        if (symbol?.type != "function") this.addError(ctx, `${funcName} não é uma função`, "Warning")
-        ctx.lista_expressoes()?.expressao()?.map(ex => {
-            expressionVisitor.visit(ex);
-        })
 
         return new InvalidNode(ctx);
     };

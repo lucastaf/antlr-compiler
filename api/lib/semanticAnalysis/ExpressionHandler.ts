@@ -23,7 +23,7 @@ import {
     Lista_expressoesContext,
     Valor_calculoContext
 } from "../../generated/fsCompiler/expressao";
-import { ASTExpressionNode, ArrayLiteral, CharLiteral, MathOperator, NumberLiteral, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, ReadNode, type VarType } from "../abstractSyntaxTree/AstExpressionNode";
+import { ASTExpressionNode, ArrayLiteral, CharLiteral, MathOperator, NumberLiteral, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, ReadNode, type VarType, PrintNode } from "../abstractSyntaxTree/AstExpressionNode";
 
 // ===================== VISITOR =====================
 
@@ -149,9 +149,19 @@ export class ExpressionTypeVisitor
         }
 
         if (ctx.function_call()) {
-            if (ctx.function_call()!.VARIABLE().text == "read") {
+            const functionName = ctx.function_call()!.VARIABLE().text;
+            if (functionName == "read") {
                 return new ReadNode(ctx);
+            } else if (functionName == "print") {
+                const firstParameter = ctx.function_call?.()?.lista_expressoes?.()?.expressao()?.at(0);
+                if (!firstParameter) {
+                    return new UnknownExpressionNode(ctx);
+                } else {
+                    return new PrintNode(this.visit(firstParameter), ctx);
+                }
             } else {
+                const symbol = this.scopes.resolve(functionName, ctx);
+                if (symbol && symbol?.type != "function") this.addError(ctx, `${functionName} não é uma função`, "Warning")
                 return new UnknownExpressionNode(ctx);
             }
         }

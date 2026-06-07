@@ -61,13 +61,12 @@ export function compile(code: string): CompileResult {
 
     console.log("INICIANDO ANALISE SEMANTICA")
     const semantic = new SemanticAnalyser();
-
+    let ASMcode = "";
     try {
         const ast = semantic.visit(tree);
         const codeGenerator = new CodeGenerator(ast, semantic.GetVariablesList());
-        const code = codeGenerator.generate();
-        console.log(code);
-        console.log("PARA AQUI")
+        ASMcode = codeGenerator.generate();
+        errors.push(...codeGenerator.errors);
     } catch (error) {
         const message = error instanceof Error ? error.message : "Falha inesperada na análise semântica";
 
@@ -91,6 +90,7 @@ export function compile(code: string): CompileResult {
         tokens,
         parseTree,
         errors,
+        ASMcode,
         variables: semantic.GetVariablesList().map(item => ({
             end: item.end,
             isConst: item.isConst,

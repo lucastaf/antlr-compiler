@@ -17,6 +17,7 @@ comando:
 	| loop
 	| comando_declaracao
 	| comandos_function
+	| expressao
 	|;
 
 // ===================== ESCOPO =====================
@@ -47,7 +48,7 @@ for_loop:
 	FOR PARENTESES_OPEN comando LINE_END expressao? LINE_END comando PARENTESES_CLOSE escopo_codigo;
 
 // ===================== FUNÇÕES =====================
-comandos_function: function_decl | return_stmt | function_call;
+comandos_function: function_decl | return_stmt;
 
 function_decl:
 	FUNCTION VARIABLE PARENTESES_OPEN lista_parametros? PARENTESES_CLOSE escopo_codigo;

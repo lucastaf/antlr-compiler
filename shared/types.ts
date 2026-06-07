@@ -27,5 +27,6 @@ export interface CompileResult {
     tokens: TokenInfo[];
     parseTree: string;
     errors: CompileError[];
-    variables: VariableDeclare[]
+    variables: VariableDeclare[],
+    ASMcode: string
 }
