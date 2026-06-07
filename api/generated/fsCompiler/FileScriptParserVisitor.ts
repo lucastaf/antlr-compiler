@@ -20,7 +20,6 @@ import { Comandos_functionContext } from "./FileScriptParser";
 import { Function_declContext } from "./FileScriptParser";
 import { Lista_parametrosContext } from "./FileScriptParser";
 import { Return_stmtContext } from "./FileScriptParser";
-import { Function_callContext } from "./FileScriptParser";
 import { ExpressaoContext } from "./FileScriptParser";
 import { Calculo_logico_ouContext } from "./FileScriptParser";
 import { Calculo_logico_eContext } from "./FileScriptParser";
@@ -42,6 +41,7 @@ import { Operador_deslocamentoContext } from "./FileScriptParser";
 import { Valor_calculoContext } from "./FileScriptParser";
 import { ArrayContext } from "./FileScriptParser";
 import { Lista_expressoesContext } from "./FileScriptParser";
+import { Function_callContext } from "./FileScriptParser";
 
 
 /**
@@ -170,13 +170,6 @@ export interface FileScriptParserVisitor<Result> extends ParseTreeVisitor<Result
 	 * @return the visitor result
 	 */
 	visitReturn_stmt?: (ctx: Return_stmtContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `FileScriptParser.function_call`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitFunction_call?: (ctx: Function_callContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `FileScriptParser.expressao`.
@@ -324,5 +317,12 @@ export interface FileScriptParserVisitor<Result> extends ParseTreeVisitor<Result
 	 * @return the visitor result
 	 */
 	visitLista_expressoes?: (ctx: Lista_expressoesContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `FileScriptParser.function_call`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitFunction_call?: (ctx: Function_callContext) => Result;
 }
 

@@ -55,6 +55,3 @@ function_decl:
 lista_parametros: VARIABLE (COMMA VARIABLE)*;
 
 return_stmt: RETURN expressao;
-
-function_call:
-	VARIABLE PARENTESES_OPEN lista_expressoes? PARENTESES_CLOSE;

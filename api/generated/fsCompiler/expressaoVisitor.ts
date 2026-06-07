@@ -24,6 +24,7 @@ import { Operador_deslocamentoContext } from "./expressao";
 import { Valor_calculoContext } from "./expressao";
 import { ArrayContext } from "./expressao";
 import { Lista_expressoesContext } from "./expressao";
+import { Function_callContext } from "./expressao";
 
 
 /**
@@ -180,5 +181,12 @@ export interface expressaoVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitLista_expressoes?: (ctx: Lista_expressoesContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `expressao.function_call`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitFunction_call?: (ctx: Function_callContext) => Result;
 }
 

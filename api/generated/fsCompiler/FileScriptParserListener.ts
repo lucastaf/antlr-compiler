@@ -20,7 +20,6 @@ import { Comandos_functionContext } from "./FileScriptParser";
 import { Function_declContext } from "./FileScriptParser";
 import { Lista_parametrosContext } from "./FileScriptParser";
 import { Return_stmtContext } from "./FileScriptParser";
-import { Function_callContext } from "./FileScriptParser";
 import { ExpressaoContext } from "./FileScriptParser";
 import { Calculo_logico_ouContext } from "./FileScriptParser";
 import { Calculo_logico_eContext } from "./FileScriptParser";
@@ -42,6 +41,7 @@ import { Operador_deslocamentoContext } from "./FileScriptParser";
 import { Valor_calculoContext } from "./FileScriptParser";
 import { ArrayContext } from "./FileScriptParser";
 import { Lista_expressoesContext } from "./FileScriptParser";
+import { Function_callContext } from "./FileScriptParser";
 
 
 /**
@@ -235,17 +235,6 @@ export interface FileScriptParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitReturn_stmt?: (ctx: Return_stmtContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `FileScriptParser.function_call`.
-	 * @param ctx the parse tree
-	 */
-	enterFunction_call?: (ctx: Function_callContext) => void;
-	/**
-	 * Exit a parse tree produced by `FileScriptParser.function_call`.
-	 * @param ctx the parse tree
-	 */
-	exitFunction_call?: (ctx: Function_callContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `FileScriptParser.expressao`.
@@ -477,5 +466,16 @@ export interface FileScriptParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitLista_expressoes?: (ctx: Lista_expressoesContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `FileScriptParser.function_call`.
+	 * @param ctx the parse tree
+	 */
+	enterFunction_call?: (ctx: Function_callContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.function_call`.
+	 * @param ctx the parse tree
+	 */
+	exitFunction_call?: (ctx: Function_callContext) => void;
 }
 

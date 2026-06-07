@@ -1,6 +1,6 @@
 import type { ParserRuleContext } from "antlr4ts";
 import type { ErrorSeverity } from "../../../shared/types";
-import type { VarType } from "./AstNode";
+import type { VarType } from "../abstractSyntaxTree/AstExpressionNode";
 
 export type SymbolInfo = {
     name: string,
@@ -49,14 +49,14 @@ export class ScopeManager {
         this.scopes.pop();
     }
 
-    define(variable: string, type: VarType, isConst: boolean, ctx: ParserRuleContext) {
+    define(variable: string, type: VarType, isConst: boolean, ctx: ParserRuleContext): SymbolInfo | undefined {
         console.log("Declarando", variable, type);
         const currentScope = this.scopes[this.scopes.length - 1];
 
         if (currentScope?.has(variable)) {
             this.addError(ctx, "Variavel já declarada - " + variable, "Error")
             console.log("VARIAVEL JA DECLARADA - ", variable)
-            return false;
+            return undefined;
         }
 
         let assemblyName = variable;
@@ -65,7 +65,7 @@ export class ScopeManager {
             assemblyName = assemblyName + "_1";
         };
 
-        currentScope?.set(variable, {
+        const symbolInfo: SymbolInfo = {
             name: variable,
             type: type,
             isConst,
@@ -73,25 +73,26 @@ export class ScopeManager {
             assignCount: 0,
             declareCtx: ctx,
             assemblyName
-        });
+        }
 
-        return true
+        currentScope?.set(variable,symbolInfo);
+
+        return symbolInfo;
     }
 
-    assign(varName: string, type: VarType, ctx: ParserRuleContext) {
-        const symbol = this.resolve(varName, ctx, false);
+    assign(symbol: SymbolInfo | undefined, type: VarType, ctx: ParserRuleContext) {
 
         if (symbol) {
 
             if (symbol?.type != type && symbol?.type != "any") {
-                const msg = "Não é possivel associar o tipo " + type + " em uma variavel do tipo " + symbol?.type + " - " + varName
+                const msg = "Não é possivel associar o tipo " + type + " em uma variavel do tipo " + symbol?.type + " - " + symbol.name
                 console.log(msg)
                 this.addError(ctx, msg, "Error")
             }
 
             if (symbol?.isConst) {
-                console.log("VARIAVEL NAO PODE SER REDECLARADA POIS É CONST", varName)
-                this.addError(ctx, "Variavel não pode ser reatribuida pois é const - " + varName, "Error");
+                console.log("VARIAVEL NAO PODE SER REDECLARADA POIS É CONST", symbol.name)
+                this.addError(ctx, "Variavel não pode ser reatribuida pois é const - " + symbol.name, "Error");
             }
 
             symbol.assignCount += 1;

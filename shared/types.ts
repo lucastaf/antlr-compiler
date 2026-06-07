@@ -5,7 +5,7 @@ export interface CompileError {
     column: number;
     message: string;
     severity: ErrorSeverity
-    type: "LEXER" | "PARSER" | "SEMANTIC";
+    type: "LEXER" | "PARSER" | "SEMANTIC" | "COMPILATION";
 }
 
 export interface TokenInfo {

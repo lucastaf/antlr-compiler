@@ -1987,6 +1987,9 @@ public class FileScriptParser extends Parser {
 		public ArrayContext array() {
 			return getRuleContext(ArrayContext.class,0);
 		}
+		public Function_callContext function_call() {
+			return getRuleContext(Function_callContext.class,0);
+		}
 		public Valor_calculoContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -1997,46 +2000,51 @@ public class FileScriptParser extends Parser {
 		Valor_calculoContext _localctx = new Valor_calculoContext(_ctx, getState());
 		enterRule(_localctx, 72, RULE_valor_calculo);
 		try {
-			setState(304);
+			setState(305);
 			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case NUMERICO:
+			switch ( getInterpreter().adaptivePredict(_input,23,_ctx) ) {
+			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(299);
 				match(NUMERICO);
 				}
 				break;
-			case VARIABLE:
+			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(300);
 				match(VARIABLE);
 				}
 				break;
-			case STRING:
+			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(301);
 				match(STRING);
 				}
 				break;
-			case CHAR:
+			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
 				setState(302);
 				match(CHAR);
 				}
 				break;
-			case COLCHETES_OPEN:
+			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
 				setState(303);
 				array();
 				}
 				break;
-			default:
-				throw new NoViableAltException(this);
+			case 6:
+				enterOuterAlt(_localctx, 6);
+				{
+				setState(304);
+				function_call();
+				}
+				break;
 			}
 		}
 		catch (RecognitionException re) {
@@ -2070,19 +2078,19 @@ public class FileScriptParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(306);
+			setState(307);
 			match(COLCHETES_OPEN);
-			setState(308);
+			setState(309);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & 57174604645488L) != 0)) {
 				{
-				setState(307);
+				setState(308);
 				lista_expressoes();
 				}
 			}
 
-			setState(310);
+			setState(311);
 			match(COLCHETES_CLOSE);
 			}
 		}
@@ -2122,21 +2130,21 @@ public class FileScriptParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(312);
+			setState(313);
 			expressao();
-			setState(317);
+			setState(318);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(313);
-				match(COMMA);
 				setState(314);
+				match(COMMA);
+				setState(315);
 				expressao();
 				}
 				}
-				setState(319);
+				setState(320);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -2154,7 +2162,7 @@ public class FileScriptParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\u0004\u0001-\u0141\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
+		"\u0004\u0001-\u0142\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
 		"\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004\u0007\u0004\u0002"+
 		"\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0002\u0007\u0007\u0007\u0002"+
 		"\b\u0007\b\u0002\t\u0007\t\u0002\n\u0007\n\u0002\u000b\u0007\u000b\u0002"+
@@ -2199,12 +2207,12 @@ public class FileScriptParser extends Parser {
 		"\u0114\t\u001c\u0001\u001d\u0001\u001d\u0001\u001d\u0003\u001d\u0119\b"+
 		"\u001d\u0001\u001e\u0001\u001e\u0001\u001e\u0001\u001e\u0001\u001e\u0003"+
 		"\u001e\u0120\b\u001e\u0001\u001f\u0001\u001f\u0001 \u0001 \u0001!\u0001"+
-		"!\u0001\"\u0001\"\u0001#\u0001#\u0001$\u0001$\u0001$\u0001$\u0001$\u0003"+
-		"$\u0131\b$\u0001%\u0001%\u0003%\u0135\b%\u0001%\u0001%\u0001&\u0001&\u0001"+
-		"&\u0005&\u013c\b&\n&\f&\u013f\t&\u0001&\u0000\u0000\'\u0000\u0002\u0004"+
-		"\u0006\b\n\f\u000e\u0010\u0012\u0014\u0016\u0018\u001a\u001c\u001e \""+
-		"$&(*,.02468:<>@BDFHJL\u0000\u0005\u0001\u0000\u0019\u001a\u0001\u0000"+
-		"\u001b\u001d\u0001\u0000\u001e\u001f\u0001\u0000 #\u0001\u0000&\'\u013d"+
+		"!\u0001\"\u0001\"\u0001#\u0001#\u0001$\u0001$\u0001$\u0001$\u0001$\u0001"+
+		"$\u0003$\u0132\b$\u0001%\u0001%\u0003%\u0136\b%\u0001%\u0001%\u0001&\u0001"+
+		"&\u0001&\u0005&\u013d\b&\n&\f&\u0140\t&\u0001&\u0000\u0000\'\u0000\u0002"+
+		"\u0004\u0006\b\n\f\u000e\u0010\u0012\u0014\u0016\u0018\u001a\u001c\u001e"+
+		" \"$&(*,.02468:<>@BDFHJL\u0000\u0005\u0001\u0000\u0019\u001a\u0001\u0000"+
+		"\u001b\u001d\u0001\u0000\u001e\u001f\u0001\u0000 #\u0001\u0000&\'\u013f"+
 		"\u0000N\u0001\u0000\u0000\u0000\u0002V\u0001\u0000\u0000\u0000\u0004`"+
 		"\u0001\u0000\u0000\u0000\u0006h\u0001\u0000\u0000\u0000\bj\u0001\u0000"+
 		"\u0000\u0000\nn\u0001\u0000\u0000\u0000\fq\u0001\u0000\u0000\u0000\u000e"+
@@ -2221,7 +2229,7 @@ public class FileScriptParser extends Parser {
 		"\u0118\u0001\u0000\u0000\u0000<\u011f\u0001\u0000\u0000\u0000>\u0121\u0001"+
 		"\u0000\u0000\u0000@\u0123\u0001\u0000\u0000\u0000B\u0125\u0001\u0000\u0000"+
 		"\u0000D\u0127\u0001\u0000\u0000\u0000F\u0129\u0001\u0000\u0000\u0000H"+
-		"\u0130\u0001\u0000\u0000\u0000J\u0132\u0001\u0000\u0000\u0000L\u0138\u0001"+
+		"\u0131\u0001\u0000\u0000\u0000J\u0133\u0001\u0000\u0000\u0000L\u0139\u0001"+
 		"\u0000\u0000\u0000NO\u0003\u0002\u0001\u0000OP\u0005\u0000\u0000\u0001"+
 		"P\u0001\u0001\u0000\u0000\u0000QR\u0003\u0004\u0002\u0000RS\u0005\f\u0000"+
 		"\u0000SU\u0001\u0000\u0000\u0000TQ\u0001\u0000\u0000\u0000UX\u0001\u0000"+
@@ -2333,21 +2341,22 @@ public class FileScriptParser extends Parser {
 		"\u0007\u0001\u0000\u0000\u0124A\u0001\u0000\u0000\u0000\u0125\u0126\u0007"+
 		"\u0002\u0000\u0000\u0126C\u0001\u0000\u0000\u0000\u0127\u0128\u0007\u0003"+
 		"\u0000\u0000\u0128E\u0001\u0000\u0000\u0000\u0129\u012a\u0007\u0004\u0000"+
-		"\u0000\u012aG\u0001\u0000\u0000\u0000\u012b\u0131\u0005,\u0000\u0000\u012c"+
-		"\u0131\u0005-\u0000\u0000\u012d\u0131\u0005\u0004\u0000\u0000\u012e\u0131"+
-		"\u0005\u0005\u0000\u0000\u012f\u0131\u0003J%\u0000\u0130\u012b\u0001\u0000"+
-		"\u0000\u0000\u0130\u012c\u0001\u0000\u0000\u0000\u0130\u012d\u0001\u0000"+
-		"\u0000\u0000\u0130\u012e\u0001\u0000\u0000\u0000\u0130\u012f\u0001\u0000"+
-		"\u0000\u0000\u0131I\u0001\u0000\u0000\u0000\u0132\u0134\u0005\n\u0000"+
-		"\u0000\u0133\u0135\u0003L&\u0000\u0134\u0133\u0001\u0000\u0000\u0000\u0134"+
-		"\u0135\u0001\u0000\u0000\u0000\u0135\u0136\u0001\u0000\u0000\u0000\u0136"+
-		"\u0137\u0005\u000b\u0000\u0000\u0137K\u0001\u0000\u0000\u0000\u0138\u013d"+
-		"\u0003$\u0012\u0000\u0139\u013a\u0005\u000e\u0000\u0000\u013a\u013c\u0003"+
-		"$\u0012\u0000\u013b\u0139\u0001\u0000\u0000\u0000\u013c\u013f\u0001\u0000"+
-		"\u0000\u0000\u013d\u013b\u0001\u0000\u0000\u0000\u013d\u013e\u0001\u0000"+
-		"\u0000\u0000\u013eM\u0001\u0000\u0000\u0000\u013f\u013d\u0001\u0000\u0000"+
+		"\u0000\u012aG\u0001\u0000\u0000\u0000\u012b\u0132\u0005,\u0000\u0000\u012c"+
+		"\u0132\u0005-\u0000\u0000\u012d\u0132\u0005\u0004\u0000\u0000\u012e\u0132"+
+		"\u0005\u0005\u0000\u0000\u012f\u0132\u0003J%\u0000\u0130\u0132\u0003\""+
+		"\u0011\u0000\u0131\u012b\u0001\u0000\u0000\u0000\u0131\u012c\u0001\u0000"+
+		"\u0000\u0000\u0131\u012d\u0001\u0000\u0000\u0000\u0131\u012e\u0001\u0000"+
+		"\u0000\u0000\u0131\u012f\u0001\u0000\u0000\u0000\u0131\u0130\u0001\u0000"+
+		"\u0000\u0000\u0132I\u0001\u0000\u0000\u0000\u0133\u0135\u0005\n\u0000"+
+		"\u0000\u0134\u0136\u0003L&\u0000\u0135\u0134\u0001\u0000\u0000\u0000\u0135"+
+		"\u0136\u0001\u0000\u0000\u0000\u0136\u0137\u0001\u0000\u0000\u0000\u0137"+
+		"\u0138\u0005\u000b\u0000\u0000\u0138K\u0001\u0000\u0000\u0000\u0139\u013e"+
+		"\u0003$\u0012\u0000\u013a\u013b\u0005\u000e\u0000\u0000\u013b\u013d\u0003"+
+		"$\u0012\u0000\u013c\u013a\u0001\u0000\u0000\u0000\u013d\u0140\u0001\u0000"+
+		"\u0000\u0000\u013e\u013c\u0001\u0000\u0000\u0000\u013e\u013f\u0001\u0000"+
+		"\u0000\u0000\u013fM\u0001\u0000\u0000\u0000\u0140\u013e\u0001\u0000\u0000"+
 		"\u0000\u001aV`hw{\u0087\u0097\u00a1\u00a7\u00b1\u00ba\u00c5\u00cd\u00d5"+
-		"\u00dd\u00e5\u00ee\u00f7\u0100\u0109\u0112\u0118\u011f\u0130\u0134\u013d";
+		"\u00dd\u00e5\u00ee\u00f7\u0100\u0109\u0112\u0118\u011f\u0131\u0135\u013e";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

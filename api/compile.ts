@@ -6,6 +6,7 @@ import {
 } from "antlr4ts";
 import type { CompileError, CompileResult, TokenInfo } from "../shared/types"
 import { SemanticAnalyser } from "./lib/SemanticAnalysis/SemanticAnalysis"
+import { CodeGenerator } from "./lib/codeGenerator/CodeGenerator";
 
 
 export function compile(code: string): CompileResult {
@@ -62,7 +63,11 @@ export function compile(code: string): CompileResult {
     const semantic = new SemanticAnalyser();
 
     try {
-        semantic.visit(tree);
+        const ast = semantic.visit(tree);
+        const codeGenerator = new CodeGenerator(ast, semantic.GetVariablesList());
+        const code = codeGenerator.generate();
+        console.log(code);
+        console.log("PARA AQUI")
     } catch (error) {
         const message = error instanceof Error ? error.message : "Falha inesperada na análise semântica";
 

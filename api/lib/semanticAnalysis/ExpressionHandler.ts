@@ -23,7 +23,7 @@ import {
     Lista_expressoesContext,
     Valor_calculoContext
 } from "../../generated/fsCompiler/expressao";
-import { ASTExpressionNode, ArrayLiteral, BinaryOperator, CharLiteral, NumberLiteral, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, type VarType } from "./AstNode";
+import { ASTExpressionNode, ArrayLiteral, CharLiteral, MathOperator, NumberLiteral, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, ReadNode, type VarType } from "../abstractSyntaxTree/AstExpressionNode";
 
 // ===================== VISITOR =====================
 
@@ -43,7 +43,7 @@ export class ExpressionTypeVisitor
     }
 
     protected defaultResult(): ASTExpressionNode {
-        return new UnknownExpressionNode();
+        return new UnknownExpressionNode(undefined);
     }
 
     visitExpressao(
@@ -78,13 +78,12 @@ export class ExpressionTypeVisitor
         ctx: ParserRuleContext,
         operands: any[],
         operators: any[],
-        resultType: VarType,
         validate: (left?: VarType, right?: VarType) => boolean,
         errorMessage: string
     ): ASTExpressionNode {
 
         if (operands.length === 0) {
-            return new UnknownExpressionNode();
+            return new UnknownExpressionNode(ctx);
         }
 
         let current = this.visit(operands[0]);
@@ -102,7 +101,7 @@ export class ExpressionTypeVisitor
                 this.isUnknown(current.type) ||
                 this.isUnknown(rightNode.type)
             ) {
-                current = new BinaryOperator(current, operatorText, rightNode, "unknown");
+                current = new MathOperator(current, operatorText, rightNode, ctx);
                 continue;
             }
 
@@ -115,15 +114,14 @@ export class ExpressionTypeVisitor
                     "Error"
                 );
 
-                current = new BinaryOperator(current, operatorText, rightNode, "unknown");
+                current = new MathOperator(current, operatorText, rightNode, ctx);
                 continue;
             }
 
-            current = new BinaryOperator(
+            current = new MathOperator(
                 current,
                 operatorText,
-                rightNode,
-                resultType
+                rightNode, ctx
             );
         }
 
@@ -136,18 +134,26 @@ export class ExpressionTypeVisitor
 
     visitValor_calculo(
         ctx: Valor_calculoContext
-    ) : ASTExpressionNode {
+    ): ASTExpressionNode {
 
         if (ctx.NUMERICO()) {
-            return new NumberLiteral(+ ctx.NUMERICO()!.text);
+            return new NumberLiteral(+ ctx.NUMERICO()!.text, ctx);
         }
 
         if (ctx.STRING()) {
-            return new StringLiteral(ctx.STRING()!.text);
+            return new StringLiteral(ctx.STRING()!.text, ctx);
         }
 
         if (ctx.CHAR()) {
-            return new CharLiteral(ctx.CHAR()!.text);
+            return new CharLiteral(ctx.CHAR()!.text, ctx);
+        }
+
+        if (ctx.function_call()) {
+            if (ctx.function_call()!.VARIABLE().text == "read") {
+                return new ReadNode(ctx);
+            } else {
+                return new UnknownExpressionNode(ctx);
+            }
         }
 
         if (ctx.array()) {
@@ -171,13 +177,13 @@ export class ExpressionTypeVisitor
                     "Error"
                 );
 
-                return new UnknownExpressionNode();
+                return new UnknownExpressionNode(ctx);
             }
 
-            return new SymbolNode(symbol);
+            return new SymbolNode(symbol, ctx);
         }
 
-        return new UnknownExpressionNode();
+        return new UnknownExpressionNode(ctx);
     }
 
     // =====================
@@ -227,10 +233,10 @@ export class ExpressionTypeVisitor
                     "Error"
                 );
 
-                return new UnaryOperator("~", innerNode, "unknown");
+                return new UnaryOperator("~", innerNode, "unknown", ctx);
             }
 
-            return new UnaryOperator("~", innerNode, "number");
+            return new UnaryOperator("~", innerNode, "number", ctx);
         }
 
         return this.visit(
@@ -244,13 +250,12 @@ export class ExpressionTypeVisitor
 
     visitCalculo_prioridade_2(
         ctx: Calculo_prioridade_2Context
-    ) : ASTExpressionNode {
+    ): ASTExpressionNode {
 
         return this.buildBinaryChain(
             ctx,
             ctx.calculo_unario(),
             ctx.operador_prioridade_2(),
-            "number",
             (left, right) => this.isNumeric(left) && this.isNumeric(right),
             "Operação aritmética inválida"
         );
@@ -268,7 +273,6 @@ export class ExpressionTypeVisitor
             ctx,
             ctx.calculo_prioridade_2(),
             ctx.operador_prioridade_1(),
-            "number",
             (left, right) => this.isNumeric(left) && this.isNumeric(right),
             "Operação aritmética inválida"
         );
@@ -286,7 +290,6 @@ export class ExpressionTypeVisitor
             ctx,
             ctx.calculo_prioridade_1(),
             ctx.operador_deslocamento(),
-            "number",
             (left, right) => this.isNumeric(left) && this.isNumeric(right),
             "Shift exige números"
         );
@@ -304,7 +307,6 @@ export class ExpressionTypeVisitor
             ctx,
             ctx.calculo_deslocamento(),
             ctx.operador_relacional(),
-            "boolean",
             (left, right) => this.isNumeric(left) && this.isNumeric(right),
             "Operador relacional exige números"
         );
@@ -321,9 +323,7 @@ export class ExpressionTypeVisitor
         return this.buildBinaryChain(
             ctx,
             ctx.calculo_relacional(),
-            ctx.operador_igualdade(),
-            "boolean",
-            (left, right) => left === right || left === "any" || right === "any",
+            ctx.operador_igualdade(), (left, right) => left === right || left === "any" || right === "any",
             "Comparação entre tipos incompatíveis"
         );
     }
@@ -339,9 +339,7 @@ export class ExpressionTypeVisitor
         return this.buildBinaryChain(
             ctx,
             ctx.calculo_igualdade(),
-            ctx.BITWISE_AND(),
-            "number",
-            (left, right) => this.isNumeric(left) && this.isNumeric(right),
+            ctx.BITWISE_AND(), (left, right) => this.isNumeric(left) && this.isNumeric(right),
             "Operador bitwise exige números"
         );
     }
@@ -357,9 +355,7 @@ export class ExpressionTypeVisitor
         return this.buildBinaryChain(
             ctx,
             ctx.calculo_bitwise_e(),
-            ctx.BITWISE_XOR(),
-            "number",
-            (left, right) => this.isNumeric(left) && this.isNumeric(right),
+            ctx.BITWISE_XOR(), (left, right) => this.isNumeric(left) && this.isNumeric(right),
             "Operador bitwise exige números"
         );
     }
@@ -375,9 +371,7 @@ export class ExpressionTypeVisitor
         return this.buildBinaryChain(
             ctx,
             ctx.calculo_bitwise_xou(),
-            ctx.BITWISE_OR(),
-            "number",
-            (left, right) => this.isNumeric(left) && this.isNumeric(right),
+            ctx.BITWISE_OR(), (left, right) => this.isNumeric(left) && this.isNumeric(right),
             "Operador bitwise exige números"
         );
     }
@@ -393,9 +387,7 @@ export class ExpressionTypeVisitor
         return this.buildBinaryChain(
             ctx,
             ctx.calculo_bitwise_ou(),
-            ctx.LOGIC_AND(),
-            "boolean",
-            (left, right) => this.isBoolean(left) && this.isBoolean(right),
+            ctx.LOGIC_AND(), (left, right) => this.isBoolean(left) && this.isBoolean(right),
             "Operador lógico exige boolean"
         );
     }
@@ -411,9 +403,7 @@ export class ExpressionTypeVisitor
         return this.buildBinaryChain(
             ctx,
             ctx.calculo_logico_e(),
-            ctx.LOGIC_OR(),
-            "boolean",
-            (left, right) => this.isBoolean(left) && this.isBoolean(right),
+            ctx.LOGIC_OR(), (left, right) => this.isBoolean(left) && this.isBoolean(right),
             "Operador lógico exige boolean"
         );
     }
@@ -431,7 +421,7 @@ export class ExpressionTypeVisitor
                 this.visit(expression)
             ) ?? [];
 
-        return new ArrayLiteral(elements);
+        return new ArrayLiteral(elements, ctx);
     }
 
     visitLista_expressoes(
@@ -443,6 +433,6 @@ export class ExpressionTypeVisitor
                 this.visit(expression)
             );
 
-        return new ArrayLiteral(elements);
+        return new ArrayLiteral(elements, ctx);
     }
 }
