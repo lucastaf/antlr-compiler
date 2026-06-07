@@ -5,7 +5,7 @@ import {
     Recognizer,
 } from "antlr4ts";
 import type { CompileError, CompileResult, TokenInfo } from "../shared/types"
-import { SemanticAnalyser } from "./lib/SemanticAnalysis"
+import { SemanticAnalyser } from "./lib/SemanticAnalysis/SemanticAnalysis"
 
 
 export function compile(code: string): CompileResult {

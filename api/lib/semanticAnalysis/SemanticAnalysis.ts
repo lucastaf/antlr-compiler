@@ -1,11 +1,10 @@
 import type { ParserRuleContext } from "antlr4ts";
 import { AbstractParseTreeVisitor } from "antlr4ts/tree";
-import type { CompileError, ErrorSeverity } from "../../shared/types";
-import type { Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codigoContext, ExpressaoContext, For_loopContext, Function_callContext, Function_declContext, ProgramContext, Return_stmtContext } from "../generated/fsCompiler/FileScriptParser";
-import type { FileScriptParserVisitor } from "../generated/fsCompiler/FileScriptParserVisitor";
+import type { CompileError, ErrorSeverity } from "../../../shared/types";
+import type { Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codigoContext, ExpressaoContext, For_loopContext, Function_callContext, Function_declContext, ProgramContext, Return_stmtContext } from "../../generated/fsCompiler/FileScriptParser";
+import type { FileScriptParserVisitor } from "../../generated/fsCompiler/FileScriptParserVisitor";
 import { ExpressionTypeVisitor } from "./ExpressionHandler";
 import { ScopeManager } from "./ScopeManager";
-
 export class SemanticAnalyser extends AbstractParseTreeVisitor<any> implements FileScriptParserVisitor<any> {
     private scopeManager: ScopeManager;
 
@@ -24,7 +23,7 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<any> implements F
 
     visitExpressao(ctx: ExpressaoContext) {
         const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager, this.addError);
-        expressionVisitor.visit(ctx);
+        return expressionVisitor.visit(ctx);
     };
 
     visitProgram(ctx: ProgramContext) {
@@ -52,7 +51,8 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<any> implements F
         const varName = ctx.VARIABLE().text;
         const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager, this.addError);
 
-        const type = expressionVisitor.visit(ctx.expressao());
+        const expression = expressionVisitor.visit(ctx.expressao());
+        const type = expression.type ?? "unknown";
 
         return {
             name: varName,

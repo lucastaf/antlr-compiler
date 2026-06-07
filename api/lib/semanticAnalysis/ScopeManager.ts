@@ -1,6 +1,6 @@
 import type { ParserRuleContext } from "antlr4ts";
-import type { VarType } from "./ExpressionHandler";
-import type { ErrorSeverity } from "../../shared/types";
+import type { ErrorSeverity } from "../../../shared/types";
+import type { VarType } from "./AstNode";
 
 export type SymbolInfo = {
     name: string,
@@ -8,7 +8,8 @@ export type SymbolInfo = {
     isConst: boolean,
     useCount: number,
     assignCount: number,
-    declareCtx: ParserRuleContext
+    declareCtx: ParserRuleContext;
+    assemblyName: string
 }
 export class ScopeManager {
     private scopes: Map<string, SymbolInfo>[] = [];
@@ -37,6 +38,7 @@ export class ScopeManager {
                 if (variable.useCount == 0) {
                     this.addError(variable.declareCtx, "Variavel declarada, mas nunca usada - " + variable.name, "Warning")
                 };
+
                 this.variablesList.push({
                     ...variable,
                     start: variable.declareCtx?._start?.line,
@@ -57,13 +59,20 @@ export class ScopeManager {
             return false;
         }
 
+        let assemblyName = variable;
+
+        while (this.variablesList.some(item => item.assemblyName == assemblyName)) {
+            assemblyName = assemblyName + "_1";
+        };
+
         currentScope?.set(variable, {
             name: variable,
             type: type,
             isConst,
             useCount: 0,
             assignCount: 0,
-            declareCtx: ctx
+            declareCtx: ctx,
+            assemblyName
         });
 
         return true

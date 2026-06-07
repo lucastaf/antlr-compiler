@@ -1,11 +1,12 @@
 import { AbstractParseTreeVisitor } from "antlr4ts/tree";
 
-import type { expressaoVisitor } from "../generated/fsCompiler/expressaoVisitor";
+import type { expressaoVisitor } from "../../generated/fsCompiler/expressaoVisitor";
 import type { ScopeManager } from "./ScopeManager";
 
 import type { ParserRuleContext } from "antlr4ts";
-import type { ErrorSeverity } from "../../shared/types";
+import type { ErrorSeverity } from "../../../shared/types";
 import {
+    ArrayContext,
     Calculo_bitwise_eContext,
     Calculo_bitwise_ouContext,
     Calculo_bitwise_xouContext,
@@ -18,28 +19,17 @@ import {
     Calculo_prioridade_2Context,
     Calculo_relacionalContext,
     Calculo_unarioContext,
+    ExpressaoContext,
+    Lista_expressoesContext,
     Valor_calculoContext
-} from "../generated/fsCompiler/expressao";
-
-
-// ===================== TYPES =====================
-
-export type VarType =
-    | "number"
-    | "string"
-    | "char"
-    | "boolean"
-    | "array"
-    | "function"
-    | "unknown"
-    | "any";
-
+} from "../../generated/fsCompiler/expressao";
+import { ASTExpressionNode, ArrayLiteral, BinaryOperator, CharLiteral, NumberLiteral, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, type VarType } from "./AstNode";
 
 // ===================== VISITOR =====================
 
 export class ExpressionTypeVisitor
-    extends AbstractParseTreeVisitor<VarType>
-    implements expressaoVisitor<VarType> {
+    extends AbstractParseTreeVisitor<ASTExpressionNode>
+    implements expressaoVisitor<ASTExpressionNode> {
 
 
     private scopes: ScopeManager
@@ -52,22 +42,92 @@ export class ExpressionTypeVisitor
         this.scopes = scopes;
     }
 
-    protected defaultResult(): VarType {
-        return "unknown";
+    protected defaultResult(): ASTExpressionNode {
+        return new UnknownExpressionNode();
+    }
+
+    visitExpressao(
+        ctx: ExpressaoContext
+    ): ASTExpressionNode {
+
+        return this.visit(
+            ctx.calculo_logico_ou()!
+        );
     }
 
     // =====================
     // HELPERS
     // =====================
 
-    private isNumeric(type: VarType) {
+    private isNumeric(type?: VarType) {
 
         return type === "number";
     }
 
-    private isBoolean(type: VarType) {
+    private isBoolean(type?: VarType) {
 
         return type === "boolean";
+    }
+
+    private isUnknown(type?: VarType) {
+
+        return type === undefined || type === "unknown";
+    }
+
+    private buildBinaryChain(
+        ctx: ParserRuleContext,
+        operands: any[],
+        operators: any[],
+        resultType: VarType,
+        validate: (left?: VarType, right?: VarType) => boolean,
+        errorMessage: string
+    ): ASTExpressionNode {
+
+        if (operands.length === 0) {
+            return new UnknownExpressionNode();
+        }
+
+        let current = this.visit(operands[0]);
+
+        for (
+            let i = 0;
+            i < operators.length;
+            i++
+        ) {
+
+            const rightNode = this.visit(operands[i + 1]);
+            const operatorText = operators[i]?.text ?? operators[i]?.getText?.() ?? "";
+
+            if (
+                this.isUnknown(current.type) ||
+                this.isUnknown(rightNode.type)
+            ) {
+                current = new BinaryOperator(current, operatorText, rightNode, "unknown");
+                continue;
+            }
+
+            if (
+                !validate(current.type, rightNode.type)
+            ) {
+                this.addError(
+                    ctx,
+                    errorMessage,
+                    "Error"
+                );
+
+                current = new BinaryOperator(current, operatorText, rightNode, "unknown");
+                continue;
+            }
+
+            current = new BinaryOperator(
+                current,
+                operatorText,
+                rightNode,
+                resultType
+            );
+        }
+
+        return current;
     }
 
     // =====================
@@ -76,18 +136,18 @@ export class ExpressionTypeVisitor
 
     visitValor_calculo(
         ctx: Valor_calculoContext
-    ): VarType {
+    ) : ASTExpressionNode {
 
         if (ctx.NUMERICO()) {
-            return "number";
+            return new NumberLiteral(+ ctx.NUMERICO()!.text);
         }
 
         if (ctx.STRING()) {
-            return "string";
+            return new StringLiteral(ctx.STRING()!.text);
         }
 
         if (ctx.CHAR()) {
-            return "char";
+            return new CharLiteral(ctx.CHAR()!.text);
         }
 
         if (ctx.array()) {
@@ -105,20 +165,19 @@ export class ExpressionTypeVisitor
                 this.scopes.resolve(name, ctx);
 
             if (!symbol) {
+                this.addError(
+                    ctx,
+                    `Variável '${name}' não declarada`,
+                    "Error"
+                );
 
-                // this.addError(
-                //     ctx,
-                //     `Variável '${name}' não declarada`,
-                //     "Error"
-                // );
-
-                return "unknown";
+                return new UnknownExpressionNode();
             }
 
-            return symbol.type;
+            return new SymbolNode(symbol);
         }
 
-        return "unknown";
+        return new UnknownExpressionNode();
     }
 
     // =====================
@@ -127,7 +186,7 @@ export class ExpressionTypeVisitor
 
     visitCalculo_parenteses(
         ctx: Calculo_parentesesContext
-    ): VarType {
+    ): ASTExpressionNode {
 
         if (ctx.expressao()) {
 
@@ -147,19 +206,19 @@ export class ExpressionTypeVisitor
 
     visitCalculo_unario(
         ctx: Calculo_unarioContext
-    ): VarType {
+    ): ASTExpressionNode {
 
         if (
             ctx.calculo_unario()
         ) {
 
-            const type =
+            const innerNode =
                 this.visit(
                     ctx.calculo_unario()!
                 );
 
             if (
-                !this.isNumeric(type)
+                !this.isNumeric(innerNode.type)
             ) {
 
                 this.addError(
@@ -168,10 +227,10 @@ export class ExpressionTypeVisitor
                     "Error"
                 );
 
-                return "unknown";
+                return new UnaryOperator("~", innerNode, "unknown");
             }
 
-            return "number";
+            return new UnaryOperator("~", innerNode, "number");
         }
 
         return this.visit(
@@ -185,50 +244,16 @@ export class ExpressionTypeVisitor
 
     visitCalculo_prioridade_2(
         ctx: Calculo_prioridade_2Context
-    ): VarType {
+    ) : ASTExpressionNode {
 
-        const expressions =
-            ctx.calculo_unario();
-
-        const currentType =
-            this.visit(
-                expressions[0]
-            );
-
-        // sem operador
-
-        if (
-            expressions.length === 1
-        ) {
-            return currentType;
-        }
-
-        for (
-            let i = 1;
-            i < expressions.length;
-            i++
-        ) {
-
-            const rightType =
-                this.visit(
-                    expressions[i]
-                );
-
-            if (
-                !this.isNumeric(currentType) ||
-                !this.isNumeric(rightType)
-            ) {
-                this.addError(
-                    ctx,
-                    "Operação aritmética inválida",
-                    "Error"
-                );
-
-                return "unknown";
-            }
-        }
-
-        return "number";
+        return this.buildBinaryChain(
+            ctx,
+            ctx.calculo_unario(),
+            ctx.operador_prioridade_2(),
+            "number",
+            (left, right) => this.isNumeric(left) && this.isNumeric(right),
+            "Operação aritmética inválida"
+        );
     }
 
     // =====================
@@ -237,51 +262,16 @@ export class ExpressionTypeVisitor
 
     visitCalculo_prioridade_1(
         ctx: Calculo_prioridade_1Context
-    ): VarType {
+    ): ASTExpressionNode {
 
-        const expressions =
-            ctx.calculo_prioridade_2();
-
-        const currentType =
-            this.visit(
-                expressions[0]
-            );
-
-        // sem operador
-
-        if (
-            expressions.length === 1
-        ) {
-            return currentType;
-        }
-
-        for (
-            let i = 1;
-            i < expressions.length;
-            i++
-        ) {
-
-            const rightType =
-                this.visit(
-                    expressions[i]
-                );
-
-            if (
-                !this.isNumeric(currentType) ||
-                !this.isNumeric(rightType)
-            ) {
-
-                this.addError(
-                    ctx,
-                    "Operação aritmética inválida",
-                    "Error"
-                );
-
-                return "unknown";
-            }
-        }
-
-        return "number";
+        return this.buildBinaryChain(
+            ctx,
+            ctx.calculo_prioridade_2(),
+            ctx.operador_prioridade_1(),
+            "number",
+            (left, right) => this.isNumeric(left) && this.isNumeric(right),
+            "Operação aritmética inválida"
+        );
     }
 
     // =====================
@@ -290,51 +280,16 @@ export class ExpressionTypeVisitor
 
     visitCalculo_deslocamento(
         ctx: Calculo_deslocamentoContext
-    ): VarType {
+    ): ASTExpressionNode {
 
-        const expressions =
-            ctx.calculo_prioridade_1();
-
-        const currentType =
-            this.visit(
-                expressions[0]
-            );
-
-        // sem operador
-
-        if (
-            expressions.length === 1
-        ) {
-            return currentType;
-        }
-
-        for (
-            let i = 1;
-            i < expressions.length;
-            i++
-        ) {
-
-            const rightType =
-                this.visit(
-                    expressions[i]
-                );
-
-            if (
-                !this.isNumeric(currentType) ||
-                !this.isNumeric(rightType)
-            ) {
-
-                this.addError(
-                    ctx,
-                    "Shift exige números",
-                    "Error"
-                );
-
-                return "unknown";
-            }
-        }
-
-        return "number";
+        return this.buildBinaryChain(
+            ctx,
+            ctx.calculo_prioridade_1(),
+            ctx.operador_deslocamento(),
+            "number",
+            (left, right) => this.isNumeric(left) && this.isNumeric(right),
+            "Shift exige números"
+        );
     }
 
     // =====================
@@ -343,51 +298,16 @@ export class ExpressionTypeVisitor
 
     visitCalculo_relacional(
         ctx: Calculo_relacionalContext
-    ): VarType {
+    ): ASTExpressionNode {
 
-        const expressions =
-            ctx.calculo_deslocamento();
-
-        const currentType =
-            this.visit(
-                expressions[0]
-            );
-
-        // sem operador
-
-        if (
-            expressions.length === 1
-        ) {
-            return currentType;
-        }
-
-        for (
-            let i = 1;
-            i < expressions.length;
-            i++
-        ) {
-
-            const rightType =
-                this.visit(
-                    expressions[i]
-                );
-
-            if (
-                !this.isNumeric(currentType) ||
-                !this.isNumeric(rightType)
-            ) {
-
-                this.addError(
-                    ctx,
-                    "Operador relacional exige números",
-                    "Error"
-                );
-
-                return "unknown";
-            }
-        }
-
-        return "boolean";
+        return this.buildBinaryChain(
+            ctx,
+            ctx.calculo_deslocamento(),
+            ctx.operador_relacional(),
+            "boolean",
+            (left, right) => this.isNumeric(left) && this.isNumeric(right),
+            "Operador relacional exige números"
+        );
     }
 
     // =====================
@@ -396,50 +316,16 @@ export class ExpressionTypeVisitor
 
     visitCalculo_igualdade(
         ctx: Calculo_igualdadeContext
-    ): VarType {
+    ): ASTExpressionNode {
 
-        const expressions =
-            ctx.calculo_relacional();
-
-        const currentType =
-            this.visit(
-                expressions[0]
-            );
-
-        // sem operador
-
-        if (
-            expressions.length === 1
-        ) {
-            return currentType;
-        }
-
-        for (
-            let i = 1;
-            i < expressions.length;
-            i++
-        ) {
-
-            const rightType =
-                this.visit(
-                    expressions[i]
-                );
-
-            if (
-                currentType !== rightType
-            ) {
-
-                this.addError(
-                    ctx,
-                    "Comparação entre tipos incompatíveis",
-                    "Error"
-                );
-
-                return "unknown";
-            }
-        }
-
-        return "boolean";
+        return this.buildBinaryChain(
+            ctx,
+            ctx.calculo_relacional(),
+            ctx.operador_igualdade(),
+            "boolean",
+            (left, right) => left === right || left === "any" || right === "any",
+            "Comparação entre tipos incompatíveis"
+        );
     }
 
     // =====================
@@ -448,49 +334,16 @@ export class ExpressionTypeVisitor
 
     visitCalculo_bitwise_e(
         ctx: Calculo_bitwise_eContext
-    ): VarType {
+    ): ASTExpressionNode {
 
-        const expressions =
-            ctx.calculo_igualdade();
-
-        const currentType =
-            this.visit(
-                expressions[0]
-            );
-
-        if (
-            expressions.length === 1
-        ) {
-            return currentType;
-        }
-
-        for (
-            let i = 1;
-            i < expressions.length;
-            i++
-        ) {
-
-            const rightType =
-                this.visit(
-                    expressions[i]
-                );
-
-            if (
-                !this.isNumeric(currentType) ||
-                !this.isNumeric(rightType)
-            ) {
-
-                this.addError(
-                    ctx,
-                    "Operador bitwise exige números",
-                    "Error"
-                );
-
-                return "unknown";
-            }
-        }
-
-        return "number";
+        return this.buildBinaryChain(
+            ctx,
+            ctx.calculo_igualdade(),
+            ctx.BITWISE_AND(),
+            "number",
+            (left, right) => this.isNumeric(left) && this.isNumeric(right),
+            "Operador bitwise exige números"
+        );
     }
 
     // =====================
@@ -499,49 +352,16 @@ export class ExpressionTypeVisitor
 
     visitCalculo_bitwise_xou(
         ctx: Calculo_bitwise_xouContext
-    ): VarType {
+    ): ASTExpressionNode {
 
-        const expressions =
-            ctx.calculo_bitwise_e();
-
-        const currentType =
-            this.visit(
-                expressions[0]
-            );
-
-        if (
-            expressions.length === 1
-        ) {
-            return currentType;
-        }
-
-        for (
-            let i = 1;
-            i < expressions.length;
-            i++
-        ) {
-
-            const rightType =
-                this.visit(
-                    expressions[i]
-                );
-
-            if (
-                !this.isNumeric(currentType) ||
-                !this.isNumeric(rightType)
-            ) {
-
-                this.addError(
-                    ctx,
-                    "Operador bitwise exige números",
-                    "Error"
-                );
-
-                return "unknown";
-            }
-        }
-
-        return "number";
+        return this.buildBinaryChain(
+            ctx,
+            ctx.calculo_bitwise_e(),
+            ctx.BITWISE_XOR(),
+            "number",
+            (left, right) => this.isNumeric(left) && this.isNumeric(right),
+            "Operador bitwise exige números"
+        );
     }
 
     // =====================
@@ -550,49 +370,16 @@ export class ExpressionTypeVisitor
 
     visitCalculo_bitwise_ou(
         ctx: Calculo_bitwise_ouContext
-    ): VarType {
+    ): ASTExpressionNode {
 
-        const expressions =
-            ctx.calculo_bitwise_xou();
-
-        const currentType =
-            this.visit(
-                expressions[0]
-            );
-
-        if (
-            expressions.length === 1
-        ) {
-            return currentType;
-        }
-
-        for (
-            let i = 1;
-            i < expressions.length;
-            i++
-        ) {
-
-            const rightType =
-                this.visit(
-                    expressions[i]
-                );
-
-            if (
-                !this.isNumeric(currentType) ||
-                !this.isNumeric(rightType)
-            ) {
-
-                this.addError(
-                    ctx,
-                    "Operador bitwise exige números",
-                    "Error"
-                );
-
-                return "unknown";
-            }
-        }
-
-        return "number";
+        return this.buildBinaryChain(
+            ctx,
+            ctx.calculo_bitwise_xou(),
+            ctx.BITWISE_OR(),
+            "number",
+            (left, right) => this.isNumeric(left) && this.isNumeric(right),
+            "Operador bitwise exige números"
+        );
     }
 
     // =====================
@@ -601,51 +388,16 @@ export class ExpressionTypeVisitor
 
     visitCalculo_logico_e(
         ctx: Calculo_logico_eContext
-    ): VarType {
+    ): ASTExpressionNode {
 
-        const expressions =
-            ctx.calculo_bitwise_ou();
-
-        const currentType =
-            this.visit(
-                expressions[0]
-            );
-
-        // sem operador
-
-        if (
-            expressions.length === 1
-        ) {
-            return currentType;
-        }
-
-        for (
-            let i = 1;
-            i < expressions.length;
-            i++
-        ) {
-
-            const rightType =
-                this.visit(
-                    expressions[i]
-                );
-
-            if (
-                !this.isBoolean(currentType) ||
-                !this.isBoolean(rightType)
-            ) {
-
-                this.addError(
-                    ctx,
-                    "Operador lógico exige boolean",
-                    "Error"
-                );
-
-                return "unknown";
-            }
-        }
-
-        return "boolean";
+        return this.buildBinaryChain(
+            ctx,
+            ctx.calculo_bitwise_ou(),
+            ctx.LOGIC_AND(),
+            "boolean",
+            (left, right) => this.isBoolean(left) && this.isBoolean(right),
+            "Operador lógico exige boolean"
+        );
     }
 
     // =====================
@@ -654,51 +406,16 @@ export class ExpressionTypeVisitor
 
     visitCalculo_logico_ou(
         ctx: Calculo_logico_ouContext
-    ): VarType {
+    ): ASTExpressionNode {
 
-        const expressions =
-            ctx.calculo_logico_e();
-
-        const currentType =
-            this.visit(
-                expressions[0]
-            );
-
-        // sem operador
-
-        if (
-            expressions.length === 1
-        ) {
-            return currentType;
-        }
-
-        for (
-            let i = 1;
-            i < expressions.length;
-            i++
-        ) {
-
-            const rightType =
-                this.visit(
-                    expressions[i]
-                );
-
-            if (
-                !this.isBoolean(currentType) ||
-                !this.isBoolean(rightType)
-            ) {
-
-                this.addError(
-                    ctx,
-                    "Operador lógico exige boolean",
-                    "Error"
-                );
-
-                return "unknown";
-            }
-        }
-
-        return "boolean";
+        return this.buildBinaryChain(
+            ctx,
+            ctx.calculo_logico_e(),
+            ctx.LOGIC_OR(),
+            "boolean",
+            (left, right) => this.isBoolean(left) && this.isBoolean(right),
+            "Operador lógico exige boolean"
+        );
     }
 
     // =====================
@@ -706,8 +423,26 @@ export class ExpressionTypeVisitor
     // =====================
 
     visitArray(
-    ): VarType {
+        ctx: ArrayContext
+    ): ASTExpressionNode {
 
-        return "array";
+        const elements =
+            ctx.lista_expressoes()?.expressao().map(expression =>
+                this.visit(expression)
+            ) ?? [];
+
+        return new ArrayLiteral(elements);
+    }
+
+    visitLista_expressoes(
+        ctx: Lista_expressoesContext
+    ): ASTExpressionNode {
+
+        const elements =
+            ctx.expressao().map(expression =>
+                this.visit(expression)
+            );
+
+        return new ArrayLiteral(elements);
     }
 }
