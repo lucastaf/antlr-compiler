@@ -1,4 +1,5 @@
-import { ArrayLiteral, ASTExpressionNode, CharLiteral, LogicExpression, MathOperator, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator } from "../abstractSyntaxTree/AstExpressionNode";
+import { ArrayLiteral, ASTExpressionNode, CharLiteral, LogicExpression, MathOperator, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
+import { InvalidNode } from "../abstractSyntaxTree/AstNode";
 import type { CodeGeneratorAddErrorType, CodeGeneratorEmit } from "./CodeGenerator";
 
 export class ExpressionCodeGenerator {
@@ -32,12 +33,11 @@ export class ExpressionCodeGenerator {
         } else if (node instanceof ArrayLiteral) {
             this.addError("Geração de array não implementada", "Error", node);
         } else if (node instanceof UnaryOperator) {
-            //
+            this.visitUnaryOperator(node);
         } else if (node instanceof MathOperator) {
             this.visitMathOperator(node);
-            //
         } else if (node instanceof LogicExpression) {
-            //
+            return;
         } else if (node instanceof ReadNode) {
             this.visitReadNode(node);
         } else if (node instanceof PrintNode) {
@@ -50,6 +50,10 @@ export class ExpressionCodeGenerator {
         this.emit("ld $in_port")
     }
 
+    private visitUnaryOperator(node: UnaryOperator){
+        this.visit(node.operand);
+        this.emit(`not`);
+    }
 
     private visitPrintNode(node: PrintNode) {
         this.visit(node.parameter);
@@ -87,6 +91,21 @@ export class ExpressionCodeGenerator {
                 break;
             case "%":
                 this.addError("Operação não suportada - %", "Error", node);
+                break;
+            case "<<":
+                this.emit(`sll ${this.stackPointer + 1}`)
+                break;
+            case ">>":
+                this.emit(`srl ${this.stackPointer + 1}`)
+                break;
+            case "&":
+                this.emit(`and ${this.stackPointer + 1}`)
+                break;
+            case "|":
+                this.emit(`or ${this.stackPointer + 1}`)
+                break;
+            case "^":
+                this.emit(`xor ${this.stackPointer + 1}`)
                 break;
         }
     }

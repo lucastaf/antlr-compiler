@@ -86,7 +86,7 @@ export class UnaryOperator extends ASTExpressionNode {
     }
 }
 
-type mathOperator = "+" | "-" | "*" | "/" | "%"
+type mathOperator = "+" | "-" | "*" | "/" | "%" | "<<" | ">>" | "&" | "|" | "^"
 export class MathOperator extends ASTExpressionNode {
     constructor(public left: ASTExpressionNode, public operator: mathOperator, public right: ASTExpressionNode, ctx: ParserRuleContext) {
         super(ctx);
