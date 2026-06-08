@@ -6,6 +6,7 @@ import type { ScopeManager } from "./ScopeManager";
 import type { ParserRuleContext } from "antlr4ts";
 import type { ErrorSeverity } from "../../../shared/types";
 import {
+    Array_accessContext,
     ArrayContext,
     Calculo_bitwise_eContext,
     Calculo_bitwise_ouContext,
@@ -20,10 +21,11 @@ import {
     Calculo_relacionalContext,
     Calculo_unarioContext,
     ExpressaoContext,
+    Function_callContext,
     Lista_expressoesContext,
     Valor_calculoContext
 } from "../../generated/fsCompiler/expressao";
-import { ASTExpressionNode, ArrayLiteral, CharLiteral, MathOperator, NumberLiteral, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, ReadNode, type VarType, PrintNode } from "../abstractSyntaxTree/AstExpressionNode";
+import { ASTExpressionNode, CharLiteral, MathOperator, NumberLiteral, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, ReadNode, type VarType, PrintNode, ArrayExpression, ArrayAccessExpression } from "../abstractSyntaxTree/AstExpressionNode";
 
 // ===================== VISITOR =====================
 
@@ -149,27 +151,17 @@ export class ExpressionTypeVisitor
         }
 
         if (ctx.function_call()) {
-            const functionName = ctx.function_call()!.VARIABLE().text;
-            if (functionName == "read") {
-                return new ReadNode(ctx);
-            } else if (functionName == "print") {
-                const firstParameter = ctx.function_call?.()?.lista_expressoes?.()?.expressao()?.at(0);
-                if (!firstParameter) {
-                    return new UnknownExpressionNode(ctx);
-                } else {
-                    return new PrintNode(this.visit(firstParameter), ctx);
-                }
-            } else {
-                const symbol = this.scopes.resolve(functionName, ctx);
-                if (symbol && symbol?.type != "function") this.addError(ctx, `${functionName} não é uma função`, "Warning")
-                return new UnknownExpressionNode(ctx);
-            }
+            return this.visit(ctx.function_call()!);
         }
 
         if (ctx.array()) {
             return this.visit(
                 ctx.array()!
             );
+        }
+
+        if (ctx.array_access()) {
+            return this.visit(ctx.array_access()!);
         }
 
         if (ctx.VARIABLE()) {
@@ -195,6 +187,24 @@ export class ExpressionTypeVisitor
 
         return new UnknownExpressionNode(ctx);
     }
+
+    visitFunction_call(ctx: Function_callContext) {
+        const functionName = ctx.VARIABLE().text;
+        if (functionName == "read") {
+            return new ReadNode(ctx);
+        } else if (functionName == "print") {
+            const firstParameter = ctx.lista_expressoes?.()?.expressao()?.at(0);
+            if (!firstParameter) {
+                return new UnknownExpressionNode(ctx);
+            } else {
+                return new PrintNode(this.visit(firstParameter), ctx);
+            }
+        } else {
+            const symbol = this.scopes.resolve(functionName, ctx);
+            if (symbol && symbol?.type != "function") this.addError(ctx, `${functionName} não é uma função`, "Warning")
+            return new UnknownExpressionNode(ctx);
+        }
+    };
 
     // =====================
     // PARENTHESES
@@ -431,9 +441,26 @@ export class ExpressionTypeVisitor
                 this.visit(expression)
             ) ?? [];
 
-        return new ArrayLiteral(elements, ctx);
+        return new ArrayExpression(elements, ctx);
     }
 
+    visitArray_access(ctx: Array_accessContext) {
+        const symbolName = ctx.VARIABLE().text;
+        const symbol = this.scopes.resolve(symbolName, ctx);
+        const indexEXP = this.visit(ctx.expressao());
+
+        if(!symbol){
+            return new UnknownExpressionNode(ctx);
+        }
+        if(symbol.type != "array"){
+            this.addError(ctx, `Não é possível acessar os elementos de ${symbol.name} pois a variavel não é uma array`, "Error")
+            return new UnknownExpressionNode(ctx);
+        }
+
+        return new ArrayAccessExpression(symbol, indexEXP, ctx);
+    };
+
+    //TODO - MUDAR O RETORNO DA LISTA DE EXPRESSOES QUANDO FOR IMPLEMENTAR FUNCTION CALL
     visitLista_expressoes(
         ctx: Lista_expressoesContext
     ): ASTExpressionNode {
@@ -443,6 +470,6 @@ export class ExpressionTypeVisitor
                 this.visit(expression)
             );
 
-        return new ArrayLiteral(elements, ctx);
+        return new ArrayExpression(elements, ctx);
     }
 }

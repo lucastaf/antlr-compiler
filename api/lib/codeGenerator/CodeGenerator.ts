@@ -39,9 +39,9 @@ export class CodeGenerator {
     private resolveDataField() {
         this.emit(".data")
         this.variablesList.forEach(variable => {
-            this.emit(`${variable.assemblyName} : 0`)
+            this.emit(`${variable.assemblyName} : ${new Array(variable.size).fill("0").join(",")}`)
+            this.stackPointer += variable.size;
         })
-        this.stackPointer = this.variablesList.length;
     }
 
     public generate(): string {

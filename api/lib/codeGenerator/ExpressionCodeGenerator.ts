@@ -1,5 +1,4 @@
-import { ArrayLiteral, ASTExpressionNode, CharLiteral, LogicExpression, MathOperator, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
-import { InvalidNode } from "../abstractSyntaxTree/AstNode";
+import { ArrayExpression, ASTExpressionNode, CharLiteral, LogicExpression, MathOperator, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator } from "../abstractSyntaxTree/AstExpressionNode";
 import type { CodeGeneratorAddErrorType, CodeGeneratorEmit } from "./CodeGenerator";
 
 export class ExpressionCodeGenerator {
@@ -30,14 +29,14 @@ export class ExpressionCodeGenerator {
             this.addError("Geração de string não implementada", "Error", node);
         } else if (node instanceof CharLiteral) {
             this.addError("Geração de char não implementada", "Error", node);
-        } else if (node instanceof ArrayLiteral) {
+        } else if (node instanceof ArrayExpression) {
             this.addError("Geração de array não implementada", "Error", node);
         } else if (node instanceof UnaryOperator) {
             this.visitUnaryOperator(node);
         } else if (node instanceof MathOperator) {
             this.visitMathOperator(node);
         } else if (node instanceof LogicExpression) {
-            return;
+            this.addError("Geração de operadores lógicos não implementado", "Error", node);
         } else if (node instanceof ReadNode) {
             this.visitReadNode(node);
         } else if (node instanceof PrintNode) {

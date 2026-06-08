@@ -65,10 +65,11 @@ operador_relacional:   GREATER | GREATER_EQUALS | LESS | LESS_EQUALS;
 operador_deslocamento: RIGHT_SHIFT | LEFT_SHIFT;
 
 // ===================== VALORES =====================
-valor_calculo: NUMERICO | VARIABLE | STRING | CHAR | array | function_call;
+valor_calculo: NUMERICO | VARIABLE | STRING | CHAR | array | function_call | array_access;
 
 // ===================== ARRAY =====================
 array: COLCHETES_OPEN lista_expressoes? COLCHETES_CLOSE;
+array_access: VARIABLE COLCHETES_OPEN expressao COLCHETES_CLOSE;
 
 lista_expressoes: expressao (COMMA expressao)*;
 

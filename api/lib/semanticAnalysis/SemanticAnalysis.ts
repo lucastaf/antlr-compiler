@@ -6,7 +6,7 @@ import type { Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codig
 import type { FileScriptParserVisitor } from "../../generated/fsCompiler/FileScriptParserVisitor";
 import { UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
 import { AssignmentNode, InvalidNode, ProgramNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
-import { ExpressionTypeVisitor } from "./ExpressionHandler";
+import { ExpressionTypeVisitor } from "./ExpressionSemanticAnalysis";
 import { ScopeManager, type SymbolInfo } from "./ScopeManager";
 export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implements FileScriptParserVisitor<ASTNode> {
     private scopeManager: ScopeManager;
@@ -86,7 +86,7 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
 
         const { varName, expressionNode } = this.parseVariableAttr(ctx.comando_atribuicao(), true);
 
-        const symbol = this.scopeManager.define(varName, expressionNode.type, isConst, ctx);
+        const symbol = this.scopeManager.define(varName, expressionNode.type, isConst, ctx, expressionNode?.size);
 
         if (!symbol) {
             return new InvalidNode(ctx);

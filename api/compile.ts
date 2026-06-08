@@ -64,7 +64,8 @@ export function compile(code: string): CompileResult {
     let ASMcode = "";
     try {
         const ast = semantic.visit(tree);
-        const codeGenerator = new CodeGenerator(ast, semantic.GetVariablesList());
+        const variableList = semantic.GetVariablesList()
+        const codeGenerator = new CodeGenerator(ast, variableList);
         ASMcode = codeGenerator.generate();
         errors.push(...codeGenerator.errors);
     } catch (error) {

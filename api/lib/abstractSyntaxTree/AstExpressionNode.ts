@@ -14,6 +14,7 @@ export type VarType =
 
 export abstract class ASTExpressionNode extends ASTNode {
     type: VarType = "unknown";
+    size?: number;
 }
 
 export class UnknownExpressionNode extends ASTExpressionNode {
@@ -52,13 +53,6 @@ export class CharLiteral extends ASTExpressionNode {
     constructor(public value: string, ctx: ParserRuleContext) {
         super(ctx);
         this.type = "char";
-    }
-}
-
-export class ArrayLiteral extends ASTExpressionNode {
-    constructor(public elements: ASTExpressionNode[], ctx: ParserRuleContext) {
-        super(ctx);
-        this.type = "array";
     }
 }
 
@@ -102,6 +96,25 @@ export class LogicExpression extends ASTExpressionNode {
     constructor(public left: ASTExpressionNode, public operator: "or" | "and", public right: ASTExpressionNode, ctx: ParserRuleContext) {
         super(ctx);
         this.type = "boolean";
+    }
+}
+
+//#endregion
+
+//#region Vetores
+export class ArrayExpression extends ASTExpressionNode {
+    public readonly size : number;
+    constructor(public expressions : Array<ASTExpressionNode>, ctx: ParserRuleContext){
+        super(ctx);
+        this.size = expressions.length;
+        this.type = "array";
+    }
+}
+
+export class ArrayAccessExpression extends ASTExpressionNode {
+    constructor(public symbol : SymbolInfo, public indexExpression : ASTExpressionNode, ctx: ParserRuleContext){
+        super(ctx);
+        this.type = symbol.type;
     }
 }
 

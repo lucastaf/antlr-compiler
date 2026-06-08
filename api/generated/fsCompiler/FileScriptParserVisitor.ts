@@ -40,6 +40,7 @@ import { Operador_relacionalContext } from "./FileScriptParser";
 import { Operador_deslocamentoContext } from "./FileScriptParser";
 import { Valor_calculoContext } from "./FileScriptParser";
 import { ArrayContext } from "./FileScriptParser";
+import { Array_accessContext } from "./FileScriptParser";
 import { Lista_expressoesContext } from "./FileScriptParser";
 import { Function_callContext } from "./FileScriptParser";
 
@@ -310,6 +311,13 @@ export interface FileScriptParserVisitor<Result> extends ParseTreeVisitor<Result
 	 * @return the visitor result
 	 */
 	visitArray?: (ctx: ArrayContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `FileScriptParser.array_access`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitArray_access?: (ctx: Array_accessContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `FileScriptParser.lista_expressoes`.
