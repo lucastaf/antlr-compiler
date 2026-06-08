@@ -22,7 +22,6 @@ import { Operador_igualdadeContext } from "./expressao";
 import { Operador_relacionalContext } from "./expressao";
 import { Operador_deslocamentoContext } from "./expressao";
 import { Valor_calculoContext } from "./expressao";
-import { ArrayContext } from "./expressao";
 import { Array_accessContext } from "./expressao";
 import { Lista_expressoesContext } from "./expressao";
 import { Function_callContext } from "./expressao";
@@ -168,13 +167,6 @@ export interface expressaoVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitValor_calculo?: (ctx: Valor_calculoContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `expressao.array`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitArray?: (ctx: ArrayContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `expressao.array_access`.

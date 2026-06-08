@@ -26,10 +26,11 @@ escopo_codigo:
 	| CHAVES_OPEN CHAVES_CLOSE;
 
 // ===================== VARIÁVEIS =====================
-comando_atribuicao: VARIABLE ATTR expressao;
+comando_atribuicao: VARIABLE ATTR (expressao | array);
 
 comando_declaracao: VARIABLE_DECLARE comando_atribuicao;
 
+array: COLCHETES_OPEN lista_expressoes? COLCHETES_CLOSE;
 // ===================== CONDICIONAIS =====================
 if_stmt: IF expressao escopo_codigo elseif* else?;
 

@@ -4,7 +4,7 @@ import { AbstractParseTreeVisitor } from "antlr4ts/tree";
 import type { CompileError, ErrorSeverity } from "../../../shared/types";
 import type { Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codigoContext, ExpressaoContext, For_loopContext, Function_declContext, ProgramContext, Return_stmtContext } from "../../generated/fsCompiler/FileScriptParser";
 import type { FileScriptParserVisitor } from "../../generated/fsCompiler/FileScriptParserVisitor";
-import { UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
+import { ArrayExpression, ASTExpressionNode, UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
 import { AssignmentNode, InvalidNode, ProgramNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
 import { ExpressionTypeVisitor } from "./ExpressionSemanticAnalysis";
 import { ScopeManager, type SymbolInfo } from "./ScopeManager";
@@ -59,18 +59,44 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
     protected defaultResult() {
         return new InvalidNode(undefined);
     }
-    
 
-    private parseVariableAttr(ctx: Comando_atribuicaoContext, isDeclaration: boolean = false) {
+
+    private parseVariableAttr(ctx: Comando_atribuicaoContext, isDeclaration: boolean = false, isConst: boolean = false) {
         const varName = ctx.VARIABLE().text;
         let varSymbol: SymbolInfo | undefined = undefined;
         if (!isDeclaration) {
             varSymbol = this.scopeManager.resolve(varName, ctx);
         }
+
         const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager, this.addError);
 
-        const expression = expressionVisitor.visit(ctx.expressao());
-        const expressionNode = expression ?? new UnknownExpressionNode(ctx);
+        const expression = ctx.expressao();
+        const array = ctx.array();
+
+
+
+        let expressionNode: ASTExpressionNode = new UnknownExpressionNode(ctx);
+        if (expression) {
+            expressionNode = expressionVisitor.visit(expression);
+            if (isDeclaration) {
+                varSymbol = this.scopeManager.define(varName, expressionNode.type, isConst, ctx, 1);
+            }
+        }
+        if (array) {
+            const expressions =
+                array.lista_expressoes()?.expressao().map(expression =>
+                    expressionVisitor.visit(expression)
+                ) ?? [];
+
+            if (isDeclaration) {
+                varSymbol = this.scopeManager.define(varName, "array", isConst, ctx, array.lista_expressoes()?.expressao()?.length);
+            }
+            expressionNode = new ArrayExpression(expressions, varSymbol!, ctx);
+
+
+        }
+
+
 
         return {
             varSymbol,
@@ -84,11 +110,10 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
     visitComando_declaracao(ctx: Comando_declaracaoContext) {
         const isConst = ctx.VARIABLE_DECLARE().text == "const";
 
-        const { varName, expressionNode } = this.parseVariableAttr(ctx.comando_atribuicao(), true);
+        const { varSymbol } = this.parseVariableAttr(ctx.comando_atribuicao(), true, isConst);
 
-        const symbol = this.scopeManager.define(varName, expressionNode.type, isConst, ctx, expressionNode?.size);
 
-        if (!symbol) {
+        if (!varSymbol) {
             return new InvalidNode(ctx);
         }
         const node = this.visitChildren(ctx);

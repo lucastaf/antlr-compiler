@@ -9,6 +9,7 @@ import { ComandoContext } from "./FileScriptParser";
 import { Escopo_codigoContext } from "./FileScriptParser";
 import { Comando_atribuicaoContext } from "./FileScriptParser";
 import { Comando_declaracaoContext } from "./FileScriptParser";
+import { ArrayContext } from "./FileScriptParser";
 import { If_stmtContext } from "./FileScriptParser";
 import { ElseifContext } from "./FileScriptParser";
 import { ElseContext } from "./FileScriptParser";
@@ -39,7 +40,6 @@ import { Operador_igualdadeContext } from "./FileScriptParser";
 import { Operador_relacionalContext } from "./FileScriptParser";
 import { Operador_deslocamentoContext } from "./FileScriptParser";
 import { Valor_calculoContext } from "./FileScriptParser";
-import { ArrayContext } from "./FileScriptParser";
 import { Array_accessContext } from "./FileScriptParser";
 import { Lista_expressoesContext } from "./FileScriptParser";
 import { Function_callContext } from "./FileScriptParser";
@@ -115,6 +115,17 @@ export interface FileScriptParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitComando_declaracao?: (ctx: Comando_declaracaoContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `FileScriptParser.array`.
+	 * @param ctx the parse tree
+	 */
+	enterArray?: (ctx: ArrayContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.array`.
+	 * @param ctx the parse tree
+	 */
+	exitArray?: (ctx: ArrayContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `FileScriptParser.if_stmt`.
@@ -445,17 +456,6 @@ export interface FileScriptParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitValor_calculo?: (ctx: Valor_calculoContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `FileScriptParser.array`.
-	 * @param ctx the parse tree
-	 */
-	enterArray?: (ctx: ArrayContext) => void;
-	/**
-	 * Exit a parse tree produced by `FileScriptParser.array`.
-	 * @param ctx the parse tree
-	 */
-	exitArray?: (ctx: ArrayContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `FileScriptParser.array_access`.

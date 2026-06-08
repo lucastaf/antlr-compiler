@@ -1,4 +1,4 @@
-import { ArrayExpression, ASTExpressionNode, CharLiteral, LogicExpression, MathOperator, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator } from "../abstractSyntaxTree/AstExpressionNode";
+import { ArrayAccessExpression, ArrayExpression, ASTExpressionNode, CharLiteral, LogicExpression, MathOperator, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator } from "../abstractSyntaxTree/AstExpressionNode";
 import type { CodeGeneratorAddErrorType, CodeGeneratorEmit } from "./CodeGenerator";
 
 export class ExpressionCodeGenerator {
@@ -25,22 +25,25 @@ export class ExpressionCodeGenerator {
             this.visitSymbolNode(node);
         } else if (node instanceof NumberLiteral) {
             this.visitNumberLiteral(node);
-        } else if (node instanceof StringLiteral) {
-            this.addError("Geração de string não implementada", "Error", node);
-        } else if (node instanceof CharLiteral) {
-            this.addError("Geração de char não implementada", "Error", node);
         } else if (node instanceof ArrayExpression) {
-            this.addError("Geração de array não implementada", "Error", node);
+            this.visitArrayExpression(node);
+        }
+        else if (node instanceof ArrayAccessExpression) {
+            this.visitArrayAccessExpression(node);
         } else if (node instanceof UnaryOperator) {
             this.visitUnaryOperator(node);
         } else if (node instanceof MathOperator) {
             this.visitMathOperator(node);
-        } else if (node instanceof LogicExpression) {
-            this.addError("Geração de operadores lógicos não implementado", "Error", node);
         } else if (node instanceof ReadNode) {
             this.visitReadNode(node);
         } else if (node instanceof PrintNode) {
             this.visitPrintNode(node);
+        } else if (node instanceof StringLiteral) {
+            this.addError("Geração de string não implementada", "Error", node);
+        } else if (node instanceof CharLiteral) {
+            this.addError("Geração de char não implementada", "Error", node);
+        } else if (node instanceof LogicExpression) {
+            this.addError("Geração de operadores lógicos não implementado", "Error", node);
         }
     }
 
@@ -49,7 +52,7 @@ export class ExpressionCodeGenerator {
         this.emit("ld $in_port")
     }
 
-    private visitUnaryOperator(node: UnaryOperator){
+    private visitUnaryOperator(node: UnaryOperator) {
         this.visit(node.operand);
         this.emit(`not`);
     }
@@ -107,5 +110,20 @@ export class ExpressionCodeGenerator {
                 this.emit(`xor ${this.stackPointer + 1}`)
                 break;
         }
+    }
+
+    private visitArrayExpression(node: ArrayExpression){
+        node.expressions.forEach((expression, index) => {
+            this.emit(`ldi ${index}`)
+            this.emit(`sto $indr`)
+            this.visit(expression);
+            this.emit(`stov ${node.symbol.assemblyName}`)
+        })
+    }
+
+    private visitArrayAccessExpression(node: ArrayAccessExpression){
+        this.visit(node.indexExpression);
+        this.emit(`sto $indr`)
+        this.emit(`ldv ${node.symbol.assemblyName}`);
     }
 }

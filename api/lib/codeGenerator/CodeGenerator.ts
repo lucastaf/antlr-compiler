@@ -78,6 +78,8 @@ export class CodeGenerator {
     
     private visitAssignmentNode(node: AssignmentNode) {
         this.visit(node.expression);
-        this.emit(`sto ${node.variable.assemblyName}`);
+        if(node.variable.type != "array"){
+            this.emit(`sto ${node.variable.assemblyName}`);
+        }
     }
 }

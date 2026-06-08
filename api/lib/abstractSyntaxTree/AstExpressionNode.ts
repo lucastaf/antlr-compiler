@@ -103,8 +103,8 @@ export class LogicExpression extends ASTExpressionNode {
 
 //#region Vetores
 export class ArrayExpression extends ASTExpressionNode {
-    public readonly size : number;
-    constructor(public expressions : Array<ASTExpressionNode>, ctx: ParserRuleContext){
+    public readonly size: number;
+    constructor(public expressions: Array<ASTExpressionNode>, public symbol: SymbolInfo, ctx: ParserRuleContext) {
         super(ctx);
         this.size = expressions.length;
         this.type = "array";
@@ -112,9 +112,9 @@ export class ArrayExpression extends ASTExpressionNode {
 }
 
 export class ArrayAccessExpression extends ASTExpressionNode {
-    constructor(public symbol : SymbolInfo, public indexExpression : ASTExpressionNode, ctx: ParserRuleContext){
+    constructor(public symbol: SymbolInfo, public indexExpression: ASTExpressionNode, ctx: ParserRuleContext) {
         super(ctx);
-        this.type = symbol.type;
+        this.type = "number";
     }
 }
 

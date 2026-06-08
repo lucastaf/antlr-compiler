@@ -7,7 +7,6 @@ import type { ParserRuleContext } from "antlr4ts";
 import type { ErrorSeverity } from "../../../shared/types";
 import {
     Array_accessContext,
-    ArrayContext,
     Calculo_bitwise_eContext,
     Calculo_bitwise_ouContext,
     Calculo_bitwise_xouContext,
@@ -25,7 +24,7 @@ import {
     Lista_expressoesContext,
     Valor_calculoContext
 } from "../../generated/fsCompiler/expressao";
-import { ASTExpressionNode, CharLiteral, MathOperator, NumberLiteral, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, ReadNode, type VarType, PrintNode, ArrayExpression, ArrayAccessExpression } from "../abstractSyntaxTree/AstExpressionNode";
+import { ASTExpressionNode, CharLiteral, MathOperator, NumberLiteral, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, ReadNode, type VarType, PrintNode, ArrayAccessExpression } from "../abstractSyntaxTree/AstExpressionNode";
 
 // ===================== VISITOR =====================
 
@@ -152,12 +151,6 @@ export class ExpressionTypeVisitor
 
         if (ctx.function_call()) {
             return this.visit(ctx.function_call()!);
-        }
-
-        if (ctx.array()) {
-            return this.visit(
-                ctx.array()!
-            );
         }
 
         if (ctx.array_access()) {
@@ -432,18 +425,6 @@ export class ExpressionTypeVisitor
     // ARRAY
     // =====================
 
-    visitArray(
-        ctx: ArrayContext
-    ): ASTExpressionNode {
-
-        const elements =
-            ctx.lista_expressoes()?.expressao().map(expression =>
-                this.visit(expression)
-            ) ?? [];
-
-        return new ArrayExpression(elements, ctx);
-    }
-
     visitArray_access(ctx: Array_accessContext) {
         const symbolName = ctx.VARIABLE().text;
         const symbol = this.scopes.resolve(symbolName, ctx);
@@ -465,11 +446,6 @@ export class ExpressionTypeVisitor
         ctx: Lista_expressoesContext
     ): ASTExpressionNode {
 
-        const elements =
-            ctx.expressao().map(expression =>
-                this.visit(expression)
-            );
-
-        return new ArrayExpression(elements, ctx);
+        return new UnknownExpressionNode(ctx);
     }
 }
