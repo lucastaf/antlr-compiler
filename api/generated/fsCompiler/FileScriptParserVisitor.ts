@@ -8,8 +8,8 @@ import { Lista_comandosContext } from "./FileScriptParser";
 import { ComandoContext } from "./FileScriptParser";
 import { Escopo_codigoContext } from "./FileScriptParser";
 import { Comando_atribuicaoContext } from "./FileScriptParser";
+import { Comando_atribuicao_arrayContext } from "./FileScriptParser";
 import { Comando_declaracaoContext } from "./FileScriptParser";
-import { ArrayContext } from "./FileScriptParser";
 import { If_stmtContext } from "./FileScriptParser";
 import { ElseifContext } from "./FileScriptParser";
 import { ElseContext } from "./FileScriptParser";
@@ -42,6 +42,7 @@ import { Operador_deslocamentoContext } from "./FileScriptParser";
 import { Valor_calculoContext } from "./FileScriptParser";
 import { Array_accessContext } from "./FileScriptParser";
 import { Lista_expressoesContext } from "./FileScriptParser";
+import { ArrayContext } from "./FileScriptParser";
 import { Function_callContext } from "./FileScriptParser";
 
 
@@ -89,18 +90,18 @@ export interface FileScriptParserVisitor<Result> extends ParseTreeVisitor<Result
 	visitComando_atribuicao?: (ctx: Comando_atribuicaoContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by `FileScriptParser.comando_atribuicao_array`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitComando_atribuicao_array?: (ctx: Comando_atribuicao_arrayContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by `FileScriptParser.comando_declaracao`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	visitComando_declaracao?: (ctx: Comando_declaracaoContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `FileScriptParser.array`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitArray?: (ctx: ArrayContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `FileScriptParser.if_stmt`.
@@ -325,6 +326,13 @@ export interface FileScriptParserVisitor<Result> extends ParseTreeVisitor<Result
 	 * @return the visitor result
 	 */
 	visitLista_expressoes?: (ctx: Lista_expressoesContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `FileScriptParser.array`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitArray?: (ctx: ArrayContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `FileScriptParser.function_call`.

@@ -1,12 +1,11 @@
 import { AbstractParseTreeVisitor } from "antlr4ts/tree";
 
 import type { expressaoVisitor } from "../../generated/fsCompiler/expressaoVisitor";
-import type { ScopeManager } from "./ScopeManager";
-
-import type { ParserRuleContext } from "antlr4ts";
+import { ConsoleErrorListener, type ParserRuleContext } from "antlr4ts";
 import type { ErrorSeverity } from "../../../shared/types";
 import {
     Array_accessContext,
+    ArrayContext,
     Calculo_bitwise_eContext,
     Calculo_bitwise_ouContext,
     Calculo_bitwise_xouContext,
@@ -24,7 +23,8 @@ import {
     Lista_expressoesContext,
     Valor_calculoContext
 } from "../../generated/fsCompiler/expressao";
-import { ASTExpressionNode, CharLiteral, MathOperator, NumberLiteral, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, ReadNode, type VarType, PrintNode, ArrayAccessExpression } from "../abstractSyntaxTree/AstExpressionNode";
+import { ArrayAccessExpression, ArrayExpression, ASTExpressionNode, CharLiteral, MathOperator, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, type VarType } from "../abstractSyntaxTree/AstExpressionNode";
+import { ScopeManager } from "./ScopeManager";
 
 // ===================== VISITOR =====================
 
@@ -37,7 +37,7 @@ export class ExpressionTypeVisitor
 
     constructor(
         scopes: ScopeManager,
-        private readonly addError: (ctx: ParserRuleContext, message: string, severity: ErrorSeverity) => void
+        private readonly addError: (ctx: ParserRuleContext, message: string, severity: ErrorSeverity) => void,
     ) {
         super();
         this.scopes = scopes;
@@ -155,6 +155,10 @@ export class ExpressionTypeVisitor
 
         if (ctx.array_access()) {
             return this.visit(ctx.array_access()!);
+        }
+
+        if (ctx.array()) {
+            return this.visit(ctx.array()!);
         }
 
         if (ctx.VARIABLE()) {
@@ -430,15 +434,25 @@ export class ExpressionTypeVisitor
         const symbol = this.scopes.resolve(symbolName, ctx);
         const indexEXP = this.visit(ctx.expressao());
 
-        if(!symbol){
+        if (!symbol) {
             return new UnknownExpressionNode(ctx);
         }
-        if(symbol.type != "array"){
+        if (symbol.type != "array") {
             this.addError(ctx, `Não é possível acessar os elementos de ${symbol.name} pois a variavel não é uma array`, "Error")
             return new UnknownExpressionNode(ctx);
         }
 
         return new ArrayAccessExpression(symbol, indexEXP, ctx);
+    };
+
+    visitArray(ctx: ArrayContext) {
+        const expressions =
+            ctx.lista_expressoes()?.expressao().map(expression =>
+                this.visit(expression)
+            ) ?? [];
+        console.log("EXPRESSAO")
+        console.log(expressions.length)
+        return new ArrayExpression(expressions, ctx);
     };
 
     //TODO - MUDAR O RETORNO DA LISTA DE EXPRESSOES QUANDO FOR IMPLEMENTAR FUNCTION CALL

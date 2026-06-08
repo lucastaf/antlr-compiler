@@ -8,8 +8,8 @@ import { Lista_comandosContext } from "./FileScriptParser";
 import { ComandoContext } from "./FileScriptParser";
 import { Escopo_codigoContext } from "./FileScriptParser";
 import { Comando_atribuicaoContext } from "./FileScriptParser";
+import { Comando_atribuicao_arrayContext } from "./FileScriptParser";
 import { Comando_declaracaoContext } from "./FileScriptParser";
-import { ArrayContext } from "./FileScriptParser";
 import { If_stmtContext } from "./FileScriptParser";
 import { ElseifContext } from "./FileScriptParser";
 import { ElseContext } from "./FileScriptParser";
@@ -42,6 +42,7 @@ import { Operador_deslocamentoContext } from "./FileScriptParser";
 import { Valor_calculoContext } from "./FileScriptParser";
 import { Array_accessContext } from "./FileScriptParser";
 import { Lista_expressoesContext } from "./FileScriptParser";
+import { ArrayContext } from "./FileScriptParser";
 import { Function_callContext } from "./FileScriptParser";
 
 
@@ -106,6 +107,17 @@ export interface FileScriptParserListener extends ParseTreeListener {
 	exitComando_atribuicao?: (ctx: Comando_atribuicaoContext) => void;
 
 	/**
+	 * Enter a parse tree produced by `FileScriptParser.comando_atribuicao_array`.
+	 * @param ctx the parse tree
+	 */
+	enterComando_atribuicao_array?: (ctx: Comando_atribuicao_arrayContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.comando_atribuicao_array`.
+	 * @param ctx the parse tree
+	 */
+	exitComando_atribuicao_array?: (ctx: Comando_atribuicao_arrayContext) => void;
+
+	/**
 	 * Enter a parse tree produced by `FileScriptParser.comando_declaracao`.
 	 * @param ctx the parse tree
 	 */
@@ -115,17 +127,6 @@ export interface FileScriptParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitComando_declaracao?: (ctx: Comando_declaracaoContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `FileScriptParser.array`.
-	 * @param ctx the parse tree
-	 */
-	enterArray?: (ctx: ArrayContext) => void;
-	/**
-	 * Exit a parse tree produced by `FileScriptParser.array`.
-	 * @param ctx the parse tree
-	 */
-	exitArray?: (ctx: ArrayContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `FileScriptParser.if_stmt`.
@@ -478,6 +479,17 @@ export interface FileScriptParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitLista_expressoes?: (ctx: Lista_expressoesContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `FileScriptParser.array`.
+	 * @param ctx the parse tree
+	 */
+	enterArray?: (ctx: ArrayContext) => void;
+	/**
+	 * Exit a parse tree produced by `FileScriptParser.array`.
+	 * @param ctx the parse tree
+	 */
+	exitArray?: (ctx: ArrayContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `FileScriptParser.function_call`.

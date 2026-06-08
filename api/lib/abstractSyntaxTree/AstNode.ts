@@ -30,3 +30,9 @@ export class AssignmentNode extends ASTNode {
         super(ctx);
     }
 }
+
+export class ArrayReassignNode extends AssignmentNode {
+    constructor(variable : SymbolInfo, expression: ASTExpressionNode, public indexExpression: ASTExpressionNode, ctx: ParserRuleContext){
+        super(variable, expression, ctx);
+    }
+}

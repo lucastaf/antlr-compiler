@@ -12,6 +12,7 @@ lista_comandos: (comando LINE_END)*;
 // ===================== COMANDOS =====================
 comando:
 	comando_atribuicao
+	|comando_atribuicao_array
 	| escopo_codigo
 	| if_stmt
 	| loop
@@ -26,11 +27,11 @@ escopo_codigo:
 	| CHAVES_OPEN CHAVES_CLOSE;
 
 // ===================== VARIÁVEIS =====================
-comando_atribuicao: VARIABLE ATTR (expressao | array);
+comando_atribuicao: VARIABLE ATTR expressao;
+comando_atribuicao_array: array_access ATTR expressao;
 
 comando_declaracao: VARIABLE_DECLARE comando_atribuicao;
 
-array: COLCHETES_OPEN lista_expressoes? COLCHETES_CLOSE;
 // ===================== CONDICIONAIS =====================
 if_stmt: IF expressao escopo_codigo elseif* else?;
 

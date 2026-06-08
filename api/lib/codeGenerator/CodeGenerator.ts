@@ -1,6 +1,6 @@
 import type { CompileError, ErrorSeverity } from "../../../shared/types";
 import { ASTExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
-import { AssignmentNode, ASTNode, ProgramNode } from "../abstractSyntaxTree/AstNode";
+import { ArrayReassignNode, AssignmentNode, ASTNode, ProgramNode } from "../abstractSyntaxTree/AstNode";
 import type { SymbolInfo } from "../SemanticAnalysis/ScopeManager";
 import { ExpressionCodeGenerator } from "./ExpressionCodeGenerator";
 
@@ -62,12 +62,12 @@ export class CodeGenerator {
         }
     }
 
-    private visitExpressionNode(node: ASTExpressionNode) {
-        const expressionCodeGenerator = new ExpressionCodeGenerator(node, this.addError, this.stackPointer);
+    private visitExpressionNode(node: ASTExpressionNode, assignSymbol?: SymbolInfo) {
+        const expressionCodeGenerator = new ExpressionCodeGenerator(node, this.addError, this.stackPointer, assignSymbol);
         const code = expressionCodeGenerator.generate();
         this.emit(code);
     }
-    
+
     private visitProgramNode(node: ProgramNode) {
         node.instructions.forEach(instruction => {
             this.emit(`#${instruction.originalLine}`)
@@ -75,11 +75,24 @@ export class CodeGenerator {
             this.emit("")
         })
     }
-    
+
     private visitAssignmentNode(node: AssignmentNode) {
-        this.visit(node.expression);
-        if(node.variable.type != "array"){
+        this.visitExpressionNode(node.expression, node.variable);
+        if (node instanceof ArrayReassignNode) {
+            return this.visitArrayReassignNode(node);
+        } else if (node.variable.type != "array") {
             this.emit(`sto ${node.variable.assemblyName}`);
         }
+
+    }
+
+    private visitArrayReassignNode(node: ArrayReassignNode) {
+        this.emit(`sto ${this.stackPointer}`);
+        this.stackPointer ++;
+        this.visitExpressionNode(node.indexExpression);
+        this.emit(`sto $indr`);
+        this.stackPointer --;
+        this.emit(`ld ${this.stackPointer}`)
+        this.emit(`stov ${node.variable.assemblyName}`);
     }
 }

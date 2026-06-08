@@ -1,11 +1,13 @@
 import { ArrayAccessExpression, ArrayExpression, ASTExpressionNode, CharLiteral, LogicExpression, MathOperator, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator } from "../abstractSyntaxTree/AstExpressionNode";
+import { SymbolInfo } from "../SemanticAnalysis/ScopeManager";
 import type { CodeGeneratorAddErrorType, CodeGeneratorEmit } from "./CodeGenerator";
 
 export class ExpressionCodeGenerator {
     private code: string[] = [];
     public constructor(private readonly RootNode: ASTExpressionNode,
         private readonly addError: CodeGeneratorAddErrorType,
-        private stackPointer: number
+        private stackPointer: number,
+        private assignSymbol?: SymbolInfo
     ) { }
 
     private readonly emit: CodeGeneratorEmit = (instruction) => {
@@ -112,16 +114,21 @@ export class ExpressionCodeGenerator {
         }
     }
 
-    private visitArrayExpression(node: ArrayExpression){
+    private visitArrayExpression(node: ArrayExpression) {
         node.expressions.forEach((expression, index) => {
+            if(!this.assignSymbol){
+                this.addError("Variavel de atribuição não identificada", "Error", node);
+                return;
+
+            }
             this.emit(`ldi ${index}`)
             this.emit(`sto $indr`)
             this.visit(expression);
-            this.emit(`stov ${node.symbol.assemblyName}`)
+            this.emit(`stov ${this.assignSymbol.assemblyName}`)
         })
     }
 
-    private visitArrayAccessExpression(node: ArrayAccessExpression){
+    private visitArrayAccessExpression(node: ArrayAccessExpression) {
         this.visit(node.indexExpression);
         this.emit(`sto $indr`)
         this.emit(`ldv ${node.symbol.assemblyName}`);
