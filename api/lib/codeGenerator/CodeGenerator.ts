@@ -1,6 +1,6 @@
 import type { CompileError, ErrorSeverity } from "../../../shared/types";
 import { ASTExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
-import { ArrayReassignNode, AssignmentNode, ASTNode, CodeScopeNode, DoWhileLoopNode, IfStmtNode, ProgramNode, WhileLoopNode } from "../abstractSyntaxTree/AstNode";
+import { ArrayReassignNode, AssignmentNode, ASTNode, CodeScopeNode, DoWhileLoopNode, ForLoopNode, IfStmtNode, ProgramNode, WhileLoopNode } from "../abstractSyntaxTree/AstNode";
 import type { SymbolInfo } from "../semanticAnalysis/ScopeManager";
 import { ExpressionCodeGenerator } from "./ExpressionCodeGenerator";
 
@@ -78,6 +78,8 @@ export class CodeGenerator {
             this.visitWhileLoop(node);
         } else if (node instanceof DoWhileLoopNode) {
             this.visitDoWhileLoop(node);
+        } else if (node instanceof ForLoopNode){
+            this.visitForLoop(node);
         }
     }
 
@@ -169,6 +171,19 @@ export class CodeGenerator {
         this.visit(node.expression);
         this.emitCode("ori  0")
         this.emitCode(`bne ${node.label}_START`)
+    }
+
+    private visitForLoop(node: ForLoopNode){
+        this.visit(node.firstExecutionNode);
+        this.emitComment(`${node.label}_START:`)
+        this.visit(node.expression);
+        this.emitCode("ori  0")
+        this.emitCode(`beq ${node.label}_CONTINUE`)
+
+        this.visit(node.codeScope);
+        this.visit(node.perIterationNode);
+        this.emitCode(`jmp ${node.label}_START`)
+        this.emitComment(`${node.label}_CONTINUE:`)
     }
 
     //#endregion

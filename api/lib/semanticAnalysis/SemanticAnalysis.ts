@@ -4,8 +4,8 @@ import { AbstractParseTreeVisitor } from "antlr4ts/tree";
 import type { CompileError, ErrorSeverity } from "../../../shared/types";
 import { Do_while_loopContext, ElseifContext, If_stmtContext, While_loopContext, type Comando_atribuicao_arrayContext, type Comando_atribuicaoContext, type Comando_declaracaoContext, type Escopo_codigoContext, type ExpressaoContext, type For_loopContext, type Function_declContext, type ProgramContext, type Return_stmtContext } from "../../generated/fsCompiler/FileScriptParser";
 import type { FileScriptParserVisitor } from "../../generated/fsCompiler/FileScriptParserVisitor";
-import { ASTExpressionNode, UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
-import { ArrayReassignNode, AssignmentNode, CodeScopeNode, DoWhileLoopNode, IfStmtNode, InvalidNode, ProgramNode, WhileLoopNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
+import { ASTExpressionNode, NumberLiteral, UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
+import { ArrayReassignNode, AssignmentNode, CodeScopeNode, DoWhileLoopNode, ForLoopNode, IfStmtNode, InvalidNode, ProgramNode, WhileLoopNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
 import { ExpressionTypeVisitor } from "./ExpressionSemanticAnalysis";
 import { ScopeManager, type SymbolInfo } from "./ScopeManager";
 export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implements FileScriptParserVisitor<ASTNode> {
@@ -186,11 +186,15 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
     };
 
     visitFor_loop(ctx: For_loopContext) {
-        this.scopeManager.beginScope();
-        this.visitChildren(ctx);
-        this.scopeManager.endScope(ctx);
+        const firstExpression = this.visit(ctx._init);
+        const expressaoRaw = ctx.expressao();
+        const expressionNode = expressaoRaw ? this.visitExpressao(expressaoRaw) : new NumberLiteral(1, ctx);
+        const iterationNode = this.visit(ctx._increment);
 
-        return new InvalidNode(ctx);
+        const codeScopeNode = this.visitEscopo_codigo(ctx.escopo_codigo());
+
+
+        return new ForLoopNode(firstExpression, expressionNode, iterationNode, codeScopeNode, this.scopeManager.getNextLabel(), ctx);
     };
 
     //#endregion

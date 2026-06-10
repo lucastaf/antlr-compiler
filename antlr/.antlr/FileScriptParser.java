@@ -809,14 +809,10 @@ public class FileScriptParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class For_loopContext extends ParserRuleContext {
+		public ComandoContext init;
+		public ComandoContext increment;
 		public TerminalNode FOR() { return getToken(FileScriptParser.FOR, 0); }
 		public TerminalNode PARENTESES_OPEN() { return getToken(FileScriptParser.PARENTESES_OPEN, 0); }
-		public List<ComandoContext> comando() {
-			return getRuleContexts(ComandoContext.class);
-		}
-		public ComandoContext comando(int i) {
-			return getRuleContext(ComandoContext.class,i);
-		}
 		public List<TerminalNode> LINE_END() { return getTokens(FileScriptParser.LINE_END); }
 		public TerminalNode LINE_END(int i) {
 			return getToken(FileScriptParser.LINE_END, i);
@@ -824,6 +820,12 @@ public class FileScriptParser extends Parser {
 		public TerminalNode PARENTESES_CLOSE() { return getToken(FileScriptParser.PARENTESES_CLOSE, 0); }
 		public Escopo_codigoContext escopo_codigo() {
 			return getRuleContext(Escopo_codigoContext.class,0);
+		}
+		public List<ComandoContext> comando() {
+			return getRuleContexts(ComandoContext.class);
+		}
+		public ComandoContext comando(int i) {
+			return getRuleContext(ComandoContext.class,i);
 		}
 		public ExpressaoContext expressao() {
 			return getRuleContext(ExpressaoContext.class,0);
@@ -846,7 +848,7 @@ public class FileScriptParser extends Parser {
 			setState(155);
 			match(PARENTESES_OPEN);
 			setState(156);
-			comando();
+			((For_loopContext)_localctx).init = comando();
 			setState(157);
 			match(LINE_END);
 			setState(159);
@@ -862,7 +864,7 @@ public class FileScriptParser extends Parser {
 			setState(161);
 			match(LINE_END);
 			setState(162);
-			comando();
+			((For_loopContext)_localctx).increment = comando();
 			setState(163);
 			match(PARENTESES_CLOSE);
 			setState(164);

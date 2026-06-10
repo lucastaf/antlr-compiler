@@ -709,7 +709,7 @@ export class FileScriptParser extends Parser {
 			this.state = 155;
 			this.match(FileScriptParser.PARENTESES_OPEN);
 			this.state = 156;
-			this.comando();
+			_localctx._init = this.comando();
 			this.state = 157;
 			this.match(FileScriptParser.LINE_END);
 			this.state = 159;
@@ -725,7 +725,7 @@ export class FileScriptParser extends Parser {
 			this.state = 161;
 			this.match(FileScriptParser.LINE_END);
 			this.state = 162;
-			this.comando();
+			_localctx._increment = this.comando();
 			this.state = 163;
 			this.match(FileScriptParser.PARENTESES_CLOSE);
 			this.state = 164;
@@ -2510,17 +2510,10 @@ export class Do_while_loopContext extends ParserRuleContext {
 
 
 export class For_loopContext extends ParserRuleContext {
+	public _init!: ComandoContext;
+	public _increment!: ComandoContext;
 	public FOR(): TerminalNode { return this.getToken(FileScriptParser.FOR, 0); }
 	public PARENTESES_OPEN(): TerminalNode { return this.getToken(FileScriptParser.PARENTESES_OPEN, 0); }
-	public comando(): ComandoContext[];
-	public comando(i: number): ComandoContext;
-	public comando(i?: number): ComandoContext | ComandoContext[] {
-		if (i === undefined) {
-			return this.getRuleContexts(ComandoContext);
-		} else {
-			return this.getRuleContext(i, ComandoContext);
-		}
-	}
 	public LINE_END(): TerminalNode[];
 	public LINE_END(i: number): TerminalNode;
 	public LINE_END(i?: number): TerminalNode | TerminalNode[] {
@@ -2533,6 +2526,15 @@ export class For_loopContext extends ParserRuleContext {
 	public PARENTESES_CLOSE(): TerminalNode { return this.getToken(FileScriptParser.PARENTESES_CLOSE, 0); }
 	public escopo_codigo(): Escopo_codigoContext {
 		return this.getRuleContext(0, Escopo_codigoContext);
+	}
+	public comando(): ComandoContext[];
+	public comando(i: number): ComandoContext;
+	public comando(i?: number): ComandoContext | ComandoContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(ComandoContext);
+		} else {
+			return this.getRuleContext(i, ComandoContext);
+		}
 	}
 	public expressao(): ExpressaoContext | undefined {
 		return this.tryGetRuleContext(0, ExpressaoContext);

@@ -47,7 +47,7 @@ while_loop: WHILE expressao escopo_codigo;
 do_while_loop: DO escopo_codigo WHILE expressao;
 
 for_loop:
-	FOR PARENTESES_OPEN comando LINE_END expressao? LINE_END comando PARENTESES_CLOSE escopo_codigo;
+	FOR PARENTESES_OPEN init=comando LINE_END expressao? LINE_END increment=comando PARENTESES_CLOSE escopo_codigo;
 
 // ===================== FUNÇÕES =====================
 comandos_function: function_decl | return_stmt;

@@ -72,4 +72,17 @@ export class DoWhileLoopNode extends ASTNode {
     }
 }
 
+export class ForLoopNode extends ASTNode {
+    constructor(
+        public firstExecutionNode : ASTNode,
+        public expression: ASTExpressionNode,
+        public perIterationNode : ASTNode,
+        public codeScope: CodeScopeNode,
+        public label: string,
+        ctx: ParserRuleContext
+    ){
+        super(ctx);
+    }
+}
+
 //#endregion
