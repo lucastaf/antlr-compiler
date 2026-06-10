@@ -16,6 +16,7 @@ export class ScopeManager {
     private scopes: Map<string, SymbolInfo>[] = [];
     private addError: (ctx: ParserRuleContext, message: string, severity: ErrorSeverity) => void;
     private variablesList: Array<SymbolInfo & { start: number, end: number }> = [];
+    private labelCounter: number = 0;
 
     constructor(addError: (ctx: ParserRuleContext, message: string, severity: ErrorSeverity) => void) {
         this.addError = addError;
@@ -23,6 +24,12 @@ export class ScopeManager {
 
     public GetVariablesList() {
         return this.variablesList;
+    }
+
+    public getNextLabel(): string {
+        const label = `L${this.labelCounter}`;
+        this.labelCounter++;
+        return label;
     }
 
     beginScope() {
@@ -77,7 +84,7 @@ export class ScopeManager {
             size
         }
 
-        currentScope?.set(variable,symbolInfo);
+        currentScope?.set(variable, symbolInfo);
 
         return symbolInfo;
     }
@@ -93,7 +100,6 @@ export class ScopeManager {
             }
 
             if (symbol?.isConst && symbol.assignCount > 0) {
-                console.log("VARIAVEL NAO PODE SER REDECLARADA POIS É CONST", symbol.name)
                 this.addError(ctx, "Variavel não pode ser reatribuida pois é const - " + symbol.name, "Error");
             }
 

@@ -1,7 +1,7 @@
 import { AbstractParseTreeVisitor } from "antlr4ts/tree";
 
 import type { expressaoVisitor } from "../../generated/fsCompiler/expressaoVisitor";
-import { ConsoleErrorListener, type ParserRuleContext } from "antlr4ts";
+import { type ParserRuleContext } from "antlr4ts";
 import type { ErrorSeverity } from "../../../shared/types";
 import {
     Array_accessContext,
@@ -23,7 +23,7 @@ import {
     Lista_expressoesContext,
     Valor_calculoContext
 } from "../../generated/fsCompiler/expressao";
-import { ArrayAccessExpression, ArrayExpression, ASTExpressionNode, CharLiteral, MathOperator, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, type VarType } from "../abstractSyntaxTree/AstExpressionNode";
+import { ArrayAccessExpression, ArrayExpression, ASTExpressionNode, CharLiteral, isLogicExpression, isMathOperator, LogicOperation, MathOperation, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, type VarType } from "../abstractSyntaxTree/AstExpressionNode";
 import { ScopeManager } from "./ScopeManager";
 
 // ===================== VISITOR =====================
@@ -75,6 +75,17 @@ export class ExpressionTypeVisitor
         return type === undefined || type === "unknown";
     }
 
+    private getMathOperation(left: ASTExpressionNode, operator: string, right: ASTExpressionNode, ctx: ParserRuleContext): ASTExpressionNode {
+        if (isMathOperator(operator)) {
+            return new MathOperation(left, operator, right, ctx);
+        }
+        if (isLogicExpression(operator)) {
+            return new LogicOperation(left, operator, right, this.scopes.getNextLabel(), ctx);
+        }
+
+        return new UnknownExpressionNode(ctx);
+    }
+
     private buildBinaryChain(
         ctx: ParserRuleContext,
         operands: any[],
@@ -96,13 +107,13 @@ export class ExpressionTypeVisitor
         ) {
 
             const rightNode = this.visit(operands[i + 1]);
-            const operatorText = operators[i]?.text ?? operators[i]?.getText?.() ?? "";
+            const operatorText: string = operators[i]?.text ?? operators[i]?.getText?.() ?? "";
 
             if (
                 this.isUnknown(current.type) ||
                 this.isUnknown(rightNode.type)
             ) {
-                current = new MathOperator(current, operatorText, rightNode, ctx);
+                current = this.getMathOperation(current, operatorText, rightNode, ctx);
                 continue;
             }
 
@@ -115,11 +126,11 @@ export class ExpressionTypeVisitor
                     "Error"
                 );
 
-                current = new MathOperator(current, operatorText, rightNode, ctx);
+                current = this.getMathOperation(current, operatorText, rightNode, ctx);
                 continue;
             }
 
-            current = new MathOperator(
+            current = this.getMathOperation(
                 current,
                 operatorText,
                 rightNode, ctx

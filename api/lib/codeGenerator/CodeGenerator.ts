@@ -37,7 +37,9 @@ export class CodeGenerator {
     }
 
     private resolveDataField() {
-        this.emit(".data")
+        if (this.variablesList.length) {
+            this.emit(".data")
+        }
         this.variablesList.forEach(variable => {
             this.emit(`${variable.assemblyName} : ${new Array(variable.size).fill("0").join(",")}`)
             this.stackPointer += variable.size;
@@ -88,10 +90,10 @@ export class CodeGenerator {
 
     private visitArrayReassignNode(node: ArrayReassignNode) {
         this.emit(`sto ${this.stackPointer}`);
-        this.stackPointer ++;
+        this.stackPointer++;
         this.visitExpressionNode(node.indexExpression);
         this.emit(`sto $indr`);
-        this.stackPointer --;
+        this.stackPointer--;
         this.emit(`ld ${this.stackPointer}`)
         this.emit(`stov ${node.variable.assemblyName}`);
     }

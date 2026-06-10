@@ -7,7 +7,7 @@ import type { FileScriptParserVisitor } from "../../generated/fsCompiler/FileScr
 import { ASTExpressionNode, UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
 import { ArrayReassignNode, AssignmentNode, InvalidNode, ProgramNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
 import { ExpressionTypeVisitor } from "./ExpressionSemanticAnalysis";
-import { ScopeManager, SymbolInfo } from "./ScopeManager";
+import { ScopeManager, type SymbolInfo } from "./ScopeManager";
 export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implements FileScriptParserVisitor<ASTNode> {
     private scopeManager: ScopeManager;
 

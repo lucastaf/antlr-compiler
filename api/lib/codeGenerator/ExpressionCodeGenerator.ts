@@ -1,5 +1,5 @@
-import { ArrayAccessExpression, ArrayExpression, ASTExpressionNode, CharLiteral, LogicExpression, MathOperator, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator } from "../abstractSyntaxTree/AstExpressionNode";
-import { SymbolInfo } from "../SemanticAnalysis/ScopeManager";
+import { ArrayAccessExpression, ArrayExpression, ASTExpressionNode, CharLiteral, LogicOperation, MathOperation, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator, type mathOperator } from "../abstractSyntaxTree/AstExpressionNode";
+import type { SymbolInfo } from "../SemanticAnalysis/ScopeManager";
 import type { CodeGeneratorAddErrorType, CodeGeneratorEmit } from "./CodeGenerator";
 
 export class ExpressionCodeGenerator {
@@ -34,18 +34,18 @@ export class ExpressionCodeGenerator {
             this.visitArrayAccessExpression(node);
         } else if (node instanceof UnaryOperator) {
             this.visitUnaryOperator(node);
-        } else if (node instanceof MathOperator) {
+        } else if (node instanceof MathOperation) {
             this.visitMathOperator(node);
         } else if (node instanceof ReadNode) {
             this.visitReadNode(node);
         } else if (node instanceof PrintNode) {
             this.visitPrintNode(node);
+        } else if (node instanceof LogicOperation) {
+            this.visitLogicOperator(node);
         } else if (node instanceof StringLiteral) {
             this.addError("Geração de string não implementada", "Error", node);
         } else if (node instanceof CharLiteral) {
             this.addError("Geração de char não implementada", "Error", node);
-        } else if (node instanceof LogicExpression) {
-            this.addError("Geração de operadores lógicos não implementado", "Error", node);
         }
     }
 
@@ -72,15 +72,54 @@ export class ExpressionCodeGenerator {
         this.emit(`ldi ${node.value}`);
     }
 
-    private visitMathOperator(node: MathOperator) {
-        this.visit(node.left);
+    private visitLogicOperator(node: LogicOperation) {
+        this.handleMathOperation(node.left, "-", node.right, node);
+        switch (node.operator) {
+            case ">":
+                this.emit(`bgt ${node.label}_true`)
+                break;
+            case "<":
+                this.emit(`blt ${node.label}_true`)
+                break;
+            case "<=":
+                this.emit(`ble ${node.label}_true`)
+                break;
+            case ">=":
+                this.emit(`bge ${node.label}_true`)
+                break;
+            case "==":
+                this.emit(`beq ${node.label}_true`)
+                break;
+            case "!=":
+                this.emit(`bne ${node.label}_true`)
+                break;
+            case "&&":
+                this.addError("Operação AND não suportada", "Error", node);
+                break;
+            case "||":
+                this.addError("Operação OR não suportada", "Error", node);
+                break;
+        }
+        this.emit("ldi 0");
+        this.emit(`jmp ${node.label}_CONTINUE`)
+        this.emit(`${node.label}_TRUE:`)
+        this.emit("ldi 1")
+        this.emit(`${node.label}_CONTINUE:`)
+    }
+
+    private visitMathOperator(node: MathOperation) {
+        this.handleMathOperation(node.left, node.operator, node.right, node);
+    }
+
+    private handleMathOperation(left: ASTExpressionNode, operation: mathOperator, right: ASTExpressionNode, node: ASTExpressionNode) {
+        this.visit(left);
         this.emit(`sto ${this.stackPointer}`);
         this.stackPointer++;
-        this.visit(node.right);
+        this.visit(right);
         this.emit(`sto ${this.stackPointer}`);
         this.stackPointer--;
         this.emit(`ld ${this.stackPointer}`)
-        switch (node.operator) {
+        switch (operation) {
             case "+":
                 this.emit(`add ${this.stackPointer + 1}`)
                 break;
@@ -116,7 +155,7 @@ export class ExpressionCodeGenerator {
 
     private visitArrayExpression(node: ArrayExpression) {
         node.expressions.forEach((expression, index) => {
-            if(!this.assignSymbol){
+            if (!this.assignSymbol) {
                 this.addError("Variavel de atribuição não identificada", "Error", node);
                 return;
 

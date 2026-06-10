@@ -80,20 +80,21 @@ export class UnaryOperator extends ASTExpressionNode {
     }
 }
 
-type mathOperator = "+" | "-" | "*" | "/" | "%" | "<<" | ">>" | "&" | "|" | "^"
-export class MathOperator extends ASTExpressionNode {
+const mathOperators = ["+", "-", "*", "/", "%", "<<", ">>", "&", "|", "^"] as const;
+export type mathOperator = typeof mathOperators[number];
+export const isMathOperator = (value: string): value is mathOperator => mathOperators.includes(value as mathOperator);
+export class MathOperation extends ASTExpressionNode {
     constructor(public left: ASTExpressionNode, public operator: mathOperator, public right: ASTExpressionNode, ctx: ParserRuleContext) {
         super(ctx);
         this.type = "number";
     }
 }
 
-//#endregion
-
-//#region Expressions
-
-export class LogicExpression extends ASTExpressionNode {
-    constructor(public left: ASTExpressionNode, public operator: "or" | "and", public right: ASTExpressionNode, ctx: ParserRuleContext) {
+const logicExpressions = [">", "<", "<=", ">=", "==", "!=", "&&", "||"] as const;
+type logicExpression = typeof logicExpressions[number];
+export const isLogicExpression = (value: string): value is logicExpression => logicExpressions.includes(value as logicExpression);
+export class LogicOperation extends ASTExpressionNode {
+    constructor(public left: ASTExpressionNode, public operator: logicExpression, public right: ASTExpressionNode, public label: string, ctx: ParserRuleContext) {
         super(ctx);
         this.type = "boolean";
     }
