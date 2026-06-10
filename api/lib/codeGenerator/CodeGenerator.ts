@@ -1,7 +1,7 @@
 import type { CompileError, ErrorSeverity } from "../../../shared/types";
 import { ASTExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
 import { ArrayReassignNode, AssignmentNode, ASTNode, CodeScopeNode, IfStmtNode, ProgramNode } from "../abstractSyntaxTree/AstNode";
-import type { SymbolInfo } from "../SemanticAnalysis/ScopeManager";
+import type { SymbolInfo } from "../semanticAnalysis/ScopeManager";
 import { ExpressionCodeGenerator } from "./ExpressionCodeGenerator";
 
 export type CodeGeneratorEmit = (instruction: string) => number;

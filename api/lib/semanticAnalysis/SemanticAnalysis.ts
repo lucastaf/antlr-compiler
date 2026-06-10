@@ -2,7 +2,7 @@ import type { ParserRuleContext } from "antlr4ts";
 import { Interval } from "antlr4ts/misc/Interval";
 import { AbstractParseTreeVisitor } from "antlr4ts/tree";
 import type { CompileError, ErrorSeverity } from "../../../shared/types";
-import { If_stmtContext, type Comando_atribuicao_arrayContext, type Comando_atribuicaoContext, type Comando_declaracaoContext, type Escopo_codigoContext, type ExpressaoContext, type For_loopContext, type Function_declContext, type ProgramContext, type Return_stmtContext } from "../../generated/fsCompiler/FileScriptParser";
+import { ElseifContext, If_stmtContext, type Comando_atribuicao_arrayContext, type Comando_atribuicaoContext, type Comando_declaracaoContext, type Escopo_codigoContext, type ExpressaoContext, type For_loopContext, type Function_declContext, type ProgramContext, type Return_stmtContext } from "../../generated/fsCompiler/FileScriptParser";
 import type { FileScriptParserVisitor } from "../../generated/fsCompiler/FileScriptParserVisitor";
 import { ASTExpressionNode, UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
 import { ArrayReassignNode, AssignmentNode, CodeScopeNode, IfStmtNode, InvalidNode, ProgramNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
@@ -154,8 +154,18 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
         const expressao = this.visitExpressao(ctx.expressao());
         const ifScope = this.visitEscopo_codigo(ctx.escopo_codigo())
 
-        const elseScopeRaw = ctx.else()?.escopo_codigo();
-        const elseScope = elseScopeRaw ? this.visitEscopo_codigo(elseScopeRaw) : undefined;
+        const elseScopeRaw = ctx.elseif() ?? ctx.else();
+        const elseScope = elseScopeRaw ? this.visit(elseScopeRaw) : undefined;
+
+        return new IfStmtNode(expressao, ifScope, elseScope, this.scopeManager.getNextLabel(), ctx);
+    };
+
+    visitElseif(ctx: ElseifContext) {
+        const expressao = this.visitExpressao(ctx.expressao());
+        const ifScope = this.visitEscopo_codigo(ctx.escopo_codigo())
+
+        const elseScopeRaw = ctx.elseif() ?? ctx.else();
+        const elseScope = elseScopeRaw ? this.visit(elseScopeRaw) : undefined;
 
         return new IfStmtNode(expressao, ifScope, elseScope, this.scopeManager.getNextLabel(), ctx);
     };

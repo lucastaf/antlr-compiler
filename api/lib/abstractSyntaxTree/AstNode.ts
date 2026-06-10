@@ -1,5 +1,5 @@
 import type { ParserRuleContext } from "antlr4ts";
-import type { SymbolInfo } from "../SemanticAnalysis/ScopeManager";
+import type { SymbolInfo } from "../semanticAnalysis/ScopeManager";
 import { ASTExpressionNode } from "./AstExpressionNode"
 
 export abstract class ASTNode {
@@ -48,7 +48,7 @@ export class ArrayReassignNode extends AssignmentNode {
 export class IfStmtNode extends ASTNode {
     constructor(public expression: ASTExpressionNode,
         public codeScope: CodeScopeNode,
-        public elseScope: CodeScopeNode | undefined,
+        public elseScope: ASTNode | undefined,
         public label: string, ctx: ParserRuleContext) {
         super(ctx);
     }

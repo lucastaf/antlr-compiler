@@ -1,5 +1,5 @@
 import { ArrayAccessExpression, ArrayExpression, ASTExpressionNode, CharLiteral, LogicOperation, MathOperation, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator, type mathOperator } from "../abstractSyntaxTree/AstExpressionNode";
-import type { SymbolInfo } from "../SemanticAnalysis/ScopeManager";
+import type { SymbolInfo } from "../semanticAnalysis/ScopeManager";
 import type { CodeGeneratorAddErrorType, CodeGeneratorEmit } from "./CodeGenerator";
 
 export class ExpressionCodeGenerator {

@@ -33,9 +33,9 @@ comando_atribuicao_array: array_access ATTR expressao;
 comando_declaracao: VARIABLE_DECLARE comando_atribuicao;
 
 // ===================== CONDICIONAIS =====================
-if_stmt: IF expressao escopo_codigo elseif* else?;
+if_stmt: IF expressao escopo_codigo (elseif | else)?;
 
-elseif: ELIF expressao escopo_codigo;
+elseif: ELIF expressao escopo_codigo (elseif | else)?;
 
 else: ELSE escopo_codigo;
 

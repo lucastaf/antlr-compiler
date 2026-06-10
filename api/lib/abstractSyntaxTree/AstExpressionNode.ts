@@ -1,5 +1,5 @@
 import type { ParserRuleContext } from "antlr4ts";
-import type { SymbolInfo } from "../SemanticAnalysis/ScopeManager";
+import type { SymbolInfo } from "../semanticAnalysis/ScopeManager";
 import { ASTNode } from "./AstNode";
 
 export type VarType =
