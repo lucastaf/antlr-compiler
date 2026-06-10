@@ -94,7 +94,7 @@ const logicExpressions = [">", "<", "<=", ">=", "==", "!=", "&&", "||"] as const
 type logicExpression = typeof logicExpressions[number];
 export const isLogicExpression = (value: string): value is logicExpression => logicExpressions.includes(value as logicExpression);
 export class LogicOperation extends ASTExpressionNode {
-    constructor(public left: ASTExpressionNode, public operator: logicExpression, public right: ASTExpressionNode, public label: string, ctx: ParserRuleContext) {
+    constructor(public left: ASTExpressionNode, public operator: logicExpression, public right: ASTExpressionNode, ctx: ParserRuleContext) {
         super(ctx);
         this.type = "boolean";
     }

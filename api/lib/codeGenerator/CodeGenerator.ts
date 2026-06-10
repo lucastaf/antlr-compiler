@@ -4,12 +4,13 @@ import { ArrayReassignNode, AssignmentNode, ASTNode, ProgramNode } from "../abst
 import type { SymbolInfo } from "../SemanticAnalysis/ScopeManager";
 import { ExpressionCodeGenerator } from "./ExpressionCodeGenerator";
 
-export type CodeGeneratorEmit = (instruction: string | string[]) => void;
+export type CodeGeneratorEmit = (instruction: string | string[]) => number;
 export type CodeGeneratorAddErrorType = (message: string, severity: ErrorSeverity, ctx: ASTNode) => void;
 export class CodeGenerator {
     private code: string[] = [];
     public errors: CompileError[] = [];
     private stackPointer: number = 0;
+    private instructionCounter: number = 0;
 
     public constructor(
         private readonly rootNode: ASTNode,
@@ -34,6 +35,9 @@ export class CodeGenerator {
         } else {
             this.code.push(instruction);
         }
+        const counter = this.instructionCounter;
+        this.instructionCounter++
+        return counter;
     }
 
     private resolveDataField() {
@@ -65,7 +69,7 @@ export class CodeGenerator {
     }
 
     private visitExpressionNode(node: ASTExpressionNode, assignSymbol?: SymbolInfo) {
-        const expressionCodeGenerator = new ExpressionCodeGenerator(node, this.addError, this.stackPointer, assignSymbol);
+        const expressionCodeGenerator = new ExpressionCodeGenerator(node, this.addError, this.stackPointer, this.emit, assignSymbol);
         const code = expressionCodeGenerator.generate();
         this.emit(code);
     }

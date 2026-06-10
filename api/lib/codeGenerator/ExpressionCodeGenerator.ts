@@ -7,16 +7,11 @@ export class ExpressionCodeGenerator {
     public constructor(private readonly RootNode: ASTExpressionNode,
         private readonly addError: CodeGeneratorAddErrorType,
         private stackPointer: number,
-        private assignSymbol?: SymbolInfo
+        private emit: CodeGeneratorEmit,
+        private assignSymbol?: SymbolInfo,
     ) { }
 
-    private readonly emit: CodeGeneratorEmit = (instruction) => {
-        if (Array.isArray(instruction)) {
-            this.code.push(...instruction)
-        } else {
-            this.code.push(instruction);
-        }
-    }
+
     public generate() {
         this.visit(this.RootNode);
         return this.code;
@@ -73,25 +68,27 @@ export class ExpressionCodeGenerator {
     }
 
     private visitLogicOperator(node: LogicOperation) {
-        this.handleMathOperation(node.left, "-", node.right, node);
+        const lastLine = this.handleMathOperation(node.left, "-", node.right, node);
+        const trueLine = lastLine + 2;
+        const continueLine = lastLine + 3;
         switch (node.operator) {
             case ">":
-                this.emit(`bgt ${node.label}_true`)
+                this.emit(`bgt ${trueLine}`)
                 break;
             case "<":
-                this.emit(`blt ${node.label}_true`)
+                this.emit(`blt ${trueLine}`)
                 break;
             case "<=":
-                this.emit(`ble ${node.label}_true`)
+                this.emit(`ble ${trueLine}`)
                 break;
             case ">=":
-                this.emit(`bge ${node.label}_true`)
+                this.emit(`bge ${trueLine}`)
                 break;
             case "==":
-                this.emit(`beq ${node.label}_true`)
+                this.emit(`beq ${trueLine}`)
                 break;
             case "!=":
-                this.emit(`bne ${node.label}_true`)
+                this.emit(`bne ${trueLine}`)
                 break;
             case "&&":
                 this.addError("Operação AND não suportada", "Error", node);
@@ -101,17 +98,15 @@ export class ExpressionCodeGenerator {
                 break;
         }
         this.emit("ldi 0");
-        this.emit(`jmp ${node.label}_CONTINUE`)
-        this.emit(`${node.label}_TRUE:`)
-        this.emit("ldi 1")
-        this.emit(`${node.label}_CONTINUE:`)
+        this.emit(`jmp ${continueLine}`)
+        this.emit("ldi 1");
     }
 
     private visitMathOperator(node: MathOperation) {
         this.handleMathOperation(node.left, node.operator, node.right, node);
     }
 
-    private handleMathOperation(left: ASTExpressionNode, operation: mathOperator, right: ASTExpressionNode, node: ASTExpressionNode) {
+    private handleMathOperation(left: ASTExpressionNode, operation: mathOperator, right: ASTExpressionNode, node: ASTExpressionNode): number {
         this.visit(left);
         this.emit(`sto ${this.stackPointer}`);
         this.stackPointer++;
@@ -121,36 +116,30 @@ export class ExpressionCodeGenerator {
         this.emit(`ld ${this.stackPointer}`)
         switch (operation) {
             case "+":
-                this.emit(`add ${this.stackPointer + 1}`)
-                break;
+                return this.emit(`add ${this.stackPointer + 1}`)
             case "-":
-                this.emit(`sub ${this.stackPointer + 1}`)
-                break;
+                return this.emit(`sub ${this.stackPointer + 1}`)
             case "*":
                 this.addError("Operação não suportada - *", "Error", node);
                 break;
             case "/":
                 this.addError("Operação não suportada - /", "Error", node);
-                break;
+                return 0;
             case "%":
                 this.addError("Operação não suportada - %", "Error", node);
-                break;
+                return 0;
             case "<<":
-                this.emit(`sll ${this.stackPointer + 1}`)
-                break;
+                return this.emit(`sll ${this.stackPointer + 1}`)
             case ">>":
-                this.emit(`srl ${this.stackPointer + 1}`)
-                break;
+                return this.emit(`srl ${this.stackPointer + 1}`)
             case "&":
-                this.emit(`and ${this.stackPointer + 1}`)
-                break;
+                return this.emit(`and ${this.stackPointer + 1}`)
             case "|":
-                this.emit(`or ${this.stackPointer + 1}`)
-                break;
+                return this.emit(`or ${this.stackPointer + 1}`)
             case "^":
-                this.emit(`xor ${this.stackPointer + 1}`)
-                break;
+                return this.emit(`xor ${this.stackPointer + 1}`)
         }
+        return 0;
     }
 
     private visitArrayExpression(node: ArrayExpression) {

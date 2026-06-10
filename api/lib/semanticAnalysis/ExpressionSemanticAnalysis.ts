@@ -80,7 +80,7 @@ export class ExpressionTypeVisitor
             return new MathOperation(left, operator, right, ctx);
         }
         if (isLogicExpression(operator)) {
-            return new LogicOperation(left, operator, right, this.scopes.getNextLabel(), ctx);
+            return new LogicOperation(left, operator, right, ctx);
         }
 
         return new UnknownExpressionNode(ctx);
