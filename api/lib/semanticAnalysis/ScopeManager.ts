@@ -67,11 +67,7 @@ export class ScopeManager {
             return undefined;
         }
 
-        let assemblyName = variable;
-
-        while (this.variablesList.some(item => item.assemblyName == assemblyName)) {
-            assemblyName = assemblyName + "_1";
-        };
+        const assemblyName = this.getAssemblyNameForVariable(variable);
 
         const symbolInfo: SymbolInfo = {
             name: variable,
@@ -123,5 +119,27 @@ export class ScopeManager {
 
         this.addError(ctx, "Simbolo não declarado - " + name, "Warning")
         return undefined;
+    }
+
+    private getAssemblyNameForVariable(originalName: string): string {
+
+        while (this.assemblyNameDeclared(originalName)) {
+            const match = originalName.match(/^(.*)_(\d+)$/);
+
+            if (match) {
+                const [, base, number] = match;
+                originalName = `${base}_${Number(number) + 1}`;
+            } else {
+                originalName = `${originalName}_1`;
+            }
+        };
+
+        return originalName;
+    }
+
+    private assemblyNameDeclared(assemblyName: string): boolean {
+        return this.scopes.some(scope => {
+            return [...scope.values()].some(variable => variable.assemblyName == assemblyName);
+        })
     }
 }

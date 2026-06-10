@@ -17,12 +17,19 @@ export class InvalidNode extends ASTNode {
 
 }
 
-
-export class ProgramNode extends ASTNode {
+export class CodeScopeNode extends ASTNode {
     constructor(public instructions: Array<{ node: ASTNode, originalLine: string }>, ctx: ParserRuleContext) {
         super(ctx)
     }
 }
+
+export class ProgramNode extends CodeScopeNode {
+    constructor(instructions: Array<{ node: ASTNode, originalLine: string }>, ctx: ParserRuleContext) {
+        super(instructions, ctx)
+    }
+}
+
+
 
 export class AssignmentNode extends ASTNode {
     constructor(public variable: SymbolInfo,
@@ -32,7 +39,7 @@ export class AssignmentNode extends ASTNode {
 }
 
 export class ArrayReassignNode extends AssignmentNode {
-    constructor(variable : SymbolInfo, expression: ASTExpressionNode, public indexExpression: ASTExpressionNode, ctx: ParserRuleContext){
+    constructor(variable: SymbolInfo, expression: ASTExpressionNode, public indexExpression: ASTExpressionNode, ctx: ParserRuleContext) {
         super(variable, expression, ctx);
     }
 }

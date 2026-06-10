@@ -5,7 +5,7 @@ import type { CompileError, ErrorSeverity } from "../../../shared/types";
 import type { Comando_atribuicao_arrayContext, Comando_atribuicaoContext, Comando_declaracaoContext, Escopo_codigoContext, ExpressaoContext, For_loopContext, Function_declContext, ProgramContext, Return_stmtContext } from "../../generated/fsCompiler/FileScriptParser";
 import type { FileScriptParserVisitor } from "../../generated/fsCompiler/FileScriptParserVisitor";
 import { ASTExpressionNode, UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
-import { ArrayReassignNode, AssignmentNode, InvalidNode, ProgramNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
+import { ArrayReassignNode, AssignmentNode, CodeScopeNode, InvalidNode, ProgramNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
 import { ExpressionTypeVisitor } from "./ExpressionSemanticAnalysis";
 import { ScopeManager, type SymbolInfo } from "./ScopeManager";
 export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implements FileScriptParserVisitor<ASTNode> {
@@ -119,7 +119,7 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
         const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager, this.addError);
         const expression = expressionVisitor.visit(ctx.expressao());
         const expressionIndex = expressionVisitor.visit(ctx.array_access().expressao());
-        
+
         return new ArrayReassignNode(symbol, expression, expressionIndex, ctx);
     };
 
@@ -130,11 +130,22 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
 
         this.scopeManager.beginScope();
 
-        this.visitChildren(ctx)
+        const nodes = ctx.lista_comandos()?.comando()?.map(ctx => {
+            const start = ctx.start.startIndex;
+            const stop = ctx!.stop!.stopIndex;
+            const originalText = ctx.start.inputStream!.getText(new Interval(start, stop));
+            const node = this.visitChildren(ctx);
+            return {
+                node,
+                originalLine: originalText
+            }
+        });
 
+        const codeScopeNode = new CodeScopeNode(nodes ?? [], ctx);
         this.scopeManager.endScope(ctx);
 
-        return new InvalidNode(ctx);
+        return codeScopeNode;
+
     };
 
     //#region loops

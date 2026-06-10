@@ -1,6 +1,6 @@
 import type { CompileError, ErrorSeverity } from "../../../shared/types";
 import { ASTExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
-import { ArrayReassignNode, AssignmentNode, ASTNode, ProgramNode } from "../abstractSyntaxTree/AstNode";
+import { ArrayReassignNode, AssignmentNode, ASTNode, CodeScopeNode, ProgramNode } from "../abstractSyntaxTree/AstNode";
 import type { SymbolInfo } from "../SemanticAnalysis/ScopeManager";
 import { ExpressionCodeGenerator } from "./ExpressionCodeGenerator";
 
@@ -65,6 +65,8 @@ export class CodeGenerator {
             this.visitAssignmentNode(node);
         } else if (node instanceof ASTExpressionNode) {
             this.visitExpressionNode(node);
+        } else if (node instanceof CodeScopeNode) {
+            this.visitCodeScopeNode(node);
         }
     }
 
@@ -75,10 +77,27 @@ export class CodeGenerator {
     }
 
     private visitProgramNode(node: ProgramNode) {
+        this.codeScopeHandler(node);
+    }
+
+    private visitCodeScopeNode(node: CodeScopeNode) {
+        this.codeScopeHandler(node);
+    }
+
+    private codeScopeHandler(node: CodeScopeNode) {
         node.instructions.forEach(instruction => {
-            this.emit(`#${instruction.originalLine}`)
+            if (!(instruction.node instanceof CodeScopeNode)) {
+                this.emit(`#${instruction.originalLine}`)
+            } else {
+                this.emit("#{")
+            }
             this.visit(instruction.node);
-            this.emit("")
+            if (!(instruction.node instanceof CodeScopeNode)) {
+                this.emit("")
+            } else {
+                this.emit("#}")
+                this.emit("")
+            }
         })
     }
 
