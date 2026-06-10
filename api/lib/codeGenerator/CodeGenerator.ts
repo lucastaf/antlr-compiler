@@ -1,10 +1,10 @@
 import type { CompileError, ErrorSeverity } from "../../../shared/types";
 import { ASTExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
-import { ArrayReassignNode, AssignmentNode, ASTNode, CodeScopeNode, ProgramNode } from "../abstractSyntaxTree/AstNode";
+import { ArrayReassignNode, AssignmentNode, ASTNode, CodeScopeNode, IfStmtNode, ProgramNode } from "../abstractSyntaxTree/AstNode";
 import type { SymbolInfo } from "../SemanticAnalysis/ScopeManager";
 import { ExpressionCodeGenerator } from "./ExpressionCodeGenerator";
 
-export type CodeGeneratorEmit = (instruction: string | string[]) => number;
+export type CodeGeneratorEmit = (instruction: string) => number;
 export type CodeGeneratorAddErrorType = (message: string, severity: ErrorSeverity, ctx: ASTNode) => void;
 export class CodeGenerator {
     private code: string[] = [];
@@ -29,23 +29,27 @@ export class CodeGenerator {
     }
 
 
-    private emit: CodeGeneratorEmit = (instruction: string | string[]) => {
-        if (Array.isArray(instruction)) {
-            this.code.push(...instruction)
-        } else {
-            this.code.push(instruction);
-        }
+    private emitCode: CodeGeneratorEmit = (instruction: string) => {
+        this.code.push(instruction);
+
         const counter = this.instructionCounter;
+
         this.instructionCounter++
+
         return counter;
     }
 
+    private emitComment: CodeGeneratorEmit = (instruction: string) => {
+        const parts = instruction.split("\n");
+        this.code.push(parts[0]);
+        return this.instructionCounter;
+    }
     private resolveDataField() {
         if (this.variablesList.length) {
-            this.emit(".data")
+            this.emitComment(".data")
         }
         this.variablesList.forEach(variable => {
-            this.emit(`${variable.assemblyName} : ${new Array(variable.size).fill("0").join(",")}`)
+            this.emitComment(`${variable.assemblyName} : ${new Array(variable.size).fill("0").join(",")}`)
             this.stackPointer += variable.size;
         })
     }
@@ -53,7 +57,8 @@ export class CodeGenerator {
     public generate(): string {
         this.code = [];
         this.resolveDataField();
-        this.emit(["", ".text"])
+        this.emitComment("")
+        this.emitComment(".text")
         this.visit(this.rootNode);
         return this.code.join("\n");
     }
@@ -67,17 +72,42 @@ export class CodeGenerator {
             this.visitExpressionNode(node);
         } else if (node instanceof CodeScopeNode) {
             this.visitCodeScopeNode(node);
+        } else if (node instanceof IfStmtNode) {
+            this.visitIfStmt(node);
         }
     }
 
     private visitExpressionNode(node: ASTExpressionNode, assignSymbol?: SymbolInfo) {
-        const expressionCodeGenerator = new ExpressionCodeGenerator(node, this.addError, this.stackPointer, this.emit, assignSymbol);
-        const code = expressionCodeGenerator.generate();
-        this.emit(code);
+        const expressionCodeGenerator = new ExpressionCodeGenerator(node, this.addError, this.stackPointer, this.emitCode, this.emitComment, assignSymbol);
+        expressionCodeGenerator.generate();
     }
 
+
+
+    private visitAssignmentNode(node: AssignmentNode) {
+        this.visitExpressionNode(node.expression, node.variable);
+        if (node instanceof ArrayReassignNode) {
+            return this.visitArrayReassignNode(node);
+        } else if (node.variable.type != "array") {
+            this.emitCode(`sto ${node.variable.assemblyName}`);
+        }
+
+    }
+
+    private visitArrayReassignNode(node: ArrayReassignNode) {
+        this.emitCode(`sto ${this.stackPointer}`);
+        this.stackPointer++;
+        this.visitExpressionNode(node.indexExpression);
+        this.emitCode(`sto $indr`);
+        this.stackPointer--;
+        this.emitCode(`ld ${this.stackPointer}`)
+        this.emitCode(`stov ${node.variable.assemblyName}`);
+    }
+
+    //#region codeScopes
     private visitProgramNode(node: ProgramNode) {
         this.codeScopeHandler(node);
+        this.emitCode("hlt")
     }
 
     private visitCodeScopeNode(node: CodeScopeNode) {
@@ -87,37 +117,37 @@ export class CodeGenerator {
     private codeScopeHandler(node: CodeScopeNode) {
         node.instructions.forEach(instruction => {
             if (!(instruction.node instanceof CodeScopeNode)) {
-                this.emit(`#${instruction.originalLine}`)
+                this.emitComment(`#${instruction.originalLine}`)
             } else {
-                this.emit("#{")
+                this.emitComment("#{")
             }
             this.visit(instruction.node);
             if (!(instruction.node instanceof CodeScopeNode)) {
-                this.emit("")
+                this.emitComment("")
             } else {
-                this.emit("#}")
-                this.emit("")
+                this.emitComment("#}")
+                this.emitComment("")
             }
         })
     }
 
-    private visitAssignmentNode(node: AssignmentNode) {
-        this.visitExpressionNode(node.expression, node.variable);
-        if (node instanceof ArrayReassignNode) {
-            return this.visitArrayReassignNode(node);
-        } else if (node.variable.type != "array") {
-            this.emit(`sto ${node.variable.assemblyName}`);
+    //#endregion
+
+    //#region branches
+    private visitIfStmt(node: IfStmtNode) {
+        this.visit(node.expression);
+        this.emitCode("ori 0")
+        this.emitCode(`beq ${node.label}_false`)
+        this.visit(node.codeScope);
+        this.emitCode(`jmp ${node.label}_continue`)
+        this.emitComment(`${node.label}_false:`)
+        if (node.elseScope) {
+            this.visit(node.elseScope);
         }
+        this.emitComment(`${node.label}_continue:`)
 
     }
 
-    private visitArrayReassignNode(node: ArrayReassignNode) {
-        this.emit(`sto ${this.stackPointer}`);
-        this.stackPointer++;
-        this.visitExpressionNode(node.indexExpression);
-        this.emit(`sto $indr`);
-        this.stackPointer--;
-        this.emit(`ld ${this.stackPointer}`)
-        this.emit(`stov ${node.variable.assemblyName}`);
-    }
+    //#endregion
+
 }

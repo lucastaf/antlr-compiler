@@ -43,3 +43,15 @@ export class ArrayReassignNode extends AssignmentNode {
         super(variable, expression, ctx);
     }
 }
+
+//#region 
+export class IfStmtNode extends ASTNode {
+    constructor(public expression: ASTExpressionNode,
+        public codeScope: CodeScopeNode,
+        public elseScope: CodeScopeNode | undefined,
+        public label: string, ctx: ParserRuleContext) {
+        super(ctx);
+    }
+}
+
+//#endregion

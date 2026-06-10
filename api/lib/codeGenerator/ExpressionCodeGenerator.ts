@@ -7,7 +7,8 @@ export class ExpressionCodeGenerator {
     public constructor(private readonly RootNode: ASTExpressionNode,
         private readonly addError: CodeGeneratorAddErrorType,
         private stackPointer: number,
-        private emit: CodeGeneratorEmit,
+        private emitCode: CodeGeneratorEmit,
+        private emitComment: CodeGeneratorEmit,
         private assignSymbol?: SymbolInfo,
     ) { }
 
@@ -46,49 +47,48 @@ export class ExpressionCodeGenerator {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private visitReadNode(_node: ReadNode) {
-        this.emit("ld $in_port")
+        this.emitCode("ld $in_port")
     }
 
     private visitUnaryOperator(node: UnaryOperator) {
         this.visit(node.operand);
-        this.emit(`not`);
+        this.emitCode(`not`);
     }
 
     private visitPrintNode(node: PrintNode) {
         this.visit(node.parameter);
-        this.emit(`sto $out_port`)
+        this.emitCode(`sto $out_port`)
     }
 
     private visitSymbolNode(node: SymbolNode) {
-        this.emit(`ld ${node.symbol.assemblyName}`);
+        this.emitCode(`ld ${node.symbol.assemblyName}`);
     }
 
     private visitNumberLiteral(node: NumberLiteral) {
-        this.emit(`ldi ${node.value}`);
+        this.emitCode(`ldi ${node.value}`);
     }
 
     private visitLogicOperator(node: LogicOperation) {
-        const lastLine = this.handleMathOperation(node.left, "-", node.right, node);
-        const trueLine = lastLine + 2;
-        const continueLine = lastLine + 3;
+        const lastLine = this.handleMathOperation(node.left, "-", node.right, node); //0
+        const trueLine = lastLine + 4;
         switch (node.operator) {
             case ">":
-                this.emit(`bgt ${trueLine}`)
+                this.emitCode(`bgt ${trueLine}`) //1
                 break;
             case "<":
-                this.emit(`blt ${trueLine}`)
+                this.emitCode(`blt ${trueLine}`)
                 break;
             case "<=":
-                this.emit(`ble ${trueLine}`)
+                this.emitCode(`ble ${trueLine}`)
                 break;
             case ">=":
-                this.emit(`bge ${trueLine}`)
+                this.emitCode(`bge ${trueLine}`)
                 break;
             case "==":
-                this.emit(`beq ${trueLine}`)
+                this.emitCode(`beq ${trueLine}`)
                 break;
             case "!=":
-                this.emit(`bne ${trueLine}`)
+                this.emitCode(`bne ${trueLine}`)
                 break;
             case "&&":
                 this.addError("Operação AND não suportada", "Error", node);
@@ -97,9 +97,10 @@ export class ExpressionCodeGenerator {
                 this.addError("Operação OR não suportada", "Error", node);
                 break;
         }
-        this.emit("ldi 0");
-        this.emit(`jmp ${continueLine}`)
-        this.emit("ldi 1");
+        const continueLine = lastLine + 5;
+        this.emitCode("ldi 0"); //2
+        this.emitCode(`jmp ${continueLine}`) //3
+        this.emitCode("ldi 1");  //4
     }
 
     private visitMathOperator(node: MathOperation) {
@@ -108,17 +109,17 @@ export class ExpressionCodeGenerator {
 
     private handleMathOperation(left: ASTExpressionNode, operation: mathOperator, right: ASTExpressionNode, node: ASTExpressionNode): number {
         this.visit(left);
-        this.emit(`sto ${this.stackPointer}`);
+        this.emitCode(`sto ${this.stackPointer}`);
         this.stackPointer++;
         this.visit(right);
-        this.emit(`sto ${this.stackPointer}`);
+        this.emitCode(`sto ${this.stackPointer}`);
         this.stackPointer--;
-        this.emit(`ld ${this.stackPointer}`)
+        this.emitCode(`ld ${this.stackPointer}`)
         switch (operation) {
             case "+":
-                return this.emit(`add ${this.stackPointer + 1}`)
+                return this.emitCode(`add ${this.stackPointer + 1}`)
             case "-":
-                return this.emit(`sub ${this.stackPointer + 1}`)
+                return this.emitCode(`sub ${this.stackPointer + 1}`)
             case "*":
                 this.addError("Operação não suportada - *", "Error", node);
                 break;
@@ -129,15 +130,15 @@ export class ExpressionCodeGenerator {
                 this.addError("Operação não suportada - %", "Error", node);
                 return 0;
             case "<<":
-                return this.emit(`sll ${this.stackPointer + 1}`)
+                return this.emitCode(`sll ${this.stackPointer + 1}`)
             case ">>":
-                return this.emit(`srl ${this.stackPointer + 1}`)
+                return this.emitCode(`srl ${this.stackPointer + 1}`)
             case "&":
-                return this.emit(`and ${this.stackPointer + 1}`)
+                return this.emitCode(`and ${this.stackPointer + 1}`)
             case "|":
-                return this.emit(`or ${this.stackPointer + 1}`)
+                return this.emitCode(`or ${this.stackPointer + 1}`)
             case "^":
-                return this.emit(`xor ${this.stackPointer + 1}`)
+                return this.emitCode(`xor ${this.stackPointer + 1}`)
         }
         return 0;
     }
@@ -149,16 +150,16 @@ export class ExpressionCodeGenerator {
                 return;
 
             }
-            this.emit(`ldi ${index}`)
-            this.emit(`sto $indr`)
+            this.emitCode(`ldi ${index}`)
+            this.emitCode(`sto $indr`)
             this.visit(expression);
-            this.emit(`stov ${this.assignSymbol.assemblyName}`)
+            this.emitCode(`stov ${this.assignSymbol.assemblyName}`)
         })
     }
 
     private visitArrayAccessExpression(node: ArrayAccessExpression) {
         this.visit(node.indexExpression);
-        this.emit(`sto $indr`)
-        this.emit(`ldv ${node.symbol.assemblyName}`);
+        this.emitCode(`sto $indr`)
+        this.emitCode(`ldv ${node.symbol.assemblyName}`);
     }
 }
