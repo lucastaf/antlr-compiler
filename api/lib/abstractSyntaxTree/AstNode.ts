@@ -44,12 +44,30 @@ export class ArrayReassignNode extends AssignmentNode {
     }
 }
 
-//#region 
+//#region branches
 export class IfStmtNode extends ASTNode {
     constructor(public expression: ASTExpressionNode,
         public codeScope: CodeScopeNode,
         public elseScope: ASTNode | undefined,
         public label: string, ctx: ParserRuleContext) {
+        super(ctx);
+    }
+}
+
+export class WhileLoopNode extends ASTNode {
+    constructor(public expression: ASTExpressionNode,
+        public codeScope: CodeScopeNode,
+        public label: string,
+        ctx: ParserRuleContext) {
+        super(ctx);
+    }
+}
+
+export class DoWhileLoopNode extends ASTNode {
+    constructor(public expression: ASTExpressionNode,
+        public codeScope: CodeScopeNode,
+        public label: string,
+        ctx: ParserRuleContext) {
         super(ctx);
     }
 }

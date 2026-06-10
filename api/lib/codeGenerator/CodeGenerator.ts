@@ -1,6 +1,6 @@
 import type { CompileError, ErrorSeverity } from "../../../shared/types";
 import { ASTExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
-import { ArrayReassignNode, AssignmentNode, ASTNode, CodeScopeNode, IfStmtNode, ProgramNode } from "../abstractSyntaxTree/AstNode";
+import { ArrayReassignNode, AssignmentNode, ASTNode, CodeScopeNode, DoWhileLoopNode, IfStmtNode, ProgramNode, WhileLoopNode } from "../abstractSyntaxTree/AstNode";
 import type { SymbolInfo } from "../semanticAnalysis/ScopeManager";
 import { ExpressionCodeGenerator } from "./ExpressionCodeGenerator";
 
@@ -74,6 +74,10 @@ export class CodeGenerator {
             this.visitCodeScopeNode(node);
         } else if (node instanceof IfStmtNode) {
             this.visitIfStmt(node);
+        } else if (node instanceof WhileLoopNode) {
+            this.visitWhileLoop(node);
+        } else if (node instanceof DoWhileLoopNode) {
+            this.visitDoWhileLoop(node);
         }
     }
 
@@ -136,7 +140,7 @@ export class CodeGenerator {
     //#region branches
     private visitIfStmt(node: IfStmtNode) {
         this.visit(node.expression);
-        this.emitCode("ori 0")
+        this.emitCode("ori  0")
         this.emitCode(`beq ${node.label}_false`)
         this.visit(node.codeScope);
         this.emitCode(`jmp ${node.label}_continue`)
@@ -146,6 +150,25 @@ export class CodeGenerator {
         }
         this.emitComment(`${node.label}_continue:`)
 
+    }
+
+    private visitWhileLoop(node: WhileLoopNode) {
+        this.emitComment(`${node.label}_START:`)
+        this.visit(node.expression);
+        this.emitCode("ori  0")
+        this.emitCode(`beq ${node.label}_CONTINUE`)
+        this.visit(node.codeScope);
+        this.emitCode(`jmp ${node.label}_START`)
+        this.emitComment(`${node.label}_CONTINUE:`)
+
+    }
+
+    private visitDoWhileLoop(node: DoWhileLoopNode) {
+        this.emitComment(`${node.label}_START:`)
+        this.visit(node.codeScope);
+        this.visit(node.expression);
+        this.emitCode("ori  0")
+        this.emitCode(`bne ${node.label}_START`)
     }
 
     //#endregion

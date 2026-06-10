@@ -5,7 +5,7 @@ import {
     Recognizer,
 } from "antlr4ts";
 import type { CompileError, CompileResult, TokenInfo } from "../shared/types"
-import { SemanticAnalyser } from "./lib/SemanticAnalysis/SemanticAnalysis"
+import { SemanticAnalyser } from "./lib/semanticAnalysis/SemanticAnalysis"
 import { CodeGenerator } from "./lib/codeGenerator/CodeGenerator";
 
 

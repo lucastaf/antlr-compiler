@@ -24,7 +24,7 @@ import {
     Valor_calculoContext
 } from "../../generated/fsCompiler/expressao";
 import { ArrayAccessExpression, ArrayExpression, ASTExpressionNode, CharLiteral, isLogicExpression, isMathOperator, LogicOperation, MathOperation, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, type VarType } from "../abstractSyntaxTree/AstExpressionNode";
-import { ScopeManager } from "./ScopeManager";
+import { ScopeManager } from "../semanticAnalysis/ScopeManager";
 
 // ===================== VISITOR =====================
 
