@@ -5,7 +5,7 @@ import type { CompileError, ErrorSeverity } from "../../../shared/types";
 import { Do_while_loopContext, ElseifContext, If_stmtContext, While_loopContext, type Comando_atribuicao_arrayContext, type Comando_atribuicaoContext, type Comando_declaracaoContext, type Escopo_codigoContext, type ExpressaoContext, type For_loopContext, type Function_declContext, type ProgramContext, type Return_stmtContext } from "../../generated/fsCompiler/FileScriptParser";
 import type { FileScriptParserVisitor } from "../../generated/fsCompiler/FileScriptParserVisitor";
 import { ASTExpressionNode, NumberLiteral, UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
-import { ArrayReassignNode, AssignmentNode, CodeScopeNode, DoWhileLoopNode, ForLoopNode, IfStmtNode, InvalidNode, ProgramNode, WhileLoopNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
+import { ArrayReassignNode, AssignmentNode, CodeScopeNode, DoWhileLoopNode, ForLoopNode, FunctionNode, IfStmtNode, InvalidNode, ProgramNode, WhileLoopNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
 import { ExpressionTypeVisitor } from "./ExpressionSemanticAnalysis";
 import { ScopeManager, type SymbolInfo } from "./ScopeManager";
 export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implements FileScriptParserVisitor<ASTNode> {
@@ -41,8 +41,8 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
                 originalLine: originalText
             }
         });
-        this.scopeManager.endScope(ctx);
-        return new ProgramNode(nodes, ctx);
+        const symbols = this.scopeManager.endScope(ctx);
+        return new ProgramNode(nodes, symbols ?? [], ctx);
     };
 
     private addError = (ctx: ParserRuleContext, message: string, severity: ErrorSeverity) => {
@@ -86,7 +86,7 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
         const isConst = ctx.VARIABLE_DECLARE().text == "const";
 
         const { expressionNode, varName } = this.parseVariableAttr(ctx.comando_atribuicao(), true);
-        const varSymbol = this.scopeManager.define(varName, expressionNode.type, isConst, ctx, expressionNode.size ?? 1);
+        const varSymbol = this.scopeManager.define(varName, expressionNode.type, isConst, ctx, { size: expressionNode.size ?? 1 });
 
 
         if (!varSymbol) {
@@ -126,9 +126,10 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
 
     //#endregion
 
-    visitEscopo_codigo(ctx: Escopo_codigoContext) {
+    visitEscopo_codigo(ctx: Escopo_codigoContext, initEscopo: boolean = true) {
 
-        this.scopeManager.beginScope();
+        if (initEscopo)
+            this.scopeManager.beginScope();
 
         const nodes = ctx.lista_comandos()?.comando()?.map(ctx => {
             const start = ctx.start.startIndex;
@@ -141,8 +142,8 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
             }
         });
 
-        const codeScopeNode = new CodeScopeNode(nodes ?? [], ctx);
-        this.scopeManager.endScope(ctx);
+        const symbols = this.scopeManager.endScope(ctx);
+        const codeScopeNode = new CodeScopeNode(nodes ?? [], symbols ?? [], ctx);
 
         return codeScopeNode;
 
@@ -201,19 +202,24 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
 
     //#region Funções
     visitFunction_decl(ctx: Function_declContext) {
-        const funcName = ctx.VARIABLE().text;
-        this.scopeManager.define(funcName, "function", true, ctx);
-        this.scopeManager.resolve(funcName, ctx);
+        //Get dos parametros
         this.scopeManager.beginScope();
-        ctx.lista_parametros()?.VARIABLE()?.map(exp => {
-            this.scopeManager.define(exp.text, "any", false, ctx);
+        const parameters = ctx.lista_parametros()?.VARIABLE()?.map(exp => {
+            return this.scopeManager.define(exp.text, "any", false, ctx);
         })
+        //Get do escopo
+        const escopo = this.visitEscopo_codigo(ctx.escopo_codigo(), false);
 
-        this.visitChildren(ctx);
+        
+        //Declaração do simbolo
+        const funcName = ctx.VARIABLE().text;
+        const funcSymbol = this.scopeManager.define(funcName, "function", true, ctx, { size: 0, parametersCount: parameters?.length });
+        this.scopeManager.resolve(funcName, ctx);
 
-        this.scopeManager.endScope(ctx);
-
-        return new InvalidNode(ctx);
+        if (!funcSymbol || parameters?.some(parameters => parameters === undefined)) {
+            return new InvalidNode(ctx);
+        }
+        return new FunctionNode(funcSymbol, escopo, parameters as SymbolInfo[], escopo.variablesInScope, ctx);
     };
 
     visitReturn_stmt(ctx: Return_stmtContext) {

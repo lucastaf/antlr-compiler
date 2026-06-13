@@ -34,6 +34,13 @@ export class SymbolNode extends ASTExpressionNode {
     }
 }
 
+export class FunctionCallNode extends ASTExpressionNode {
+    constructor(public functionInfo: SymbolInfo, public parameters: ASTExpressionNode[], ctx: ParserRuleContext) {
+        super(ctx);
+        this.type = "number";
+    }
+}
+
 //#region Literals
 export class NumberLiteral extends ASTExpressionNode {
     constructor(public value: number, ctx: ParserRuleContext) {

@@ -11,6 +11,7 @@ export type SymbolInfo = {
     declareCtx: ParserRuleContext;
     assemblyName: string;
     size: number;
+    parametersCount: number
 }
 export class ScopeManager {
     private scopes: Map<string, SymbolInfo>[] = [];
@@ -54,10 +55,13 @@ export class ScopeManager {
                 })
             });
         }
-        this.scopes.pop();
+        const poppedScope = this.scopes.pop();
+        if (!poppedScope) return undefined;
+        return Array.from(poppedScope.values());
     }
 
-    define(variable: string, type: VarType, isConst: boolean, ctx: ParserRuleContext, size: number = 1): SymbolInfo | undefined {
+    define(variable: string, type: VarType, isConst: boolean, ctx: ParserRuleContext, options: { size?: number, parametersCount?: number } = {}): SymbolInfo | undefined {
+        const { parametersCount = 0, size = 1} = options;
         console.log("Declarando", variable, type);
         const currentScope = this.scopes[this.scopes.length - 1];
 
@@ -77,6 +81,7 @@ export class ScopeManager {
             assignCount: 0,
             declareCtx: ctx,
             assemblyName,
+            parametersCount,
             size
         }
 

@@ -18,14 +18,14 @@ export class InvalidNode extends ASTNode {
 }
 
 export class CodeScopeNode extends ASTNode {
-    constructor(public instructions: Array<{ node: ASTNode, originalLine: string }>, ctx: ParserRuleContext) {
+    constructor(public instructions: Array<{ node: ASTNode, originalLine: string }>, public variablesInScope: SymbolInfo[], ctx: ParserRuleContext) {
         super(ctx)
     }
 }
 
 export class ProgramNode extends CodeScopeNode {
-    constructor(instructions: Array<{ node: ASTNode, originalLine: string }>, ctx: ParserRuleContext) {
-        super(instructions, ctx)
+    constructor(instructions: Array<{ node: ASTNode, originalLine: string }>, public variablesInScope: SymbolInfo[], ctx: ParserRuleContext) {
+        super(instructions, variablesInScope, ctx)
     }
 }
 
@@ -74,13 +74,33 @@ export class DoWhileLoopNode extends ASTNode {
 
 export class ForLoopNode extends ASTNode {
     constructor(
-        public firstExecutionNode : ASTNode,
+        public firstExecutionNode: ASTNode,
         public expression: ASTExpressionNode,
-        public perIterationNode : ASTNode,
+        public perIterationNode: ASTNode,
         public codeScope: CodeScopeNode,
         public label: string,
         ctx: ParserRuleContext
-    ){
+    ) {
+        super(ctx);
+    }
+}
+
+//#endregion
+
+//#region functions
+
+export class FunctionNode extends ASTNode {
+    constructor(public symbol: SymbolInfo,
+        public codeScope: CodeScopeNode,
+        public parameters: SymbolInfo[] | undefined,
+        public variablesInScope: SymbolInfo[] | undefined, ctx: ParserRuleContext) {
+        symbol.type = "function";
+        super(ctx);
+    }
+}
+
+export class ReturnNode extends ASTNode {
+    constructor(public returnValue: ASTExpressionNode, ctx: ParserRuleContext) {
         super(ctx);
     }
 }

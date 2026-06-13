@@ -23,7 +23,7 @@ import {
     Lista_expressoesContext,
     Valor_calculoContext
 } from "../../generated/fsCompiler/expressao";
-import { ArrayAccessExpression, ArrayExpression, ASTExpressionNode, CharLiteral, isLogicExpression, isMathOperator, LogicOperation, MathOperation, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, type VarType } from "../abstractSyntaxTree/AstExpressionNode";
+import { ArrayAccessExpression, ArrayExpression, ASTExpressionNode, CharLiteral, FunctionCallNode, isLogicExpression, isMathOperator, LogicOperation, MathOperation, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator, UnknownExpressionNode, type VarType } from "../abstractSyntaxTree/AstExpressionNode";
 import { ScopeManager } from "../semanticAnalysis/ScopeManager";
 
 // ===================== VISITOR =====================
@@ -73,6 +73,13 @@ export class ExpressionTypeVisitor
     private isUnknown(type?: VarType) {
 
         return type === undefined || type === "unknown";
+    }
+
+    private resizeArray<T>(array: Array<T>, expectedSize: number, defaultValue: T): Array<T> {
+        return Array.from(
+            { length: expectedSize },
+            (_, i) => i < array.length ? array[i] : defaultValue
+        );
     }
 
     private getMathOperation(left: ASTExpressionNode, operator: string, right: ASTExpressionNode, ctx: ParserRuleContext): ASTExpressionNode {
@@ -198,21 +205,39 @@ export class ExpressionTypeVisitor
 
     visitFunction_call(ctx: Function_callContext) {
         const functionName = ctx.VARIABLE().text;
+        const parametersRaw = ctx.lista_expressoes()?.expressao();
+        const parameters = parametersRaw?.map(parameter => this.visit(parameter));
+
         if (functionName == "read") {
             return new ReadNode(ctx);
-        } else if (functionName == "print") {
-            const firstParameter = ctx.lista_expressoes?.()?.expressao()?.at(0);
-            if (!firstParameter) {
-                return new UnknownExpressionNode(ctx);
+        }
+        if (functionName == "print") {
+            const firstParameter = parameters?.at(0);
+            if (firstParameter) {
+                return new PrintNode(firstParameter, ctx);
             } else {
-                return new PrintNode(this.visit(firstParameter), ctx);
+                return new UnknownExpressionNode(ctx);
             }
-        } else {
-            const symbol = this.scopes.resolve(functionName, ctx);
-            if (symbol && symbol?.type != "function") this.addError(ctx, `${functionName} não é uma função`, "Warning")
+        }
+
+        const symbol = this.scopes.resolve(functionName, ctx);
+        if(!symbol){
             return new UnknownExpressionNode(ctx);
         }
-    };
+
+        if (symbol?.type != "function") {
+            this.addError(ctx, `${functionName} não é uma função`, "Warning")
+            return new UnknownExpressionNode(ctx);
+        }
+
+        if (symbol?.parametersCount != parameters?.length) {
+            this.addError(ctx, `Número de parametros inválidos para ${functionName}, eram esperado ${symbol?.parametersCount} mas enviados ${parameters?.length ?? 0}`, "Warning")
+        }
+
+        const parametersResized = this.resizeArray<ASTExpressionNode>(parameters ?? [], parameters?.length ?? 0, new NumberLiteral(0, ctx));
+        return new FunctionCallNode(symbol, parametersResized, ctx);
+    }
+
 
     // =====================
     // PARENTHESES
