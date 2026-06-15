@@ -11,16 +11,23 @@ export type SymbolInfo = {
     declareCtx: ParserRuleContext;
     assemblyName: string;
     size: number;
+    scopeName: string;
     parametersCount: number
 }
 export class ScopeManager {
-    private scopes: Map<string, SymbolInfo>[] = [];
+    private scopes: { name: string, scope: Map<string, SymbolInfo> }[] = [];
     private addError: (ctx: ParserRuleContext, message: string, severity: ErrorSeverity) => void;
     private variablesList: Array<SymbolInfo & { start: number, end: number }> = [];
     private labelCounter: number = 0;
+    private scopeCount : number = 0;
 
     constructor(addError: (ctx: ParserRuleContext, message: string, severity: ErrorSeverity) => void) {
         this.addError = addError;
+    }
+
+    private getNextScopeName(){
+        this.scopeCount ++;
+        return `ESCOPO_${this.scopeCount}`
     }
 
     public GetVariablesList() {
@@ -35,14 +42,14 @@ export class ScopeManager {
 
     beginScope() {
         console.log("Iniciando escopo de código")
-        this.scopes.push(new Map());
+        this.scopes.push({ scope: new Map(), name: this.getNextScopeName() });
     }
 
     endScope(ctx: ParserRuleContext) {
         console.log("Encerrando escopo de código")
         const lastScope = this.scopes.at(-1);
         if (lastScope) {
-            const variables = Array.from(lastScope.values());
+            const variables = Array.from(lastScope.scope.values());
             variables.forEach(variable => {
                 if (variable.useCount == 1) {
                     this.addError(variable.declareCtx, "Variavel declarada, mas nunca usada - " + variable.name, "Warning")
@@ -57,15 +64,15 @@ export class ScopeManager {
         }
         const poppedScope = this.scopes.pop();
         if (!poppedScope) return undefined;
-        return Array.from(poppedScope.values());
+        return Array.from(poppedScope.scope.values());
     }
 
     define(variable: string, type: VarType, isConst: boolean, ctx: ParserRuleContext, options: { size?: number, parametersCount?: number } = {}): SymbolInfo | undefined {
-        const { parametersCount = 0, size = 1} = options;
+        const { parametersCount = 0, size = 1 } = options;
         console.log("Declarando", variable, type);
         const currentScope = this.scopes[this.scopes.length - 1];
 
-        if (currentScope?.has(variable)) {
+        if (currentScope?.scope.has(variable)) {
             this.addError(ctx, "Variavel já declarada - " + variable, "Error")
             console.log("VARIAVEL JA DECLARADA - ", variable)
             return undefined;
@@ -82,10 +89,11 @@ export class ScopeManager {
             declareCtx: ctx,
             assemblyName,
             parametersCount,
+            scopeName: currentScope.name,
             size
         }
 
-        currentScope?.set(variable, symbolInfo);
+        currentScope?.scope.set(variable, symbolInfo);
 
         return symbolInfo;
     }
@@ -112,7 +120,7 @@ export class ScopeManager {
         for (let i = this.scopes.length - 1; i >= 0; i--) {
 
             const scope = this.scopes[i];
-            const symbol = scope.get(name);
+            const symbol = scope.scope.get(name);
 
             if (symbol) {
                 if (sumUseCount) {
@@ -144,7 +152,7 @@ export class ScopeManager {
 
     private assemblyNameDeclared(assemblyName: string): boolean {
         return this.scopes.some(scope => {
-            return [...scope.values()].some(variable => variable.assemblyName == assemblyName);
+            return [...scope.scope.values()].some(variable => variable.assemblyName == assemblyName);
         })
     }
 }

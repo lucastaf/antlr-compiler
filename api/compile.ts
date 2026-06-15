@@ -97,7 +97,8 @@ export function compile(code: string): CompileResult {
             isConst: item.isConst,
             name: item.name,
             start: item.start,
-            type: item.type
+            type: item.type,
+            scopeName: item.scopeName
         }))
     };
 }
