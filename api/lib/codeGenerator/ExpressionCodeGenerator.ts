@@ -1,16 +1,22 @@
-import { ArrayAccessExpression, ArrayExpression, ASTExpressionNode, CharLiteral, LogicOperation, MathOperation, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator, type mathOperator } from "../abstractSyntaxTree/AstExpressionNode";
+import { ArrayAccessExpression, ArrayExpression, ASTExpressionNode, CharLiteral, FunctionCallNode, LogicOperation, MathOperation, NumberLiteral, PrintNode, ReadNode, StringLiteral, SymbolNode, UnaryOperator, type mathOperator } from "../abstractSyntaxTree/AstExpressionNode";
 import type { SymbolInfo } from "../semanticAnalysis/ScopeManager";
 import type { CodeGeneratorAddErrorType, CodeGeneratorEmit } from "./CodeGenerator";
 
 export class ExpressionCodeGenerator {
     private code: string[] = [];
-    public constructor(private readonly RootNode: ASTExpressionNode,
-        private readonly addError: CodeGeneratorAddErrorType,
-        private stackPointer: number,
-        private emitCode: CodeGeneratorEmit,
-        private emitComment: CodeGeneratorEmit,
-        private assignSymbol?: SymbolInfo,
+    public constructor(
+        protected readonly RootNode: ASTExpressionNode,
+        protected readonly addError: CodeGeneratorAddErrorType,
+        protected staticStackPointer: number,
+        protected emitCode: CodeGeneratorEmit,
+        protected emitComment: CodeGeneratorEmit,
+        protected stackPointerAddr: SymbolInfo,
+        protected tempVariableAddr: SymbolInfo,
+        protected stackInitAddr: number,
+        protected assignSymbol?: SymbolInfo,
     ) { }
+
+
 
 
     public generate() {
@@ -18,7 +24,7 @@ export class ExpressionCodeGenerator {
         return this.code;
     }
 
-    private visit(node: ASTExpressionNode): void {
+    protected visit(node: ASTExpressionNode): void {
         if (node instanceof SymbolNode) {
             this.visitSymbolNode(node);
         } else if (node instanceof NumberLiteral) {
@@ -42,6 +48,8 @@ export class ExpressionCodeGenerator {
             this.addError("Geração de string não implementada", "Error", node);
         } else if (node instanceof CharLiteral) {
             this.addError("Geração de char não implementada", "Error", node);
+        } else if (node instanceof FunctionCallNode) {
+            this.visitFunctionCallNode(node);
         }
     }
 
@@ -109,17 +117,17 @@ export class ExpressionCodeGenerator {
 
     private handleMathOperation(left: ASTExpressionNode, operation: mathOperator, right: ASTExpressionNode, node: ASTExpressionNode): number {
         this.visit(left);
-        this.emitCode(`sto ${this.stackPointer}`);
-        this.stackPointer++;
+        this.emitCode(`sto ${this.staticStackPointer}`);
+        this.staticStackPointer++;
         this.visit(right);
-        this.emitCode(`sto ${this.stackPointer}`);
-        this.stackPointer--;
-        this.emitCode(`ld ${this.stackPointer}`)
+        this.emitCode(`sto ${this.staticStackPointer}`);
+        this.staticStackPointer--;
+        this.emitCode(`ld ${this.staticStackPointer}`)
         switch (operation) {
             case "+":
-                return this.emitCode(`add ${this.stackPointer + 1}`)
+                return this.emitCode(`add ${this.staticStackPointer + 1}`)
             case "-":
-                return this.emitCode(`sub ${this.stackPointer + 1}`)
+                return this.emitCode(`sub ${this.staticStackPointer + 1}`)
             case "*":
                 this.addError("Operação não suportada - *", "Error", node);
                 break;
@@ -130,15 +138,15 @@ export class ExpressionCodeGenerator {
                 this.addError("Operação não suportada - %", "Error", node);
                 return 0;
             case "<<":
-                return this.emitCode(`sll ${this.stackPointer + 1}`)
+                return this.emitCode(`sll ${this.staticStackPointer + 1}`)
             case ">>":
-                return this.emitCode(`srl ${this.stackPointer + 1}`)
+                return this.emitCode(`srl ${this.staticStackPointer + 1}`)
             case "&":
-                return this.emitCode(`and ${this.stackPointer + 1}`)
+                return this.emitCode(`and ${this.staticStackPointer + 1}`)
             case "|":
-                return this.emitCode(`or ${this.stackPointer + 1}`)
+                return this.emitCode(`or ${this.staticStackPointer + 1}`)
             case "^":
-                return this.emitCode(`xor ${this.stackPointer + 1}`)
+                return this.emitCode(`xor ${this.staticStackPointer + 1}`)
         }
         return 0;
     }
@@ -161,5 +169,20 @@ export class ExpressionCodeGenerator {
         this.visit(node.indexExpression);
         this.emitCode(`sto $indr`)
         this.emitCode(`ldv ${node.symbol.assemblyName}`);
+    }
+
+    protected visitFunctionCallNode(node: FunctionCallNode) {
+        node.parameters.forEach(parameter => {
+            this.visit(parameter);
+            this.emitCode(`sto ${this.tempVariableAddr.assemblyName}`)
+            this.emitCode(`ld ${this.stackPointerAddr.assemblyName}`)
+            this.emitCode(`addi 1`)
+            this.emitCode(`sto $indr`)
+            this.emitCode(`sto ${this.stackPointerAddr.assemblyName}`)
+            this.emitCode(`ld ${this.tempVariableAddr.assemblyName}`)
+            this.emitCode(`stov ${this.stackInitAddr}`);
+        })
+
+        this.emitCode(`call func_${node.functionInfo.assemblyName}`);
     }
 }

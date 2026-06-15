@@ -18,7 +18,7 @@ export class InvalidNode extends ASTNode {
 }
 
 export class CodeScopeNode extends ASTNode {
-    constructor(public instructions: Array<{ node: ASTNode, originalLine: string }>, public variablesInScope: SymbolInfo[], ctx: ParserRuleContext) {
+    constructor(public instructions: Array<{ node: ASTNode, originalLine: string }>, public variablesInScope: SymbolInfo[], public ctx: ParserRuleContext) {
         super(ctx)
     }
 }

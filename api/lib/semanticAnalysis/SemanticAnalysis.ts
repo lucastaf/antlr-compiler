@@ -5,7 +5,7 @@ import type { CompileError, ErrorSeverity } from "../../../shared/types";
 import { Do_while_loopContext, ElseifContext, If_stmtContext, While_loopContext, type Comando_atribuicao_arrayContext, type Comando_atribuicaoContext, type Comando_declaracaoContext, type Escopo_codigoContext, type ExpressaoContext, type For_loopContext, type Function_declContext, type ProgramContext, type Return_stmtContext } from "../../generated/fsCompiler/FileScriptParser";
 import type { FileScriptParserVisitor } from "../../generated/fsCompiler/FileScriptParserVisitor";
 import { ASTExpressionNode, NumberLiteral, UnknownExpressionNode } from "../abstractSyntaxTree/AstExpressionNode";
-import { ArrayReassignNode, AssignmentNode, CodeScopeNode, DoWhileLoopNode, ForLoopNode, FunctionNode, IfStmtNode, InvalidNode, ProgramNode, WhileLoopNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
+import { ArrayReassignNode, AssignmentNode, CodeScopeNode, DoWhileLoopNode, ForLoopNode, FunctionNode, IfStmtNode, InvalidNode, ProgramNode, ReturnNode, WhileLoopNode, type ASTNode } from "../abstractSyntaxTree/AstNode";
 import { ExpressionTypeVisitor } from "./ExpressionSemanticAnalysis";
 import { ScopeManager, type SymbolInfo } from "./ScopeManager";
 export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implements FileScriptParserVisitor<ASTNode> {
@@ -41,6 +41,9 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
                 originalLine: originalText
             }
         });
+
+        this.scopeManager.define('stack_pointer', 'number', false, ctx);
+        this.scopeManager.define('temp_var', 'number', false, ctx);
         const symbols = this.scopeManager.endScope(ctx);
         return new ProgramNode(nodes, symbols ?? [], ctx);
     };
@@ -202,19 +205,21 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
 
     //#region Funções
     visitFunction_decl(ctx: Function_declContext) {
+        //Declaração do simbolo - declarado antes do escopo para pegar o escopo global
+        const funcName = ctx.VARIABLE().text;
+        const funcSymbol = this.scopeManager.define(funcName, "function", true, ctx, { size: 0, parametersCount: ctx.lista_parametros()?.VARIABLE()?.length });
+        this.scopeManager.resolve(funcName, ctx);
+        
         //Get dos parametros
         this.scopeManager.beginScope();
         const parameters = ctx.lista_parametros()?.VARIABLE()?.map(exp => {
-            return this.scopeManager.define(exp.text, "any", false, ctx);
+            return this.scopeManager.define(exp.text, "number", false, ctx);
         })
-        //Get do escopo
-        const escopo = this.visitEscopo_codigo(ctx.escopo_codigo(), false);
-
         
-        //Declaração do simbolo
-        const funcName = ctx.VARIABLE().text;
-        const funcSymbol = this.scopeManager.define(funcName, "function", true, ctx, { size: 0, parametersCount: parameters?.length });
-        this.scopeManager.resolve(funcName, ctx);
+        
+
+        //Get do escopo - feito após a declaração do simbolo para permitir recursividade
+        const escopo = this.visitEscopo_codigo(ctx.escopo_codigo(), false);
 
         if (!funcSymbol || parameters?.some(parameters => parameters === undefined)) {
             return new InvalidNode(ctx);
@@ -224,9 +229,9 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
 
     visitReturn_stmt(ctx: Return_stmtContext) {
         const expressionVisitor = new ExpressionTypeVisitor(this.scopeManager, this.addError);
-        expressionVisitor.visit(ctx.expressao());
+        const expressionNode = expressionVisitor.visit(ctx.expressao());
 
-        return new InvalidNode(ctx);
+        return new ReturnNode(expressionNode, ctx);
     };
 
     //#endregion

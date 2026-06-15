@@ -230,11 +230,11 @@ export class ExpressionTypeVisitor
             return new UnknownExpressionNode(ctx);
         }
 
-        if (symbol?.parametersCount != parameters?.length) {
+        if (symbol?.parametersCount != (parameters?.length ?? 0)) {
             this.addError(ctx, `Número de parametros inválidos para ${functionName}, eram esperado ${symbol?.parametersCount} mas enviados ${parameters?.length ?? 0}`, "Warning")
         }
 
-        const parametersResized = this.resizeArray<ASTExpressionNode>(parameters ?? [], parameters?.length ?? 0, new NumberLiteral(0, ctx));
+        const parametersResized = this.resizeArray<ASTExpressionNode>(parameters ?? [], symbol.parametersCount, new NumberLiteral(0, ctx));
         return new FunctionCallNode(symbol, parametersResized, ctx);
     }
 
