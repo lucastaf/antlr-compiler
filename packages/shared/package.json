@@ -1,0 +1,15 @@
+{
+  "name": "@antlr-compiler/shared",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./types": "./types.ts"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.2"
+  },
+  "scripts": {
+    "lint": "biome check ."
+  }
+}
