@@ -15,8 +15,8 @@ importers:
         specifier: ^2.9.18
         version: 2.9.18
       typescript:
-        specifier: ~6.0.2
-        version: 6.0.2
+        specifier: ~6.0.3
+        version: 6.0.3
 
   apps/api:
     dependencies:
@@ -993,6 +993,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typescript@6.0.3:
+    resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
@@ -1826,6 +1831,8 @@ snapshots:
       '@turbo/windows-arm64': 2.9.18
 
   typescript@6.0.2: {}
+
+  typescript@6.0.3: {}
 
   undici-types@7.16.0: {}
 

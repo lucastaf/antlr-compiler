@@ -1,8 +1,10 @@
 import type { CompileError, CompileResult, TokenInfo } from '@antlr-compiler/shared/types'
 import { CharStreams, CommonTokenStream, type Recognizer } from 'antlr4ts'
+import type { ProgramNode } from 'services/abstract-syntax-tree/AstNode'
 import { FileScriptLexer } from './generated/fsCompiler/FileScriptLexer'
 import { FileScriptParser } from './generated/fsCompiler/FileScriptParser'
-import { SemanticAnalyser } from './services/semanticAnalysis/SemanticAnalyser'
+import { CodeGenerator } from './services/code-generator/CodeGenerator'
+import { SemanticAnalyser } from './services/semantic-analysis/SemanticAnalysis'
 
 export function compile(code: string): CompileResult {
   const input = CharStreams.fromString(code)
@@ -15,7 +17,7 @@ export function compile(code: string): CompileResult {
 
   // 🎯 Error listener
   const errorListener: any = {
-    syntaxError(recognizer: Recognizer<any, any>, _offendingSymbol: any, line: number, column: number, msg: string) {
+    syntaxError(recognizer: Recognizer<any, any>, offendingSymbol: any, line: number, column: number, msg: string) {
       const isLexer = recognizer.constructor.name.includes('Lexer')
 
       errors.push({
@@ -50,9 +52,13 @@ export function compile(code: string): CompileResult {
 
   console.log('INICIANDO ANALISE SEMANTICA')
   const semantic = new SemanticAnalyser()
-
+  let ASMcode = ''
   try {
-    semantic.visit(tree)
+    const ast = semantic.visit(tree)
+    const variableList = semantic.GetVariablesList()
+    const codeGenerator = new CodeGenerator(ast as ProgramNode, variableList)
+    ASMcode = codeGenerator.generate()
+    errors.push(...codeGenerator.errors)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Falha inesperada na análise semântica'
 
@@ -76,12 +82,14 @@ export function compile(code: string): CompileResult {
     tokens,
     parseTree,
     errors,
+    ASMcode,
     variables: semantic.GetVariablesList().map((item) => ({
       end: item.end,
       isConst: item.isConst,
       name: item.name,
       start: item.start,
       type: item.type,
+      scopeName: item.scopeName,
     })),
   }
 }

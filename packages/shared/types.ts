@@ -1,11 +1,13 @@
 export type ErrorSeverity = 'Error' | 'Warning'
 
+export type CompileErrorType = 'LEXER' | 'PARSER' | 'SEMANTIC' | 'COMPILATION'
+
 export interface CompileError {
   line: number
   column: number
   message: string
   severity: ErrorSeverity
-  type: 'LEXER' | 'PARSER' | 'SEMANTIC'
+  type: CompileErrorType
 }
 
 export interface TokenInfo {
@@ -21,6 +23,7 @@ export interface VariableDeclare {
   isConst: boolean
   start: number
   end: number
+  scopeName: string
 }
 
 export interface CompileResult {
@@ -28,4 +31,5 @@ export interface CompileResult {
   parseTree: string
   errors: CompileError[]
   variables: VariableDeclare[]
+  ASMcode: string
 }
