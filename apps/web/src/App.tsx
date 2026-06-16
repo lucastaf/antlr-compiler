@@ -3,7 +3,6 @@ import { AlertCircle, AlertTriangle, Play } from 'lucide-react'
 import type * as monaco from 'monaco-editor'
 import { useRef, useState } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
-import FSLOGO from '../public/favicon.svg'
 import { trpcClient } from '../services/api'
 import CodeEditor from './components/file-script-editor'
 import FileSidebar from './components/file-sidebar'
@@ -157,7 +156,7 @@ export default function App() {
 
       {/* Title bar */}
       <header className="shrink-0 h-9 bg-[#323233] border-b border-[#3c3c3c] flex items-center px-3 gap-2 select-none">
-        <img src={FSLOGO} width={18} height={18} alt="FileScript logo" />
+        <img src="/logo.png" width={18} height={18} alt="FileScript logo" />
         <span className="text-sm text-[#cccccc] font-medium">FileScript</span>
         <div className="ml-auto">
           <WorkspaceMenu files={files} onImport={importFiles} />
