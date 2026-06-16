@@ -1,0 +1,11 @@
+{
+  "name": "@antlr-compiler/antlr",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "antlr:generate": "antlr4ts -visitor -Xexact-output-dir -o ../../apps/api/generated/fsCompiler *.g4"
+  },
+  "devDependencies": {
+    "antlr4ts-cli": "^0.5.0-alpha.4"
+  }
+}

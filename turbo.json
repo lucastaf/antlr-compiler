@@ -1,0 +1,18 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "antlr:generate": {
+      "outputs": ["../../apps/api/generated/fsCompiler/**"]
+    },
+    "dev": {
+      "dependsOn": ["^antlr:generate"],
+      "cache": false,
+      "persistent": true
+    },
+    "build": {
+      "dependsOn": ["^build", "^antlr:generate"],
+      "outputs": ["dist/**"]
+    },
+    "lint": {}
+  }
+}
