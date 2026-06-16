@@ -1,8 +1,8 @@
 import type { CompileError, CompileResult, TokenInfo } from '@antlr-compiler/shared/types'
 import { CharStreams, CommonTokenStream, type Recognizer } from 'antlr4ts'
-import type { ProgramNode } from 'services/abstract-syntax-tree/AstNode'
 import { FileScriptLexer } from './generated/fsCompiler/FileScriptLexer'
 import { FileScriptParser } from './generated/fsCompiler/FileScriptParser'
+import type { ProgramNode } from './services/abstract-syntax-tree/AstNode'
 import { CodeGenerator } from './services/code-generator/CodeGenerator'
 import { SemanticAnalyser } from './services/semantic-analysis/SemanticAnalysis'
 

@@ -11,7 +11,7 @@ import SymbolTable from './components/symbols-table'
 import WorkspaceMenu from './components/workspace-menu'
 import { useFileStorage } from './hooks/useFileStorage'
 
-const DEBOUNCE_MS = 500
+const DEBOUNCE_MS = 1000
 
 export default function App() {
   const {
@@ -215,9 +215,7 @@ export default function App() {
                 <span className="text-[10px] font-semibold uppercase tracking-widest text-[#858585] select-none">
                   Problemas
                 </span>
-                <span className="text-[10px] text-[#858585]">
-                  ({errorCount})
-                </span>
+                <span className="text-[10px] text-[#858585]">({errorCount})</span>
               </div>
               <div className="overflow-y-auto max-h-36">
                 {errors.map((err) => (
@@ -228,10 +226,7 @@ export default function App() {
                     {err.severity === 'Error' ? (
                       <AlertCircle size={13} className="text-[#f14c4c] mt-0.5 shrink-0" />
                     ) : (
-                      <AlertTriangle
-                        size={13}
-                        className="text-[#cca700] mt-0.5 shrink-0"
-                      />
+                      <AlertTriangle size={13} className="text-[#cca700] mt-0.5 shrink-0" />
                     )}
                     <span className="text-xs text-[#d4d4d4] flex-1 min-w-0">{err.message}</span>
                     <span className="text-xs text-[#858585] shrink-0 font-mono">

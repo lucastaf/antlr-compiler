@@ -42,10 +42,10 @@ export default function SymbolTable(props: { variables: VariableDeclare[] | null
                 )}
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-[11px] text-[#4ec9b0] font-mono">{v.type}</span>
-                <span className="text-[11px] text-[#4e4e4e]">·</span>
-                <span className="text-[11px] text-[#858585]">
-                  linha {v.start}–{v.end}
+                <span className="text-xs text-[#4ec9b0] font-mono">{v.type}</span>
+                <span className="text-xs text-[#626262]">·</span>
+                <span className="text-xs text-[#a7a7a7]">
+                  {v.scopeName} ({v.start}–{v.end})
                 </span>
               </div>
             </div>

@@ -26,8 +26,16 @@ export class ScopeManager {
   }
 
   private getNextScopeName() {
-    this.scopeCount++
-    return `ESCOPO_${this.scopeCount}`
+    console.log('scopeCount', this.scopeCount)
+    if (this.scopeCount === 0) {
+      this.scopeCount += 1
+      return 'global'
+    }
+
+    const scopeName = `scope_${this.scopeCount}`
+    this.scopeCount += 1
+
+    return scopeName
   }
 
   public GetVariablesList() {
