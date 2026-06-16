@@ -4,6 +4,7 @@ import type * as monaco from 'monaco-editor'
 import { useRef, useState } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
 import { trpcClient } from '../services/api'
+import AsmPanel from './components/asm-panel'
 import CodeEditor from './components/file-script-editor'
 import FileSidebar from './components/file-sidebar'
 import SymbolTable from './components/symbols-table'
@@ -27,6 +28,7 @@ export default function App() {
 
   const [errors, setErrors] = useState<CompileError[] | null>(null)
   const [symbols, setSymbols] = useState<VariableDeclare[] | null>(null)
+  const [asmCode, setAsmCode] = useState<string | null>(null)
   const [isCompiling, setIsCompiling] = useState(false)
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
@@ -57,6 +59,7 @@ export default function App() {
     setActiveFileId(id)
     setErrors(null)
     setSymbols(null)
+    setAsmCode(null)
     clearMarkers()
   }
 
@@ -95,6 +98,7 @@ export default function App() {
         }
 
         setSymbols(res.variables as VariableDeclare[])
+        setAsmCode(res.ASMcode ?? null)
 
         const hasErrors = res.errors.some((e) => e.severity === 'Error')
         const hasWarnings = res.errors.some((e) => e.severity === 'Warning')
@@ -241,6 +245,11 @@ export default function App() {
         {/* Right panel: symbol table */}
         <aside className="w-64 shrink-0 bg-[#252526] border-l border-[#3c3c3c] flex flex-col overflow-hidden">
           <SymbolTable variables={symbols} />
+        </aside>
+
+        {/* Far-right panel: generated ASM */}
+        <aside className="w-72 shrink-0 bg-[#252526] border-l border-[#3c3c3c] flex flex-col overflow-hidden">
+          <AsmPanel code={asmCode} />
         </aside>
       </div>
 
