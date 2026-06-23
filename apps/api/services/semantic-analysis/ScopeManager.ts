@@ -162,8 +162,12 @@ export class ScopeManager {
   }
 
   private assemblyNameDeclared(assemblyName: string): boolean {
-    return this.scopes.some((scope) => {
+    const isDeclaredInScopes = this.scopes.some((scope) => {
       return [...scope.scope.values()].some((variable) => variable.assemblyName === assemblyName)
     })
+
+    const isDeclaredInHistory = this.variablesList.some(variable => variable.assemblyName == assemblyName);
+
+    return isDeclaredInScopes || isDeclaredInHistory;
   }
 }
