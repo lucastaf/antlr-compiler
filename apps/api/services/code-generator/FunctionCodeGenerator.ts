@@ -32,9 +32,7 @@ export class FunctionCodeGenerator extends CodeGenerator {
 
   public GenerateFunction() {
     this.parameters.toReversed().forEach((parameter) => {
-      this.emitCode(`ldv ${this.stackInitAddr}`)
-      this.emitCode(`sto ${parameter.assemblyName}`)
-      this.pop();
+      this.pop(parameter.assemblyName);
     })
 
     this.visit(this.rootNode)
@@ -80,8 +78,8 @@ class InFunctionExpressionCodeGenerator extends ExpressionCodeGenerator {
     tempVariableAddr: SymbolInfo,
     stackInitAddr: number,
     assignSymbol: SymbolInfo | undefined,
-    private push: (assemblyName: string) => void,
-    private pop: () => void,
+    private push: (assemblyName: string | number) => void,
+    private pop: CodeGenerator["pop"],
     private variablesInScope: SymbolInfo[],
   ) {
     super(
@@ -101,7 +99,10 @@ class InFunctionExpressionCodeGenerator extends ExpressionCodeGenerator {
     this.variablesInScope.forEach((variable) => {
       this.push(variable.assemblyName)
     })
-
+    
+    this.push(this.stackInitAddr - 3 + " #stackInit - 3");
+    this.push(this.stackInitAddr - 2 + " #stackInit - 2");
+    this.push(this.stackInitAddr - 1 + " #stackInit - 1");
     node.parameters.forEach((parameter) => {
       this.visit(parameter)
       this.emitCode(`sto ${this.tempVariableAddr.assemblyName}`)
@@ -109,13 +110,13 @@ class InFunctionExpressionCodeGenerator extends ExpressionCodeGenerator {
     })
 
     this.emitCode(`call func_${node.functionInfo.assemblyName}`)
-    this.emitCode(`ld ${this.staticStackPointer}`)
-    this.emitCode(`sto $indr`)
+    
 
+    this.pop(this.stackInitAddr - 1 + " #stackInit - 1", true);
+    this.pop(this.stackInitAddr - 2 + " #stackInit - 2");
+    this.pop(this.stackInitAddr - 3 + " #stackInit - 3");
     this.variablesInScope.toReversed().forEach((variable) => {
-      this.emitCode(`ldv ${this.stackInitAddr} #Stack`)
-      this.emitCode(`sto ${variable.assemblyName}`)
-      this.pop()
+      this.pop(variable.assemblyName)
     })
 
     this.emitCode(`call func_${node.functionInfo.assemblyName}`)

@@ -287,7 +287,7 @@ export class CodeGenerator {
     this.emitComment('#Return inválido - fora de escopo de função')
   }
 
-  protected push = (assemblyName: string) => {
+  protected push = (assemblyName: string | number) => {
     this.emitComment(`#Push ${assemblyName}`)
     this.emitCode(`ld ${this.stackPointerAddr.assemblyName}`)
     this.emitCode(`addi 1`)
@@ -298,8 +298,14 @@ export class CodeGenerator {
     this.emitComment(`#---`)
   }
 
-  protected pop = () => {
+  protected pop = (assemblyName: string | number, loadIndr: boolean = false) => {
+    if (loadIndr) {
+      this.emitCode(`ld ${this.staticStackPointer}`)
+      this.emitCode(`sto $indr`)
+    }
     this.emitComment(`#Pop`)
+    this.emitCode(`ldv ${this.stackInitAddr} #Stack`)
+    this.emitCode(`sto ${assemblyName}`)
     this.emitCode(`ld ${this.stackPointerAddr.assemblyName}`)
     this.emitCode(`subi 1`)
     this.emitCode(`sto ${this.stackPointerAddr.assemblyName}`)
