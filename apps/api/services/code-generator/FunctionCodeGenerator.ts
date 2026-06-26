@@ -34,10 +34,7 @@ export class FunctionCodeGenerator extends CodeGenerator {
     this.parameters.toReversed().forEach((parameter) => {
       this.emitCode(`ldv ${this.stackInitAddr}`)
       this.emitCode(`sto ${parameter.assemblyName}`)
-      this.emitCode(`ld ${this.stackPointerAddr.assemblyName}`)
-      this.emitCode(`subi 1`)
-      this.emitCode(`sto ${this.stackPointerAddr.assemblyName}`)
-      this.emitCode(`sto $indr`)
+      this.pop();
     })
 
     this.visit(this.rootNode)
@@ -59,6 +56,8 @@ export class FunctionCodeGenerator extends CodeGenerator {
       this.tempVariableAddr,
       this.stackInitAddr,
       assignSymbol,
+      this.push,
+      this.pop,
       this.variablesInScope,
     )
     expressionCodeGenerator.generate()
@@ -81,6 +80,8 @@ class InFunctionExpressionCodeGenerator extends ExpressionCodeGenerator {
     tempVariableAddr: SymbolInfo,
     stackInitAddr: number,
     assignSymbol: SymbolInfo | undefined,
+    private push: (assemblyName: string) => void,
+    private pop: () => void,
     private variablesInScope: SymbolInfo[],
   ) {
     super(
@@ -98,23 +99,13 @@ class InFunctionExpressionCodeGenerator extends ExpressionCodeGenerator {
 
   protected visitFunctionCallNode(node: FunctionCallNode) {
     this.variablesInScope.forEach((variable) => {
-      this.emitCode(`ld ${this.stackPointerAddr.assemblyName}`)
-      this.emitCode(`addi 1`)
-      this.emitCode(`sto $indr`)
-      this.emitCode(`sto ${this.stackPointerAddr.assemblyName}`)
-      this.emitCode(`ld ${variable.assemblyName}`)
-      this.emitCode(`stov ${this.stackInitAddr}`)
+      this.push(variable.assemblyName)
     })
 
     node.parameters.forEach((parameter) => {
       this.visit(parameter)
       this.emitCode(`sto ${this.tempVariableAddr.assemblyName}`)
-      this.emitCode(`ld ${this.stackPointerAddr.assemblyName}`)
-      this.emitCode(`addi 1`)
-      this.emitCode(`sto $indr`)
-      this.emitCode(`sto ${this.stackPointerAddr.assemblyName}`)
-      this.emitCode(`ld ${this.tempVariableAddr.assemblyName}`)
-      this.emitCode(`stov ${this.stackInitAddr}`)
+      this.push(this.tempVariableAddr.assemblyName)
     })
 
     this.emitCode(`call func_${node.functionInfo.assemblyName}`)
@@ -122,12 +113,9 @@ class InFunctionExpressionCodeGenerator extends ExpressionCodeGenerator {
     this.emitCode(`sto $indr`)
 
     this.variablesInScope.toReversed().forEach((variable) => {
-      this.emitCode(`ldv ${this.stackInitAddr}`)
+      this.emitCode(`ldv ${this.stackInitAddr} #Stack`)
       this.emitCode(`sto ${variable.assemblyName}`)
-      this.emitCode(`ld ${this.stackPointerAddr.assemblyName}`)
-      this.emitCode(`subi 1`)
-      this.emitCode(`sto ${this.stackPointerAddr.assemblyName}`)
-      this.emitCode(`sto $indr`)
+      this.pop()
     })
 
     this.emitCode(`call func_${node.functionInfo.assemblyName}`)

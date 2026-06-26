@@ -429,8 +429,6 @@ export class ExpressionTypeVisitor
         .lista_expressoes()
         ?.expressao()
         .map((expression) => this.visit(expression)) ?? []
-    console.log('EXPRESSAO')
-    console.log(expressions.length)
     return new ArrayExpression(expressions, ctx)
   }
 

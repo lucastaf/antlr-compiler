@@ -26,7 +26,6 @@ export class ScopeManager {
   }
 
   private getNextScopeName() {
-    console.log('scopeCount', this.scopeCount)
     if (this.scopeCount === 0) {
       this.scopeCount += 1
       return 'global'
@@ -49,12 +48,10 @@ export class ScopeManager {
   }
 
   beginScope() {
-    console.log('Iniciando escopo de código')
     this.scopes.push({ scope: new Map(), name: this.getNextScopeName() })
   }
 
   endScope(ctx: ParserRuleContext) {
-    console.log('Encerrando escopo de código')
     const lastScope = this.scopes.at(-1)
     if (lastScope) {
       const variables = Array.from(lastScope.scope.values())
@@ -83,12 +80,10 @@ export class ScopeManager {
     options: { size?: number; parametersCount?: number } = {},
   ): SymbolInfo | undefined {
     const { parametersCount = 0, size = 1 } = options
-    console.log('Declarando', variable, type)
     const currentScope = this.scopes[this.scopes.length - 1]
 
     if (currentScope?.scope.has(variable)) {
       this.addError(ctx, 'Variavel já declarada - ' + variable, 'Error')
-      console.log('VARIAVEL JA DECLARADA - ', variable)
       return undefined
     }
 
@@ -117,7 +112,6 @@ export class ScopeManager {
       if (symbol?.type !== type && symbol?.type !== 'any') {
         const msg =
           'Não é possivel associar o tipo ' + type + ' em uma variavel do tipo ' + symbol?.type + ' - ' + symbol.name
-        console.log(msg)
         this.addError(ctx, msg, 'Error')
       }
 

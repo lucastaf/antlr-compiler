@@ -78,7 +78,6 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
   }
 
   private addError = (ctx: ParserRuleContext, message: string, severity: ErrorSeverity) => {
-    console.log('ADICIONADO ERROR', message)
     this.errors.push({
       line: ctx.start.line,
       column: ctx.start.charPositionInLine,
@@ -159,7 +158,7 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
 
   //#endregion
 
-  visitEscopo_codigo(ctx: Escopo_codigoContext, initEscopo: boolean = true) {
+   visitEscopo_codigo(ctx: Escopo_codigoContext, initEscopo: boolean = true) {
     if (initEscopo) this.scopeManager.beginScope()
 
     const nodes = ctx
@@ -254,7 +253,9 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
       .lista_parametros()
       ?.VARIABLE()
       ?.map((exp) => {
-        return this.scopeManager.define(exp.text, 'number', false, ctx)
+        const newVariable = this.scopeManager.define(exp.text, 'number', false, ctx)
+        this.scopeManager.resolve(exp.text, ctx);
+        return newVariable;
       })
 
     //Get do escopo - feito após a declaração do simbolo para permitir recursividade

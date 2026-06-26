@@ -33,7 +33,7 @@ export class CodeGenerator {
   public constructor(
     protected readonly rootNode: ProgramNode,
     private variablesList: SymbolInfo[],
-  ) {}
+  ) { }
 
   //#region start
 
@@ -285,6 +285,26 @@ export class CodeGenerator {
   protected visitReturnNode(node: ReturnNode) {
     this.addError('Return fora de escopo de função', 'Error', node)
     this.emitComment('#Return inválido - fora de escopo de função')
+  }
+
+  protected push = (assemblyName: string) => {
+    this.emitComment(`#Push ${assemblyName}`)
+    this.emitCode(`ld ${this.stackPointerAddr.assemblyName}`)
+    this.emitCode(`addi 1`)
+    this.emitCode(`sto $indr`)
+    this.emitCode(`sto ${this.stackPointerAddr.assemblyName}`)
+    this.emitCode(`ld ${assemblyName}`)
+    this.emitCode(`stov ${this.stackInitAddr} #Stack`)
+    this.emitComment(`#---`)
+  }
+
+  protected pop = () => {
+    this.emitComment(`#Pop`)
+    this.emitCode(`ld ${this.stackPointerAddr.assemblyName}`)
+    this.emitCode(`subi 1`)
+    this.emitCode(`sto ${this.stackPointerAddr.assemblyName}`)
+    this.emitCode(`sto $indr`)
+    this.emitComment(`#---`)
   }
 
   //#endregion
