@@ -47,8 +47,7 @@ import type { ScopeManager } from './ScopeManager'
 
 export class ExpressionTypeVisitor
   extends AbstractParseTreeVisitor<ASTExpressionNode>
-  implements expressaoVisitor<ASTExpressionNode>
-{
+  implements expressaoVisitor<ASTExpressionNode> {
   private scopes: ScopeManager
 
   constructor(
@@ -156,7 +155,8 @@ export class ExpressionTypeVisitor
     }
 
     if (ctx.function_call()) {
-      return this.visit(ctx.function_call()!)
+      return this.visitFunction_call(ctx.function_call()!)
+
     }
 
     if (ctx.array_access()) {

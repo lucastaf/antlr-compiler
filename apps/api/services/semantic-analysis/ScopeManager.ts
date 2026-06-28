@@ -56,7 +56,7 @@ export class ScopeManager {
     if (lastScope) {
       const variables = Array.from(lastScope.scope.values())
       variables.forEach((variable) => {
-        if (variable.useCount === 1) {
+        if (variable.useCount <= 0) {
           this.addError(variable.declareCtx, 'Variavel declarada, mas nunca usada - ' + variable.name, 'Warning')
         }
 
@@ -77,7 +77,7 @@ export class ScopeManager {
     type: VarType,
     isConst: boolean,
     ctx: ParserRuleContext,
-    options: { size?: number; parametersCount?: number } = {},
+    options: { size?: number; parametersCount?: number, initialUseCount?: number } = {},
   ): SymbolInfo | undefined {
     const { parametersCount = 0, size = 1 } = options
     const currentScope = this.scopes[this.scopes.length - 1]
@@ -93,7 +93,7 @@ export class ScopeManager {
       name: variable,
       type: type,
       isConst,
-      useCount: 0,
+      useCount: options.initialUseCount ?? 0,
       assignCount: 0,
       declareCtx: ctx,
       assemblyName,
@@ -123,15 +123,13 @@ export class ScopeManager {
     }
   }
 
-  resolve(name: string, ctx: ParserRuleContext, sumUseCount: boolean = true): SymbolInfo | undefined {
+  resolve(name: string, ctx: ParserRuleContext): SymbolInfo | undefined {
     for (let i = this.scopes.length - 1; i >= 0; i--) {
       const scope = this.scopes[i]
       const symbol = scope.scope.get(name)
 
       if (symbol) {
-        if (sumUseCount) {
-          symbol.useCount += 1
-        }
+        symbol.useCount += 1
         return symbol
       }
     }

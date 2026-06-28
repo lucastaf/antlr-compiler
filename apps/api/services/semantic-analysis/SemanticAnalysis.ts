@@ -71,8 +71,8 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
         }
       })
 
-    this.scopeManager.define('stack_pointer', 'number', false, ctx)
-    this.scopeManager.define('temp_var', 'number', false, ctx)
+    this.scopeManager.define('stack_pointer', 'number', false, ctx, { initialUseCount: 1 })
+    this.scopeManager.define('temp_var', 'number', false, ctx, { initialUseCount: 1 })
     const symbols = this.scopeManager.endScope(ctx)
     return new ProgramNode(nodes, symbols ?? [], ctx)
   }
@@ -125,8 +125,7 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
     if (!varSymbol) {
       return new InvalidNode(ctx)
     }
-    const node = this.visitChildren(ctx)
-    return node
+    return new AssignmentNode(varSymbol, expressionNode, ctx);
   }
 
   visitComando_atribuicao(ctx: Comando_atribuicaoContext) {
@@ -158,7 +157,7 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
 
   //#endregion
 
-   visitEscopo_codigo(ctx: Escopo_codigoContext, initEscopo: boolean = true) {
+  visitEscopo_codigo(ctx: Escopo_codigoContext, initEscopo: boolean = true) {
     if (initEscopo) this.scopeManager.beginScope()
 
     const nodes = ctx
@@ -245,7 +244,6 @@ export class SemanticAnalyser extends AbstractParseTreeVisitor<ASTNode> implemen
       size: 0,
       parametersCount: ctx.lista_parametros()?.VARIABLE()?.length,
     })
-    this.scopeManager.resolve(funcName, ctx)
 
     //Get dos parametros
     this.scopeManager.beginScope()
