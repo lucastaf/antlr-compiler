@@ -160,6 +160,8 @@ export class CodeGenerator {
       this.stackPointerAddr,
       this.tempVariableAddr,
       this.stackInitAddr,
+      this.push,
+      this.pop,
       assignSymbol,
     )
     expressionCodeGenerator.generate()

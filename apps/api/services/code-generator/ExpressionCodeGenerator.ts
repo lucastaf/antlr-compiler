@@ -15,7 +15,7 @@ import {
   UnaryOperator,
 } from '../abstract-syntax-tree/AstExpressionNode'
 import type { SymbolInfo } from '../semantic-analysis/ScopeManager'
-import type { CodeGeneratorAddErrorType, CodeGeneratorEmit } from './CodeGenerator'
+import type { CodeGenerator, CodeGeneratorAddErrorType, CodeGeneratorEmit } from './CodeGenerator'
 
 export class ExpressionCodeGenerator {
   private code: string[] = []
@@ -28,8 +28,10 @@ export class ExpressionCodeGenerator {
     protected stackPointerAddr: SymbolInfo,
     protected tempVariableAddr: SymbolInfo,
     protected stackInitAddr: number,
+    protected push: (assemblyName: string | number) => void,
+    protected pop: CodeGenerator["pop"],
     protected assignSymbol?: SymbolInfo,
-  ) {}
+  ) { }
 
   public generate() {
     this.visit(this.RootNode)
@@ -190,12 +192,7 @@ export class ExpressionCodeGenerator {
     node.parameters.forEach((parameter) => {
       this.visit(parameter)
       this.emitCode(`sto ${this.tempVariableAddr.assemblyName}`)
-      this.emitCode(`ld ${this.stackPointerAddr.assemblyName}`)
-      this.emitCode(`addi 1`)
-      this.emitCode(`sto $indr`)
-      this.emitCode(`sto ${this.stackPointerAddr.assemblyName}`)
-      this.emitCode(`ld ${this.tempVariableAddr.assemblyName}`)
-      this.emitCode(`stov ${this.stackInitAddr}`)
+      this.push(this.tempVariableAddr.assemblyName)
     })
 
     this.emitCode(`call func_${node.functionInfo.assemblyName}`)

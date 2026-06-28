@@ -53,9 +53,9 @@ export class FunctionCodeGenerator extends CodeGenerator {
       this.stackPointerAddr,
       this.tempVariableAddr,
       this.stackInitAddr,
-      assignSymbol,
       this.push,
       this.pop,
+      assignSymbol,
       this.variablesInScope,
     )
     expressionCodeGenerator.generate()
@@ -77,9 +77,9 @@ class InFunctionExpressionCodeGenerator extends ExpressionCodeGenerator {
     stackPointerAddr: SymbolInfo,
     tempVariableAddr: SymbolInfo,
     stackInitAddr: number,
+    push: (assemblyName: string | number) => void,
+    pop: CodeGenerator["pop"],
     assignSymbol: SymbolInfo | undefined,
-    private push: (assemblyName: string | number) => void,
-    private pop: CodeGenerator["pop"],
     private variablesInScope: SymbolInfo[],
   ) {
     super(
@@ -91,6 +91,8 @@ class InFunctionExpressionCodeGenerator extends ExpressionCodeGenerator {
       stackPointerAddr,
       tempVariableAddr,
       stackInitAddr,
+      push,
+      pop,
       assignSymbol,
     )
   }
@@ -99,7 +101,7 @@ class InFunctionExpressionCodeGenerator extends ExpressionCodeGenerator {
     this.variablesInScope.forEach((variable) => {
       this.push(variable.assemblyName)
     })
-    
+
     this.push(this.stackInitAddr - 3 + " #stackInit - 3");
     this.push(this.stackInitAddr - 2 + " #stackInit - 2");
     this.push(this.stackInitAddr - 1 + " #stackInit - 1");
@@ -110,7 +112,7 @@ class InFunctionExpressionCodeGenerator extends ExpressionCodeGenerator {
     })
 
     this.emitCode(`call func_${node.functionInfo.assemblyName}`)
-    
+
 
     this.pop(this.stackInitAddr - 1 + " #stackInit - 1", true);
     this.pop(this.stackInitAddr - 2 + " #stackInit - 2");
@@ -118,7 +120,5 @@ class InFunctionExpressionCodeGenerator extends ExpressionCodeGenerator {
     this.variablesInScope.toReversed().forEach((variable) => {
       this.pop(variable.assemblyName)
     })
-
-    this.emitCode(`call func_${node.functionInfo.assemblyName}`)
   }
 }
