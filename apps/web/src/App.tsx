@@ -1,17 +1,20 @@
-import type { CompileError, VariableDeclare } from '@antlr-compiler/shared/types'
-import { AlertCircle, AlertTriangle, Play } from 'lucide-react'
-import type * as monaco from 'monaco-editor'
-import { useRef, useState } from 'react'
-import { Toaster, toast } from 'react-hot-toast'
-import { trpcClient } from '../services/api'
-import AsmPanel from './components/asm-panel'
-import CodeEditor from './components/file-script-editor'
-import FileSidebar from './components/file-sidebar'
-import SymbolTable from './components/symbols-table'
-import WorkspaceMenu from './components/workspace-menu'
-import { useFileStorage } from './hooks/useFileStorage'
+import type {
+  CompileError,
+  VariableDeclare,
+} from '@antlr-compiler/shared/types';
+import { AlertCircle, AlertTriangle, Play } from 'lucide-react';
+import type * as monaco from 'monaco-editor';
+import { useRef, useState } from 'react';
+import { Toaster, toast } from 'react-hot-toast';
+import { trpcClient } from '../services/api';
+import AsmPanel from './components/asm-panel';
+import CodeEditor from './components/file-script-editor';
+import FileSidebar from './components/file-sidebar';
+import SymbolTable from './components/symbols-table';
+import WorkspaceMenu from './components/workspace-menu';
+import { useFileStorage } from './hooks/useFileStorage';
 
-const DEBOUNCE_MS = 1000
+const DEBOUNCE_MS = 1000;
 
 export default function App() {
   const {
@@ -24,88 +27,106 @@ export default function App() {
     updateContent,
     setActiveFileId,
     importFiles,
-  } = useFileStorage()
+  } = useFileStorage();
 
-  const [errors, setErrors] = useState<CompileError[] | null>(null)
-  const [symbols, setSymbols] = useState<VariableDeclare[] | null>(null)
-  const [asmCode, setAsmCode] = useState<string | null>(null)
-  const [isCompiling, setIsCompiling] = useState(false)
+  const [errors, setErrors] = useState<CompileError[] | null>(null);
+  const [symbols, setSymbols] = useState<VariableDeclare[] | null>(null);
+  const [asmCode, setAsmCode] = useState<string | null>(null);
+  const [isCompiling, setIsCompiling] = useState(false);
 
-  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
-  const monacoRef = useRef<typeof monaco | null>(null)
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<typeof monaco | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Always points to the latest handleCompile — used by Monaco keybinding and
   // the debounce timer to avoid stale closures after file switches.
-  const compileRef = useRef<() => void>(() => {})
+  const compileRef = useRef<() => void>(() => {});
 
   function clearMarkers() {
-    const editor = editorRef.current
-    const monacoInstance = monacoRef.current
+    const editor = editorRef.current;
+    const monacoInstance = monacoRef.current;
     if (editor && monacoInstance) {
-      monacoInstance.editor.setModelMarkers(editor.getModel()!, 'filescript', [])
+      monacoInstance.editor.setModelMarkers(
+        editor.getModel()!,
+        'filescript',
+        [],
+      );
     }
   }
 
   function cancelDebounce() {
     if (debounceRef.current !== null) {
-      clearTimeout(debounceRef.current)
-      debounceRef.current = null
+      clearTimeout(debounceRef.current);
+      debounceRef.current = null;
     }
   }
 
   function handleSelectFile(id: string) {
-    cancelDebounce()
-    setActiveFileId(id)
-    setErrors(null)
-    setSymbols(null)
-    setAsmCode(null)
-    clearMarkers()
+    cancelDebounce();
+    setActiveFileId(id);
+    setErrors(null);
+    setSymbols(null);
+    setAsmCode(null);
+    clearMarkers();
   }
 
-  function handleEditorMount(editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: typeof monaco) {
-    editorRef.current = editor
-    monacoRef.current = monacoInstance
+  function handleEditorMount(
+    editor: monaco.editor.IStandaloneCodeEditor,
+    monacoInstance: typeof monaco,
+  ) {
+    editorRef.current = editor;
+    monacoRef.current = monacoInstance;
 
     // Ctrl+Enter (Windows/Linux) / Cmd+Enter (macOS) → compile immediately
-    editor.addCommand(monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.Enter, () => {
-      cancelDebounce()
-      compileRef.current()
-    })
+    editor.addCommand(
+      monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.Enter,
+      () => {
+        cancelDebounce();
+        compileRef.current();
+      },
+    );
   }
 
   function handleCompile() {
-    if (!activeFile) return
-    setIsCompiling(true)
+    if (!activeFile) return;
+    setIsCompiling(true);
 
     trpcClient.compileFScriptCode
       .mutate({ code: activeFile.content })
       .then((res) => {
-        const editor = editorRef.current
-        const monacoInstance = monacoRef.current
+        const editor = editorRef.current;
+        const monacoInstance = monacoRef.current;
 
         if (editor && monacoInstance) {
-          const markers: monaco.editor.IMarkerData[] = res.errors.map((err) => ({
-            startLineNumber: err.line,
-            startColumn: err.column + 1,
-            endLineNumber: err.line,
-            endColumn: err.column + 2,
-            message: err.message,
-            severity:
-              err.severity === 'Error' ? monacoInstance.MarkerSeverity.Error : monacoInstance.MarkerSeverity.Warning,
-          }))
-          monacoInstance.editor.setModelMarkers(editor.getModel()!, 'filescript', markers)
+          const markers: monaco.editor.IMarkerData[] = res.errors.map(
+            (err) => ({
+              startLineNumber: err.line,
+              startColumn: err.column + 1,
+              endLineNumber: err.line,
+              endColumn: err.column + 2,
+              message: err.message,
+              severity:
+                err.severity === 'Error'
+                  ? monacoInstance.MarkerSeverity.Error
+                  : monacoInstance.MarkerSeverity.Warning,
+            }),
+          );
+          monacoInstance.editor.setModelMarkers(
+            editor.getModel()!,
+            'filescript',
+            markers,
+          );
         }
 
-        setSymbols(res.variables as VariableDeclare[])
-        setAsmCode(res.ASMcode ?? null)
+        setSymbols(res.variables as VariableDeclare[]);
+        setAsmCode(res.ASMcode ?? null);
 
-        const hasErrors = res.errors.some((e) => e.severity === 'Error')
-        const hasWarnings = res.errors.some((e) => e.severity === 'Warning')
+        const hasErrors = res.errors.some((e) => e.severity === 'Error');
+        const hasWarnings = res.errors.some((e) => e.severity === 'Warning');
 
         if (!res.errors.length) {
-          toast.success('Compilado com sucesso')
-          setErrors(null)
+          toast.success('Compilado com sucesso');
+          setErrors(null);
         } else if (!hasErrors && hasWarnings) {
           toast('Compilado com avisos', {
             icon: '⚠️',
@@ -114,35 +135,35 @@ export default function App() {
               color: '#cca710',
               fontSize: '13px',
             },
-          })
-          setErrors(res.errors as CompileError[])
+          });
+          setErrors(res.errors as CompileError[]);
         } else {
-          toast.error('Erros de compilação encontrados')
-          setErrors(res.errors as CompileError[])
+          toast.error('Erros de compilação encontrados');
+          setErrors(res.errors as CompileError[]);
         }
       })
       .catch(() => {
-        toast.error('Não foi possível conectar ao compilador')
+        toast.error('Não foi possível conectar ao compilador');
       })
       .finally(() => {
-        setIsCompiling(false)
-      })
+        setIsCompiling(false);
+      });
   }
 
   // Keep the ref current on every render so Monaco's keybinding and the
   // debounce timer always call the latest version (with up-to-date activeFile).
-  compileRef.current = handleCompile
+  compileRef.current = handleCompile;
 
   function handleContentChange(content: string) {
     if (activeFile) {
-      updateContent(activeFile.id, content)
+      updateContent(activeFile.id, content);
     }
     // Debounce: reset the timer on every keystroke
-    cancelDebounce()
-    debounceRef.current = setTimeout(() => compileRef.current(), DEBOUNCE_MS)
+    cancelDebounce();
+    debounceRef.current = setTimeout(() => compileRef.current(), DEBOUNCE_MS);
   }
 
-  const errorCount = errors?.length ?? 0
+  const errorCount = errors?.length ?? 0;
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden bg-[#1e1e1e]">
@@ -183,12 +204,14 @@ export default function App() {
         <main className="flex-1 flex flex-col overflow-hidden">
           {/* Editor toolbar */}
           <div className="shrink-0 h-9 bg-[#2d2d2d] border-b border-[#3c3c3c] flex items-center justify-between px-3">
-            <span className="text-xs text-[#858585] select-none font-mono">{activeFile?.name ?? ''}</span>
+            <span className="text-xs text-[#858585] select-none font-mono">
+              {activeFile?.name ?? ''}
+            </span>
             <button
               type="button"
               onClick={() => {
-                cancelDebounce()
-                handleCompile()
+                cancelDebounce();
+                handleCompile();
               }}
               disabled={isCompiling}
               title="Executar (Ctrl+Enter)"
@@ -198,7 +221,9 @@ export default function App() {
             >
               <Play size={12} />
               {isCompiling ? 'Executando…' : 'Executar'}
-              <kbd className="ml-1 text-[10px] opacity-60 font-sans">Ctrl+↵</kbd>
+              <kbd className="ml-1 text-[10px] opacity-60 font-sans">
+                Ctrl+↵
+              </kbd>
             </button>
           </div>
 
@@ -218,7 +243,9 @@ export default function App() {
                 <span className="text-[10px] font-semibold uppercase tracking-widest text-[#858585] select-none">
                   Problemas
                 </span>
-                <span className="text-[10px] text-[#858585]">({errorCount})</span>
+                <span className="text-[10px] text-[#858585]">
+                  ({errorCount})
+                </span>
               </div>
               <div className="overflow-y-auto max-h-36">
                 {errors.map((err) => (
@@ -227,11 +254,19 @@ export default function App() {
                     className="flex items-start gap-2 px-3 py-1.5 hover:bg-[#2a2d2e] transition-colors"
                   >
                     {err.severity === 'Error' ? (
-                      <AlertCircle size={13} className="text-[#f14c4c] mt-0.5 shrink-0" />
+                      <AlertCircle
+                        size={13}
+                        className="text-[#f14c4c] mt-0.5 shrink-0"
+                      />
                     ) : (
-                      <AlertTriangle size={13} className="text-[#cca700] mt-0.5 shrink-0" />
+                      <AlertTriangle
+                        size={13}
+                        className="text-[#cca700] mt-0.5 shrink-0"
+                      />
                     )}
-                    <span className="text-xs text-[#d4d4d4] flex-1 min-w-0">{err.message}</span>
+                    <span className="text-xs text-[#d4d4d4] flex-1 min-w-0">
+                      {err.message}
+                    </span>
                     <span className="text-xs text-[#858585] shrink-0 font-mono">
                       {err.line}:{err.column}
                     </span>
@@ -242,14 +277,14 @@ export default function App() {
           )}
         </main>
 
-        {/* Right panel: symbol table */}
-        <aside className="w-64 shrink-0 bg-[#252526] border-l border-[#3c3c3c] flex flex-col overflow-hidden">
-          <SymbolTable variables={symbols} />
+        {/* Far-right panel: generated ASM */}
+        <aside className="w-80 shrink-0 bg-[#252526] border-l border-[#3c3c3c] flex flex-col overflow-hidden">
+          <AsmPanel code={asmCode} />
         </aside>
 
-        {/* Far-right panel: generated ASM */}
-        <aside className="w-72 shrink-0 bg-[#252526] border-l border-[#3c3c3c] flex flex-col overflow-hidden">
-          <AsmPanel code={asmCode} />
+        {/* Right panel: symbol table */}
+        <aside className="w-68 shrink-0 bg-[#252526] border-l border-[#3c3c3c] flex flex-col overflow-hidden">
+          <SymbolTable variables={symbols} />
         </aside>
       </div>
 
@@ -266,5 +301,5 @@ export default function App() {
         <span className="ml-auto opacity-80">FileScript</span>
       </footer>
     </div>
-  )
+  );
 }
